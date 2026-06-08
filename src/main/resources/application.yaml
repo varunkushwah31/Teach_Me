@@ -1,3 +1,33 @@
 spring:
   application:
     name: TeachMe
+
+  # --- PostgreSQL Connection ---
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vectordb
+    username: springai
+    password: secret
+    driver-class-name: org.postgresql.Driver
+
+  # --- Spring AI & Ollama Configuration ---
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: deepseek-r1:8b
+        keep-alive: 0m
+      embedding:
+        model: nomic-embed-text
+        keep-alive: 0m
+
+    # --- pgvector Configuration ---
+    vectorstore:
+      pgvector:
+        dimensions: 768
+        distance-type: COSINE_DISTANCE
+        index-type: HNSW
+        initialize-schema: true
+
+# --- Spring Boot Server Configuration ---
+server:
+  port: 8081
