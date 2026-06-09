@@ -9,7 +9,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat")
-@CrossOrigin(origins = "*") // Allows the frontend to connect
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -20,15 +20,20 @@ public class ChatController {
         try {
             String question = payload.get("question");
 
-            // Prevent empty queries
+            // Extract the chatId from the request. If missing, assign "default-session"
+            String chatId = payload.getOrDefault("chatId", "default-session");
+
             if (question == null || question.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Question cannot be empty."));
             }
 
-            String answer = chatService.askQuestion(question);
+            String answer = chatService.askQuestion(question, chatId);
 
-            // Return as JSON so the frontend can easily parse it
-            return ResponseEntity.ok(Map.of("answer", answer));
+            // Return both the answer AND the chatId so the frontend knows which session it is using
+            return ResponseEntity.ok(Map.of(
+                    "answer", answer,
+                    "chatId", chatId
+            ));
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
