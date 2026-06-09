@@ -1,4 +1,4 @@
-package com.TeachMe.TeachMe.Controller;
+package com.TeachMe.TeachMe.controller;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;

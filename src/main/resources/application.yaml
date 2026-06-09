@@ -4,7 +4,7 @@ spring:
 
   # --- PostgreSQL Connection ---
   datasource:
-    url: jdbc:postgresql://localhost:5432/vectordb
+    url: jdbc:postgresql://localhost:5433/vectordb
     username: springai
     password: secret
     driver-class-name: org.postgresql.Driver
