@@ -8,6 +8,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,10 +30,10 @@ public class RagChatService {
         this.vectorStore = vectorStore;
     }
 
-    public String askQuestion(String question, String chatId) {
+    public Flux<String> askQuestionStream(String question, String chatId) {
         log.info("Session {}: Searching database for context related to: {}", chatId, question);
 
-        // 1. Perform Semantic Search in PostgreSQL
+        // 1. Perform Semantic Search
         List<Document> similarDocuments = vectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(question)
@@ -40,14 +41,14 @@ public class RagChatService {
                         .build()
         );
 
-        // 2. Stitch the retrieved chunks together
+        // 2. Stitch context together
         String context = similarDocuments.stream()
                 .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
-        log.info("Found {} relevant chunks. Generating response with memory context...", similarDocuments.size());
+        log.info("Found {} relevant chunks. Opening stream to DeepSeek-R1...", similarDocuments.size());
 
-        // 3. Construct the System Prompt
+        // 3. System Prompt
         String systemInstruction = """
                 You are an expert academic tutor. Answer the user's question using ONLY the provided context below.
                 If the answer cannot be found in the context, clearly state that you do not have enough information.
@@ -55,13 +56,13 @@ public class RagChatService {
                 Context:
                 """ + context;
 
-        // 4. Call the LLM
+        // 4. Return the Stream Publisher (Flux)
         return chatClient.prompt()
                 .system(systemInstruction)
                 .user(question)
-                // The key string constant is resolved from ChatMemory interface directly
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
-                .call()
+                // Swap .call() with .stream() to enable real-time token emission
+                .stream()
                 .content();
     }
 }
