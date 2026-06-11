@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -20,12 +22,27 @@ public class DocumentIngestionService {
 
     private final VectorStore vectorStore;
 
-    public String ingestPdf(MultipartFile file) throws IOException {
-        log.info("Starting ingestion for file: {}", file.getOriginalFilename());
+    //  Notice the new 'category' parameter
+    public String ingestPdf(MultipartFile file, String category) throws IOException {
+        log.info("Starting ingestion for file: {} in category: {}", file.getOriginalFilename(), category);
 
         TikaDocumentReader reader = new TikaDocumentReader(new InputStreamResource(file.getInputStream()));
         List<Document> rawDocuments = reader.get();
-        log.info("Extracted {} raw pages/sections from the PDF.", rawDocuments.size());
+
+        //  NEW: Inject custom metadata into every page before splitting
+        List<Document> enrichedDocuments = rawDocuments.stream()
+                .map(doc -> {
+                    Map<String, Object> newMetadata = new HashMap<>(doc.getMetadata());
+                    newMetadata.put("fileName", file.getOriginalFilename());
+                    newMetadata.put("category", category);
+
+                    return Document.builder()
+                            .id(doc.getId())
+                            .text(doc.getText())
+                            .metadata(newMetadata)
+                            .build();
+                })
+                .toList();
 
         TokenTextSplitter splitter = TokenTextSplitter.builder()
                 .withChunkSize(800)
@@ -35,7 +52,8 @@ public class DocumentIngestionService {
                 .withKeepSeparator(true)
                 .build();
 
-        List<Document> splitDocuments = splitter.apply(rawDocuments);
+        // Pass the enriched documents to the splitter
+        List<Document> splitDocuments = splitter.apply(enrichedDocuments);
         log.info("Split document into {} vectorized chunks. Saving to PostgreSQL...", splitDocuments.size());
 
         this.vectorStore.accept(splitDocuments);

@@ -16,18 +16,20 @@ public class ChatController {
 
     private final RagChatService chatService;
 
-    //  Notice the 'produces' attribute. This tells Spring Boot to keep the connection open for SSE.
     @PostMapping(value = "/ask/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> streamQuestion(@RequestBody Map<String, String> payload) {
 
         String question = payload.get("question");
         String chatId = payload.getOrDefault("chatId", "default-session");
 
+        // Extract the category filter ("all" will trigger a global search)
+        String category = payload.getOrDefault("category", "all");
+
         if (question == null || question.trim().isEmpty()) {
             return Flux.just("Error: Question cannot be empty.");
         }
 
-        // Return the reactive stream directly to the client
-        return chatService.askQuestionStream(question, chatId);
+        // Pass the category downstream to the service
+        return chatService.askQuestionStream(question, chatId, category);
     }
 }

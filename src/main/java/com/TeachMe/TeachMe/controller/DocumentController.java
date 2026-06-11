@@ -16,9 +16,12 @@ public class DocumentController {
     private final DocumentIngestionService ingestionService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadPdf(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadPdf(
+            @RequestParam("file") MultipartFile file,
+            // Default to "general" if the user forgets to select a category
+            @RequestParam(value = "category", defaultValue = "general") String category) {
         try {
-            String result = ingestionService.ingestPdf(file);
+            String result = ingestionService.ingestPdf(file, category);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to process document: " + e.getMessage());
