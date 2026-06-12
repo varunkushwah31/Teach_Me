@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -18,43 +19,48 @@ import java.util.stream.Collectors;
 @Service
 public class RagChatService {
 
-    private final ChatClient chatClient;
+    private final ChatClient mainChatClient;
+    private final ChatClient rewriteClient;
     private final VectorStore vectorStore;
+    private final ChatMemory chatMemory;
 
     public RagChatService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, ChatMemory chatMemory) {
-        this.chatClient = chatClientBuilder
+        this.mainChatClient = chatClientBuilder
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
 
+        this.rewriteClient = chatClientBuilder.build();
         this.vectorStore = vectorStore;
+        this.chatMemory = chatMemory;
     }
 
     public Flux<String> askQuestionStream(String question, String chatId, String category) {
-        log.info("Session {}: Searching database for context related to: {} (Category: {})", chatId, question, category);
+        log.info("Session {}: Received Original Question: '{}'", chatId, question);
 
-        // 1. Initialize the base Search Request
+        // --- STEP 1: QUERY REWRITING ---
+        String optimizedQuery = optimizeSearchQuery(question, chatId);
+        log.info("Session {}: Optimized Database Query: '{}'", chatId, optimizedQuery);
+
+        // --- STEP 2: SEMANTIC SEARCH ---
         SearchRequest.Builder requestBuilder = SearchRequest.builder()
-                .query(question)
+                .query(optimizedQuery)
                 .topK(4);
 
-        // 2. Conditionally apply the metadata filter
         if (category != null && !category.equalsIgnoreCase("all")) {
             requestBuilder.filterExpression(
                     new FilterExpressionBuilder().eq("category", category).build()
             );
         }
 
-        // 3. Execute Semantic Search in PostgreSQL
         List<Document> similarDocuments = vectorStore.similaritySearch(requestBuilder.build());
 
-        // 4. Stitch the retrieved chunks together
         String context = similarDocuments.stream()
                 .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
         log.info("Found {} relevant chunks. Generating streaming response...", similarDocuments.size());
 
-        // 5. Construct the System Prompt
+        // --- STEP 3: GENERATE FINAL ANSWER ---
         String systemInstruction = """
                 You are an expert academic tutor. Answer the user's question using ONLY the provided context below.
                 If the answer cannot be found in the context, clearly state that you do not have enough information.
@@ -62,12 +68,66 @@ public class RagChatService {
                 Context:
                 """ + context;
 
-        // 6. Call the LLM and return the reactive Flux stream
-        return chatClient.prompt()
+        return mainChatClient.prompt()
                 .system(systemInstruction)
                 .user(question)
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
                 .stream()
                 .content();
+    }
+
+    private String optimizeSearchQuery(String originalQuestion, String chatId) {
+        // Fixed: get() now only takes the conversation ID
+        List<Message> history = chatMemory.get(chatId);
+
+        // Fixed: Removed redundant null check
+        if (history.isEmpty()) {
+            return originalQuestion;
+        }
+
+        // Format the last 5 messages into a flat string for the LLM to read
+        String historyText = history.stream()
+                .skip(Math.max(0, history.size() - 5)) // Ensures we only grab the tail end of long conversations
+                .map(m -> m.getMessageType().name() + ": " + m.getText()) // 🚨 Fixed: Use getText()
+                .collect(Collectors.joining("\n"));
+
+        String systemPrompt = """
+                You are an expert search query rewriter.
+                Analyze the Conversation History and the New Question.
+                If the New Question contains pronouns (he, it, that, those) or vague references, rewrite it into a single, standalone, highly specific search query.
+                If the New Question is already specific and standalone, return it exactly as is.
+                
+                RULES:
+                1. Output ONLY the raw rewritten query.
+                2. Do NOT add quotes, formatting, xml tags, or conversational text.
+                """;
+
+        String userPrompt = "Conversation History:\n" + historyText + "\n\nNew Question: " + originalQuestion;
+
+        try {
+            String rewritten = rewriteClient.prompt()
+                    .system(systemPrompt)
+                    .user(userPrompt)
+                    .call()
+                    .content();
+
+            return cleanDeepSeekTags(rewritten, originalQuestion);
+
+        } catch (Exception e) {
+            log.warn("Query rewriting failed, falling back to original query", e);
+            return originalQuestion;
+        }
+    }
+
+    private String cleanDeepSeekTags(String response, String fallback) {
+        if (response == null || response.isBlank()) {
+            return fallback;
+        }
+
+        if (response.contains("</think>")) {
+            response = response.substring(response.indexOf("</think>") + 8);
+        }
+
+        return response.trim();
     }
 }
