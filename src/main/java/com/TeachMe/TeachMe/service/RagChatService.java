@@ -7,6 +7,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -20,9 +21,7 @@ public class RagChatService {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
 
-    // Notice we removed the private final ChatMemory field declaration completely
     public RagChatService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, ChatMemory chatMemory) {
-        // The chatMemory instance is safely consumed here and encapsulated within the client
         this.chatClient = chatClientBuilder
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
@@ -30,25 +29,32 @@ public class RagChatService {
         this.vectorStore = vectorStore;
     }
 
-    public Flux<String> askQuestionStream(String question, String chatId) {
-        log.info("Session {}: Searching database for context related to: {}", chatId, question);
+    public Flux<String> askQuestionStream(String question, String chatId, String category) {
+        log.info("Session {}: Searching database for context related to: {} (Category: {})", chatId, question, category);
 
-        // 1. Perform Semantic Search
-        List<Document> similarDocuments = vectorStore.similaritySearch(
-                SearchRequest.builder()
-                        .query(question)
-                        .topK(4)
-                        .build()
-        );
+        // 1. Initialize the base Search Request
+        SearchRequest.Builder requestBuilder = SearchRequest.builder()
+                .query(question)
+                .topK(4);
 
-        // 2. Stitch context together
+        // 2. Conditionally apply the metadata filter
+        if (category != null && !category.equalsIgnoreCase("all")) {
+            requestBuilder.filterExpression(
+                    new FilterExpressionBuilder().eq("category", category).build()
+            );
+        }
+
+        // 3. Execute Semantic Search in PostgreSQL
+        List<Document> similarDocuments = vectorStore.similaritySearch(requestBuilder.build());
+
+        // 4. Stitch the retrieved chunks together
         String context = similarDocuments.stream()
                 .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
-        log.info("Found {} relevant chunks. Opening stream to DeepSeek-R1...", similarDocuments.size());
+        log.info("Found {} relevant chunks. Generating streaming response...", similarDocuments.size());
 
-        // 3. System Prompt
+        // 5. Construct the System Prompt
         String systemInstruction = """
                 You are an expert academic tutor. Answer the user's question using ONLY the provided context below.
                 If the answer cannot be found in the context, clearly state that you do not have enough information.
@@ -56,12 +62,11 @@ public class RagChatService {
                 Context:
                 """ + context;
 
-        // 4. Return the Stream Publisher (Flux)
+        // 6. Call the LLM and return the reactive Flux stream
         return chatClient.prompt()
                 .system(systemInstruction)
                 .user(question)
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
-                // Swap .call() with .stream() to enable real-time token emission
                 .stream()
                 .content();
     }
