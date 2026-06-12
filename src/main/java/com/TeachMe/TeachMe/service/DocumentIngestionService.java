@@ -1,7 +1,8 @@
 package com.TeachMe.TeachMe.service;
 
 import com.TeachMe.TeachMe.exception.FileProcessingException;
-import lombok.RequiredArgsConstructor;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
@@ -18,13 +19,31 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class DocumentIngestionService {
 
     private final VectorStore vectorStore;
     private final JobStatusManager jobStatusManager;
 
-    // @Async means this runs completely in the background
+    // Custom Telemetry Counters
+    private final Counter documentUploadCounter;
+    private final Counter vectorChunkCounter;
+
+    public DocumentIngestionService(VectorStore vectorStore,
+                                    JobStatusManager jobStatusManager,
+                                    MeterRegistry meterRegistry) {
+        this.vectorStore = vectorStore;
+        this.jobStatusManager = jobStatusManager;
+
+        // Initialize the tracking metrics
+        this.documentUploadCounter = Counter.builder("rag.documents.uploaded.total")
+                .description("Total number of PDF documents ingested")
+                .register(meterRegistry);
+
+        this.vectorChunkCounter = Counter.builder("rag.vectors.generated.total")
+                .description("Total number of vectorized text chunks saved to PostgreSQL")
+                .register(meterRegistry);
+    }
+
     @Async("taskExecutor")
     public void ingestPdfAsync(InputStream fileStream, String originalFilename, String category, String jobId) {
         try {
@@ -57,8 +76,11 @@ public class DocumentIngestionService {
 
             List<Document> splitDocuments = splitter.apply(enrichedDocuments);
 
-            // This is the line that blocks longest (Ollama generating embeddings)
             this.vectorStore.accept(splitDocuments);
+
+            // Update our custom business metrics
+            documentUploadCounter.increment();
+            vectorChunkCounter.increment(splitDocuments.size());
 
             log.info("Job {}: Successfully embedded {} chunks.", jobId, splitDocuments.size());
             jobStatusManager.updateStatus(jobId, "COMPLETED");

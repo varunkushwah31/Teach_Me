@@ -1,5 +1,6 @@
 package com.TeachMe.TeachMe.service;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -34,6 +35,7 @@ public class RagChatService {
         this.chatMemory = chatMemory;
     }
 
+    @Timed(value = "rag.chat.execution.time", description = "Time taken to process a question and start the stream")
     public Flux<String> askQuestionStream(String question, String chatId, String category) {
         log.info("Session {}: Received Original Question: '{}'", chatId, question);
 

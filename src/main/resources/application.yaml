@@ -31,3 +31,27 @@ spring:
 # --- Spring Boot Server Configuration ---
 server:
   port: 8081
+
+# ==========================================
+# ACTUATOR & OBSERVABILITY CONFIGURATION
+# ==========================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus,metrics"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: TeachMe-RAG-Engine
+
+# --- Application Info Metadata ---
+info:
+  app:
+    name: "TeachMe AI Backend"
+    description: "Enterprise RAG Pipeline"
+    version: "1.0.0"
