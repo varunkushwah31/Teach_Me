@@ -30,6 +30,11 @@ spring:
 # --- Spring Boot Server Configuration ---
 server:
   port: 8081
+  netty:
+    connection-timeout: 10000s
+    idle-timeout: 60s
+    # Increase max header size for huge JWTs or context parameters
+    max-http-request-header-size: 16KB
 
 # ==========================================
 # ACTUATOR & OBSERVABILITY CONFIGURATION
@@ -62,3 +67,8 @@ application:
       # This is a generated 256-bit secure hex key. In production, inject this via environment variables!
       secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
       expiration: 86400000 # 1 day in milliseconds
+
+# --- WebFlux & Netty Tuning ---
+
+  webflux:
+    base-path: /
