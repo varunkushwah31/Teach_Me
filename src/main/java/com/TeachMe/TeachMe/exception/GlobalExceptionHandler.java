@@ -82,4 +82,16 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.TOO_MANY_REQUESTS);
     }
+
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(Exception ex) {
+        log.warn("Failed login attempt: Bad credentials");
+        ErrorResponse error = new ErrorResponse(
+                401,
+                "Invalid email or password",
+                java.time.LocalDateTime.now(),
+                null
+        );
+        return ResponseEntity.status(401).body(error);
+    }
 }
