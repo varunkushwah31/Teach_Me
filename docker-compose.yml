@@ -1,20 +1,20 @@
 version: '3.8'
 
 services:
-  # 1. The Database (PostgreSQL + pgvector)
   postgres:
     image: pgvector/pgvector:pg16
     container_name: teachme-db
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=teachme
+      - POSTGRES_USER=springai
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=vectordb
     ports:
-      - "5432:5432"
+      - "5433:5432" # ✅ Forces Docker to use 5433, avoiding the Windows port clash
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
+    restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d teachme"]
+      test: ["CMD-SHELL", "pg_isready -U springai -d vectordb"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -26,8 +26,7 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - ollama_data:/root/.ollama
-    # Pass your RTX 4050 GPU into the container for fast inference
+      - C:/Users/prach/.ollama:/root/.ollama
     deploy:
       resources:
         reservations:
@@ -35,26 +34,22 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    restart: always
 
   # 3. Your Spring Boot Backend
   backend:
     build: .
     container_name: teachme-backend
     ports:
-      - "8081:8081"
+      - "8082:8081"
     environment:
-      # Override Spring Boot properties via environment variables
-      # We must use the container names ('postgres' and 'ollama') instead of 'localhost'
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/teachme
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/vectordb
+      - SPRING_DATASOURCE_USERNAME=springai
+      - SPRING_DATASOURCE_PASSWORD=secret
       - SPRING_AI_OLLAMA_BASE_URL=http://ollama:11434
     depends_on:
       postgres:
         condition: service_healthy
       ollama:
         condition: service_started
-
-volumes:
-  pg_data:
-  ollama_data:
+    restart: always

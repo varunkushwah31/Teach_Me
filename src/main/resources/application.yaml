@@ -1,9 +1,10 @@
 spring:
   application:
     name: TeachMe
+
   # --- PostgreSQL Connection ---
   datasource:
-    url: jdbc:postgresql://localhost:5433/vectordb
+    url: jdbc:postgresql://localhost:5433/vectordb # Point to the safe port
     username: springai
     password: secret
     driver-class-name: org.postgresql.Driver
@@ -27,14 +28,14 @@ spring:
         index-type: HNSW
         initialize-schema: true
 
-# --- Spring Boot Server Configuration ---
+# --- Spring Boot Server (Tomcat) Configuration ---
 server:
   port: 8081
-  netty:
-    connection-timeout: 10000s
-    idle-timeout: 60s
-    # Increase max header size for huge JWTs or context parameters
-    max-http-request-header-size: 16KB
+  tomcat:
+    connection-timeout: 10000ms
+    keep-alive-timeout: 60000ms
+    max-http-form-post-size: 10MB # Helpful for uploading large PDF documents
+  max-http-request-header-size: 16KB
 
 # ==========================================
 # ACTUATOR & OBSERVABILITY CONFIGURATION
@@ -60,15 +61,9 @@ info:
     description: "Enterprise RAG Pipeline"
     version: "1.0.0"
 
-# Add this under your existing configuration
 application:
   security:
     jwt:
       # This is a generated 256-bit secure hex key. In production, inject this via environment variables!
       secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
       expiration: 86400000 # 1 day in milliseconds
-
-# --- WebFlux & Netty Tuning ---
-
-  webflux:
-    base-path: /
