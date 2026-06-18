@@ -26,7 +26,7 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - C:/Users/prach/.ollama:/root/.ollama
+      - D:/Ollama:/root/.ollama
     deploy:
       resources:
         reservations:
