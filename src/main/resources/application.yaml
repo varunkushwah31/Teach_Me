@@ -1,6 +1,8 @@
 spring:
   application:
     name: TeachMe
+
+  # --- File Upload Limits ---
   servlet:
     multipart:
       max-file-size: 50MB
@@ -12,6 +14,22 @@ spring:
     username: springai
     password: secret
     driver-class-name: org.postgresql.Driver
+
+  # --- JPA & Hibernate Configuration ---
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          fetch_size: 50
+          batch_size: 10
+        order_inserts: true
+        order_updates: true
+    show-sql: false
+    open-in-view: false
 
   # --- Spring AI & Ollama Configuration ---
   ai:
@@ -31,6 +49,11 @@ spring:
         distance-type: COSINE_DISTANCE
         index-type: HNSW
         initialize-schema: true
+
+  # --- DevTools ---
+  devtools:
+    restart:
+      enabled: true
 
 # --- Spring Boot Server (Tomcat) Configuration ---
 server:
@@ -65,6 +88,7 @@ info:
     description: "Enterprise RAG Pipeline"
     version: "1.0.0"
 
+# --- Custom Security Configuration ---
 application:
   security:
     jwt:

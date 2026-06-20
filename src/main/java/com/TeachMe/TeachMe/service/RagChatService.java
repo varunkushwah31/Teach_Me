@@ -1,5 +1,8 @@
 package com.TeachMe.TeachMe.service;
 
+import com.TeachMe.TeachMe.entity.Chat;
+import com.TeachMe.TeachMe.entity.User;
+import com.TeachMe.TeachMe.repository.ChatRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -11,6 +14,8 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,17 +28,22 @@ public class RagChatService {
     private final ChatClient rewriteClient;
     private final VectorStore vectorStore;
     private final ChatMemory chatMemory;
+    private final ChatRepository chatRepository;
 
-    public RagChatService(ChatClient.Builder chatClientBuilder, VectorStore vectorStore, ChatMemory chatMemory) {
+    public RagChatService(ChatClient.Builder chatClientBuilder,
+                          VectorStore vectorStore,
+                          ChatMemory chatMemory,
+                          ChatRepository chatRepository) {
         this.mainChatClient = chatClientBuilder
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
         this.rewriteClient = chatClientBuilder.build();
         this.vectorStore = vectorStore;
         this.chatMemory = chatMemory;
+        this.chatRepository = chatRepository;
     }
 
-    public Flux<String> askQuestionStream(String question, String chatId, String category) {
+    public Flux<String> askQuestionStream(String question, String chatId, String category, User currentUser) {
         log.info("Session {}: Received Original Question: '{}'", chatId, question);
 
         String optimizedQuery = optimizeSearchQuery(question, chatId);
@@ -64,12 +74,30 @@ public class RagChatService {
                 Context:
                 """ + context;
 
+        StringBuilder aiResponseBuffer = new StringBuilder();
+
         return mainChatClient.prompt()
                 .system(systemInstruction)
                 .user(question)
                 .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
                 .stream()
-                .content();
+                .content()
+                .doOnNext(aiResponseBuffer::append)
+                .doOnComplete(() -> {
+                    // ✅ Wrap the blocking database save in an elastic background thread
+                    Mono.fromRunnable(() -> {
+                        Chat chatRecord = Chat.builder()
+                                .sessionId(chatId)
+                                .question(question)
+                                .answer(aiResponseBuffer.toString())
+                                .context(context)
+                                .user(currentUser)
+                                .build();
+
+                        chatRepository.save(chatRecord);
+                        log.info("Session {}: Chat history securely saved to PostgreSQL.", chatId);
+                    }).subscribeOn(Schedulers.boundedElastic()).subscribe(); // ✅ Execute it without blocking the stream
+                });
     }
 
     private String optimizeSearchQuery(String originalQuestion, String chatId) {

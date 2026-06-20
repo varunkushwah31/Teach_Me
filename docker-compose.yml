@@ -25,15 +25,15 @@ services:
     container_name: teachme-ollama
     ports:
       - "11434:11434"
-    # volumes:
-    #   - D:/Ollama:/root/.ollama
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+    volumes:
+       - D:/Ollama:/root/.ollama
+    deploy:
+       resources:
+         reservations:
+           devices:
+             - driver: nvidia
+               count: 1
+               capabilities: [gpu]
     restart: always
 
   # 3. Your Spring Boot Backend
