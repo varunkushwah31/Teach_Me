@@ -1,7 +1,11 @@
 package com.TeachMe.TeachMe.repository;
 
 import com.TeachMe.TeachMe.entity.Chat;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,4 +17,19 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     List<Chat> findBySessionId(String sessionId);
     List<Chat> findByUserIdOrderByCreatedAtDesc(Long userId);
     List<Chat> findByDocumentIdOrderByCreatedAtDesc(Long documentId);
+
+    // Pagination support
+    Page<Chat> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+    Page<Chat> findByDocumentIdOrderByCreatedAtDesc(Long documentId, Pageable pageable);
+    Page<Chat> findBySessionIdOrderByCreatedAtDesc(String sessionId, Pageable pageable);
+
+    // Search with pagination
+    @Query("SELECT c FROM Chat c WHERE c.user.id = :userId AND (LOWER(c.question) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(c.answer) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) ORDER BY c.createdAt DESC")
+    Page<Chat> searchByUserIdAndTerm(@Param("userId") Long userId, @Param("searchTerm") String searchTerm, Pageable pageable);
+
+    @Query("SELECT c FROM Chat c WHERE c.document.id = :documentId AND (LOWER(c.question) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(c.answer) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) ORDER BY c.createdAt DESC")
+    Page<Chat> searchByDocumentIdAndTerm(@Param("documentId") Long documentId, @Param("searchTerm") String searchTerm, Pageable pageable);
+
+    @Query("SELECT c FROM Chat c WHERE c.sessionId = :sessionId AND (LOWER(c.question) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(c.answer) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) ORDER BY c.createdAt DESC")
+    Page<Chat> searchBySessionIdAndTerm(@Param("sessionId") String sessionId, @Param("searchTerm") String searchTerm, Pageable pageable);
 }

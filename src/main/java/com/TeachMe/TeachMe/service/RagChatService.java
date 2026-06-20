@@ -55,12 +55,15 @@ public class RagChatService {
 
         // ✅ Strict Multi-Tenant Isolation Filter Built Cleanly Inside Method
         FilterExpressionBuilder b = new FilterExpressionBuilder();
-        requestBuilder.filterExpression(
-                b.and(
-                        b.eq("userId", currentUser.getId()),
-                        b.eq("chatId", chatId)
-                ).build()
+        var filter = b.and(
+                b.eq("userId", currentUser.getId()),
+                b.eq("chatId", chatId)
         );
+        requestBuilder.filterExpression(filter.build());
+
+        if (category != null && !category.equalsIgnoreCase("all")) {
+            filter = b.and(filter, b.eq("category", category));
+        }
 
         List<Document> similarDocuments = vectorStore.similaritySearch(requestBuilder.build());
 

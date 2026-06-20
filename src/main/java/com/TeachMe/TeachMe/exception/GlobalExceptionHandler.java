@@ -85,7 +85,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(Exception ex) {
-        log.warn("Failed login attempt: Bad credentials");
+        log.warn("Failed login attempt: Bad credentials. Detail: {}", ex.getMessage());
+
         ErrorResponse error = new ErrorResponse(
                 401,
                 "Invalid email or password",
