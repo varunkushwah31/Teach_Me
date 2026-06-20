@@ -53,11 +53,14 @@ public class RagChatService {
                 .query(optimizedQuery)
                 .topK(4);
 
-        if (category != null && !category.equalsIgnoreCase("all")) {
-            requestBuilder.filterExpression(
-                    new FilterExpressionBuilder().eq("category", category).build()
-            );
-        }
+        // ✅ Strict Multi-Tenant Isolation Filter Built Cleanly Inside Method
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
+        requestBuilder.filterExpression(
+                b.and(
+                        b.eq("userId", currentUser.getId()),
+                        b.eq("chatId", chatId)
+                ).build()
+        );
 
         List<Document> similarDocuments = vectorStore.similaritySearch(requestBuilder.build());
 
@@ -65,7 +68,7 @@ public class RagChatService {
                 .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
-        log.info("Found {} relevant chunks. Generating streaming response...", similarDocuments.size());
+        log.info("Found {} relevant chunks matching this chat session.", similarDocuments.size());
 
         String systemInstruction = """
                 You are an expert academic tutor. Answer the user's question using ONLY the provided context below.
@@ -83,21 +86,18 @@ public class RagChatService {
                 .stream()
                 .content()
                 .doOnNext(aiResponseBuffer::append)
-                .doOnComplete(() -> {
-                    // ✅ Wrap the blocking database save in an elastic background thread
-                    Mono.fromRunnable(() -> {
-                        Chat chatRecord = Chat.builder()
-                                .sessionId(chatId)
-                                .question(question)
-                                .answer(aiResponseBuffer.toString())
-                                .context(context)
-                                .user(currentUser)
-                                .build();
+                .doOnComplete(() -> Mono.fromRunnable(() -> {
+                    Chat chatRecord = Chat.builder()
+                            .sessionId(chatId)
+                            .question(question)
+                            .answer(aiResponseBuffer.toString())
+                            .context(context)
+                            .user(currentUser)
+                            .build();
 
-                        chatRepository.save(chatRecord);
-                        log.info("Session {}: Chat history securely saved to PostgreSQL.", chatId);
-                    }).subscribeOn(Schedulers.boundedElastic()).subscribe(); // ✅ Execute it without blocking the stream
-                });
+                    chatRepository.save(chatRecord);
+                    log.info("Session {}: Chat history securely saved to PostgreSQL.", chatId);
+                }).subscribeOn(Schedulers.boundedElastic()).subscribe());
     }
 
     private String optimizeSearchQuery(String originalQuestion, String chatId) {

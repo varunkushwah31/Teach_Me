@@ -25,7 +25,7 @@ public class DocumentIngestionService {
 
     private final VectorStore vectorStore;
     private final JobStatusManager jobStatusManager;
-    private final DocumentRepository documentRepository; // ✅ Injected the Document Repository
+    private final DocumentRepository documentRepository;
 
     private final Counter documentUploadCounter;
     private final Counter vectorChunkCounter;
@@ -49,19 +49,18 @@ public class DocumentIngestionService {
 
     @Async("taskExecutor")
     public void ingestPdfAsync(InputStream fileStream, String originalFilename, Long fileSize,
-                               String category, String jobId, User currentUser) {
+                               String category, String chatId, String jobId, User currentUser) {
 
-        // ✅ 1. Create the Database Record immediately
+        // 1. Create the Database Record immediately
         com.TeachMe.TeachMe.entity.Document dbDocument = com.TeachMe.TeachMe.entity.Document.builder()
                 .fileName(originalFilename)
-                .filePath("local-stream") // Or an S3 bucket URL if you add cloud storage later
+                .filePath("local-stream")
                 .fileType("application/pdf")
                 .fileSize(fileSize)
                 .status(com.TeachMe.TeachMe.entity.Document.DocumentStatus.PROCESSING)
                 .user(currentUser)
                 .build();
 
-        // Save to PostgreSQL
         documentRepository.save(dbDocument);
 
         try {
@@ -71,13 +70,16 @@ public class DocumentIngestionService {
             TikaDocumentReader reader = new TikaDocumentReader(new InputStreamResource(fileStream));
             List<Document> rawDocuments = reader.get();
 
+            // ✅ Cleaned up metadata mapping - stamps the vector with chatId and userId directly
             List<Document> enrichedDocuments = rawDocuments.stream()
                     .map(doc -> {
                         Map<String, Object> newMetadata = new HashMap<>(doc.getMetadata());
                         newMetadata.put("fileName", originalFilename);
                         newMetadata.put("category", category);
-                        // ✅ Embed the Postgres Document ID into the Vector metadata for future filtering!
                         newMetadata.put("dbDocumentId", dbDocument.getId());
+                        newMetadata.put("chatId", chatId);
+                        newMetadata.put("userId", currentUser.getId());
+
                         return Document.builder()
                                 .id(doc.getId())
                                 .text(doc.getText())
@@ -104,7 +106,6 @@ public class DocumentIngestionService {
             log.info("Job {}: Successfully embedded {} chunks.", jobId, splitDocuments.size());
             jobStatusManager.updateStatus(jobId, "COMPLETED");
 
-            // ✅ 2. Update Database Record to COMPLETED
             dbDocument.setStatus(com.TeachMe.TeachMe.entity.Document.DocumentStatus.COMPLETED);
             documentRepository.save(dbDocument);
 
@@ -112,7 +113,6 @@ public class DocumentIngestionService {
             log.error("Job {}: Failed to process document", jobId, e);
             jobStatusManager.updateStatus(jobId, "FAILED: " + e.getMessage());
 
-            // ✅ 3. Update Database Record to FAILED
             dbDocument.setStatus(com.TeachMe.TeachMe.entity.Document.DocumentStatus.FAILED);
             dbDocument.setErrorMessage(e.getMessage());
             documentRepository.save(dbDocument);
