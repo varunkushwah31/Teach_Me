@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/history/documents")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class DocumentHistoryController {
 
     private final DocumentHistoryService documentHistoryService;
     private final AuthService authService;
+    private static final String DEFAULT_SORT_COLUMN = "createdAt";
 
     @GetMapping
     public ResponseEntity<PaginatedResponse<DocumentHistoryDTO>> getDocumentHistory(
@@ -27,7 +27,7 @@ public class DocumentHistoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
         Long userId = authService.getAuthenticatedUserId();
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(documentHistoryService.getHistoryByUser(userId, pageable));
     }
 
@@ -37,7 +37,7 @@ public class DocumentHistoryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Long userId = authService.getAuthenticatedUserId();
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(documentHistoryService.searchHistoryByUser(userId, q, pageable));
     }
 
@@ -49,7 +49,7 @@ public class DocumentHistoryController {
             @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
         Long userId = authService.getAuthenticatedUserId();
         Document.DocumentStatus docStatus = Document.DocumentStatus.valueOf(status.toUpperCase());
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(documentHistoryService.getHistoryByUserAndStatus(userId, docStatus, pageable));
     }
 
@@ -61,7 +61,7 @@ public class DocumentHistoryController {
             @RequestParam(defaultValue = "20") int size) {
         Long userId = authService.getAuthenticatedUserId();
         Document.DocumentStatus docStatus = Document.DocumentStatus.valueOf(status.toUpperCase());
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(documentHistoryService.searchHistoryByUserAndStatus(userId, docStatus, q, pageable));
     }
 }

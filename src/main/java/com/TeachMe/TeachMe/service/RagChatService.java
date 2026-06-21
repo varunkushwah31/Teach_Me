@@ -53,17 +53,19 @@ public class RagChatService {
                 .query(optimizedQuery)
                 .topK(4);
 
-        // ✅ Strict Multi-Tenant Isolation Filter Built Cleanly Inside Method
+        // Strict Multi-Tenant Isolation Filter
         FilterExpressionBuilder b = new FilterExpressionBuilder();
-        var filter = b.and(
+        var dynamicFilter = b.and(
                 b.eq("userId", currentUser.getId()),
                 b.eq("chatId", chatId)
         );
-        requestBuilder.filterExpression(filter.build());
 
         if (category != null && !category.equalsIgnoreCase("all")) {
-            filter = b.and(filter, b.eq("category", category));
+            dynamicFilter = b.and(dynamicFilter, b.eq("category", category));
         }
+
+        // Pass the complete compiled expression directly to the vector store request
+        requestBuilder.filterExpression(dynamicFilter.build());
 
         List<Document> similarDocuments = vectorStore.similaritySearch(requestBuilder.build());
 

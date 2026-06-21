@@ -3,6 +3,7 @@ package com.TeachMe.TeachMe.config;
 import com.TeachMe.TeachMe.security.RateLimitInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -14,9 +15,18 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // Apply the rate limiter exclusively to the chat and document upload routes
         registry.addInterceptor(rateLimitInterceptor)
                 .addPathPatterns("/api/chat/**")
                 .addPathPatterns("/api/documents/upload");
+    }
+
+    // Centralized CORS Configuration
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://localhost:3000", "http://localhost:5173") // Add your React port here
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }

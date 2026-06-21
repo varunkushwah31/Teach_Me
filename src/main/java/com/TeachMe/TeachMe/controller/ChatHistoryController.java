@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/history/chats")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class ChatHistoryController {
 
     private final ChatHistoryService chatHistoryService;
     private final AuthService authService;
+    private static final String DEFAULT_SORT_COLUMN = "createdAt";
 
     @GetMapping
     public ResponseEntity<PaginatedResponse<ChatHistoryDTO>> getChatHistory(
@@ -26,7 +26,7 @@ public class ChatHistoryController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
         Long userId = authService.getAuthenticatedUserId();
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(chatHistoryService.getHistoryByUser(userId, pageable));
     }
 
@@ -36,7 +36,7 @@ public class ChatHistoryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Long userId = authService.getAuthenticatedUserId();
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(chatHistoryService.searchHistoryByUser(userId, q, pageable));
     }
 
@@ -45,7 +45,7 @@ public class ChatHistoryController {
             @PathVariable Long documentId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(chatHistoryService.getHistoryByDocument(documentId, pageable));
     }
 
@@ -55,7 +55,7 @@ public class ChatHistoryController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(chatHistoryService.searchHistoryByDocument(documentId, q, pageable));
     }
 
@@ -64,7 +64,7 @@ public class ChatHistoryController {
             @PathVariable String sessionId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(chatHistoryService.getHistoryBySession(sessionId, pageable));
     }
 
@@ -74,7 +74,7 @@ public class ChatHistoryController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, DEFAULT_SORT_COLUMN));
         return ResponseEntity.ok(chatHistoryService.searchHistoryBySession(sessionId, q, pageable));
     }
 }
