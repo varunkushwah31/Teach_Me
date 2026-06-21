@@ -1,6 +1,7 @@
 package com.TeachMe.TeachMe.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.TeachMe.TeachMe.entity.Chat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,4 +27,20 @@ public class ChatHistoryDTO {
 
     @JsonProperty("documentName")
     private String documentName;
+
+    // ✅ Added the static mapping method here
+    public static ChatHistoryDTO fromEntity(Chat chat) {
+        return ChatHistoryDTO.builder()
+                .id(chat.getId())
+                .sessionId(chat.getSessionId())
+                .question(chat.getQuestion())
+                .answer(chat.getAnswer())
+                .context(chat.getContext())
+                .createdAt(chat.getCreatedAt())
+                .updatedAt(chat.getUpdatedAt())
+                // Safely handle lazy-loaded document relationships to avoid NullPointerExceptions
+                .documentId(chat.getDocument() != null ? chat.getDocument().getId() : null)
+                .documentName(chat.getDocument() != null ? chat.getDocument().getFileName() : null)
+                .build();
+    }
 }

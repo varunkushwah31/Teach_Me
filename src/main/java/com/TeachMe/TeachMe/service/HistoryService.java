@@ -9,7 +9,6 @@ import com.TeachMe.TeachMe.repository.ChatRepository;
 import com.TeachMe.TeachMe.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -20,79 +19,68 @@ public class HistoryService {
     private final ChatRepository chatRepository;
     private final DocumentRepository documentRepository;
 
-    // Chat History Methods
-    public PaginatedResponse<ChatHistoryDTO> getChatHistoryByUser(Long userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    // ==========================================
+    // CHAT HISTORY METHODS
+    // ==========================================
+
+    public PaginatedResponse<ChatHistoryDTO> getChatHistoryByUser(Long userId, Pageable pageable) {
         Page<Chat> chatPage = chatRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
-        Page<ChatHistoryDTO> dtoPage = chatPage.map(this::convertChatToDTO);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(chatPage.map(this::convertChatToDTO));
     }
 
-    public PaginatedResponse<ChatHistoryDTO> searchChatHistoryByUser(Long userId, String searchTerm, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedResponse<ChatHistoryDTO> searchChatHistoryByUser(Long userId, String searchTerm, Pageable pageable) {
         Page<Chat> chatPage = chatRepository.searchByUserIdAndTerm(userId, searchTerm, pageable);
-        Page<ChatHistoryDTO> dtoPage = chatPage.map(this::convertChatToDTO);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(chatPage.map(this::convertChatToDTO));
     }
 
-    public PaginatedResponse<ChatHistoryDTO> getChatHistoryByDocument(Long documentId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedResponse<ChatHistoryDTO> getChatHistoryByDocument(Long documentId, Pageable pageable) {
         Page<Chat> chatPage = chatRepository.findByDocumentIdOrderByCreatedAtDesc(documentId, pageable);
-        Page<ChatHistoryDTO> dtoPage = chatPage.map(this::convertChatToDTO);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(chatPage.map(this::convertChatToDTO));
     }
 
-    public PaginatedResponse<ChatHistoryDTO> searchChatHistoryByDocument(Long documentId, String searchTerm, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedResponse<ChatHistoryDTO> searchChatHistoryByDocument(Long documentId, String searchTerm, Pageable pageable) {
         Page<Chat> chatPage = chatRepository.searchByDocumentIdAndTerm(documentId, searchTerm, pageable);
-        Page<ChatHistoryDTO> dtoPage = chatPage.map(this::convertChatToDTO);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(chatPage.map(this::convertChatToDTO));
     }
 
-    public PaginatedResponse<ChatHistoryDTO> getChatHistoryBySession(String sessionId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedResponse<ChatHistoryDTO> getChatHistoryBySession(String sessionId, Pageable pageable) {
         Page<Chat> chatPage = chatRepository.findBySessionIdOrderByCreatedAtDesc(sessionId, pageable);
-        Page<ChatHistoryDTO> dtoPage = chatPage.map(this::convertChatToDTO);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(chatPage.map(this::convertChatToDTO));
     }
 
-    public PaginatedResponse<ChatHistoryDTO> searchChatHistoryBySession(String sessionId, String searchTerm, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedResponse<ChatHistoryDTO> searchChatHistoryBySession(String sessionId, String searchTerm, Pageable pageable) {
         Page<Chat> chatPage = chatRepository.searchBySessionIdAndTerm(sessionId, searchTerm, pageable);
-        Page<ChatHistoryDTO> dtoPage = chatPage.map(this::convertChatToDTO);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(chatPage.map(this::convertChatToDTO));
     }
 
-    // Document History Methods
-    public PaginatedResponse<DocumentHistoryDTO> getDocumentHistoryByUser(Long userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    // ==========================================
+    // DOCUMENT HISTORY METHODS
+    // ==========================================
+
+    public PaginatedResponse<DocumentHistoryDTO> getDocumentHistoryByUser(Long userId, Pageable pageable) {
         Page<Document> docPage = documentRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
-        Page<DocumentHistoryDTO> dtoPage = docPage.map(DocumentHistoryDTO::fromEntity);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(docPage.map(DocumentHistoryDTO::fromEntity));
     }
 
-    public PaginatedResponse<DocumentHistoryDTO> searchDocumentHistoryByUser(Long userId, String searchTerm, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedResponse<DocumentHistoryDTO> searchDocumentHistoryByUser(Long userId, String searchTerm, Pageable pageable) {
         Page<Document> docPage = documentRepository.searchByUserIdAndTerm(userId, searchTerm, pageable);
-        Page<DocumentHistoryDTO> dtoPage = docPage.map(DocumentHistoryDTO::fromEntity);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(docPage.map(DocumentHistoryDTO::fromEntity));
     }
 
-    public PaginatedResponse<DocumentHistoryDTO> getDocumentHistoryByUserAndStatus(Long userId, Document.DocumentStatus status, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedResponse<DocumentHistoryDTO> getDocumentHistoryByUserAndStatus(Long userId, Document.DocumentStatus status, Pageable pageable) {
         Page<Document> docPage = documentRepository.findByUserIdAndStatus(userId, status, pageable);
-        Page<DocumentHistoryDTO> dtoPage = docPage.map(DocumentHistoryDTO::fromEntity);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(docPage.map(DocumentHistoryDTO::fromEntity));
     }
 
-    public PaginatedResponse<DocumentHistoryDTO> searchDocumentHistoryByUserAndStatus(Long userId, Document.DocumentStatus status, String searchTerm, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedResponse<DocumentHistoryDTO> searchDocumentHistoryByUserAndStatus(Long userId, Document.DocumentStatus status, String searchTerm, Pageable pageable) {
         Page<Document> docPage = documentRepository.searchByUserIdStatusAndTerm(userId, status, searchTerm, pageable);
-        Page<DocumentHistoryDTO> dtoPage = docPage.map(DocumentHistoryDTO::fromEntity);
-        return PaginatedResponse.fromPage(dtoPage);
+        return PaginatedResponse.fromPage(docPage.map(DocumentHistoryDTO::fromEntity));
     }
 
-    // Helper method to convert Chat entity to DTO
+    // ==========================================
+    // HELPER
+    // ==========================================
+
     private ChatHistoryDTO convertChatToDTO(Chat chat) {
         return ChatHistoryDTO.builder()
                 .id(chat.getId())

@@ -8,9 +8,11 @@ import com.TeachMe.TeachMe.entity.User;
 import com.TeachMe.TeachMe.repository.UserRepository;
 import com.TeachMe.TeachMe.service.HistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -24,17 +26,26 @@ public class HistoryController {
     private final HistoryService historyService;
     private final UserRepository userRepository;
 
-    // Chat History Endpoints
+    // Helper method to securely get the logged-in user's ID
+    private Long getAuthenticatedUserId() {
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getId();
+    }
+
+    // ==========================================
+    // CHAT ENDPOINTS
+    // ==========================================
+
     @GetMapping("/chat")
     public ResponseEntity<PaginatedResponse<ChatHistoryDTO>> getChatHistory(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        String userEmail = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        PaginatedResponse<ChatHistoryDTO> response = historyService.getChatHistoryByUser(user.getId(), page, size);
-        return ResponseEntity.ok(response);
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
+        Long userId = getAuthenticatedUserId();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+        return ResponseEntity.ok(historyService.getChatHistoryByUser(userId, pageable));
     }
 
     @GetMapping("/chat/search")
@@ -42,12 +53,9 @@ public class HistoryController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        String userEmail = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        PaginatedResponse<ChatHistoryDTO> response = historyService.searchChatHistoryByUser(user.getId(), q, page, size);
-        return ResponseEntity.ok(response);
+        Long userId = getAuthenticatedUserId();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return ResponseEntity.ok(historyService.searchChatHistoryByUser(userId, q, pageable));
     }
 
     @GetMapping("/chat/document/{documentId}")
@@ -55,8 +63,8 @@ public class HistoryController {
             @PathVariable Long documentId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PaginatedResponse<ChatHistoryDTO> response = historyService.getChatHistoryByDocument(documentId, page, size);
-        return ResponseEntity.ok(response);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return ResponseEntity.ok(historyService.getChatHistoryByDocument(documentId, pageable));
     }
 
     @GetMapping("/chat/document/{documentId}/search")
@@ -65,8 +73,8 @@ public class HistoryController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PaginatedResponse<ChatHistoryDTO> response = historyService.searchChatHistoryByDocument(documentId, q, page, size);
-        return ResponseEntity.ok(response);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return ResponseEntity.ok(historyService.searchChatHistoryByDocument(documentId, q, pageable));
     }
 
     @GetMapping("/chat/session/{sessionId}")
@@ -74,8 +82,8 @@ public class HistoryController {
             @PathVariable String sessionId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PaginatedResponse<ChatHistoryDTO> response = historyService.getChatHistoryBySession(sessionId, page, size);
-        return ResponseEntity.ok(response);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return ResponseEntity.ok(historyService.getChatHistoryBySession(sessionId, pageable));
     }
 
     @GetMapping("/chat/session/{sessionId}/search")
@@ -84,21 +92,22 @@ public class HistoryController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PaginatedResponse<ChatHistoryDTO> response = historyService.searchChatHistoryBySession(sessionId, q, page, size);
-        return ResponseEntity.ok(response);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return ResponseEntity.ok(historyService.searchChatHistoryBySession(sessionId, q, pageable));
     }
 
-    // Document History Endpoints
+    // ==========================================
+    // DOCUMENT ENDPOINTS
+    // ==========================================
+
     @GetMapping("/documents")
     public ResponseEntity<PaginatedResponse<DocumentHistoryDTO>> getDocumentHistory(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        String userEmail = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        PaginatedResponse<DocumentHistoryDTO> response = historyService.getDocumentHistoryByUser(user.getId(), page, size);
-        return ResponseEntity.ok(response);
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
+        Long userId = getAuthenticatedUserId();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+        return ResponseEntity.ok(historyService.getDocumentHistoryByUser(userId, pageable));
     }
 
     @GetMapping("/documents/search")
@@ -106,26 +115,21 @@ public class HistoryController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        String userEmail = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        PaginatedResponse<DocumentHistoryDTO> response = historyService.searchDocumentHistoryByUser(user.getId(), q, page, size);
-        return ResponseEntity.ok(response);
+        Long userId = getAuthenticatedUserId();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return ResponseEntity.ok(historyService.searchDocumentHistoryByUser(userId, q, pageable));
     }
 
     @GetMapping("/documents/status/{status}")
     public ResponseEntity<PaginatedResponse<DocumentHistoryDTO>> getDocumentHistoryByStatus(
             @PathVariable String status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        String userEmail = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
+        Long userId = getAuthenticatedUserId();
         Document.DocumentStatus docStatus = Document.DocumentStatus.valueOf(status.toUpperCase());
-        PaginatedResponse<DocumentHistoryDTO> response = historyService.getDocumentHistoryByUserAndStatus(user.getId(), docStatus, page, size);
-        return ResponseEntity.ok(response);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, "createdAt"));
+        return ResponseEntity.ok(historyService.getDocumentHistoryByUserAndStatus(userId, docStatus, pageable));
     }
 
     @GetMapping("/documents/status/{status}/search")
@@ -134,12 +138,9 @@ public class HistoryController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        String userEmail = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+        Long userId = getAuthenticatedUserId();
         Document.DocumentStatus docStatus = Document.DocumentStatus.valueOf(status.toUpperCase());
-        PaginatedResponse<DocumentHistoryDTO> response = historyService.searchDocumentHistoryByUserAndStatus(user.getId(), docStatus, q, page, size);
-        return ResponseEntity.ok(response);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return ResponseEntity.ok(historyService.searchDocumentHistoryByUserAndStatus(userId, docStatus, q, pageable));
     }
 }
