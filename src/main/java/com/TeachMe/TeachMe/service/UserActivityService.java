@@ -2,11 +2,14 @@ package com.TeachMe.TeachMe.service;
 
 import com.TeachMe.TeachMe.dto.ChatResponse;
 import com.TeachMe.TeachMe.dto.DocumentResponse;
+import com.TeachMe.TeachMe.dto.PaginatedResponse;
 import com.TeachMe.TeachMe.entity.Chat;
 import com.TeachMe.TeachMe.entity.Document;
 import com.TeachMe.TeachMe.repository.ChatRepository;
 import com.TeachMe.TeachMe.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +23,7 @@ public class UserActivityService {
     private final DocumentRepository documentRepository;
 
     // ==========================================
-    // DOCUMENT REPOSITORY METHODS
+    // DOCUMENT REPOSITORY METHODS - WITH PAGINATION
     // ==========================================
 
     public List<DocumentResponse> getAllUserDocumentsUnsorted(Long userId) {
@@ -41,8 +44,33 @@ public class UserActivityService {
                 .map(this::mapToDocumentResponse).collect(Collectors.toList());
     }
 
+    // Paginated Document Methods
+    public PaginatedResponse<DocumentResponse> getRecentUserDocumentsPaged(Long userId, Pageable pageable) {
+        Page<Document> docPage = documentRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+        Page<DocumentResponse> dtoPage = docPage.map(this::mapToDocumentResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
+    public PaginatedResponse<DocumentResponse> getUserDocumentsByStatusPaged(Long userId, Document.DocumentStatus status, Pageable pageable) {
+        Page<Document> docPage = documentRepository.findByUserIdAndStatus(userId, status, pageable);
+        Page<DocumentResponse> dtoPage = docPage.map(this::mapToDocumentResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
+    public PaginatedResponse<DocumentResponse> searchUserDocuments(Long userId, String searchTerm, Pageable pageable) {
+        Page<Document> docPage = documentRepository.searchByUserIdAndTerm(userId, searchTerm, pageable);
+        Page<DocumentResponse> dtoPage = docPage.map(this::mapToDocumentResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
+    public PaginatedResponse<DocumentResponse> searchUserDocumentsByStatus(Long userId, Document.DocumentStatus status, String searchTerm, Pageable pageable) {
+        Page<Document> docPage = documentRepository.searchByUserIdStatusAndTerm(userId, status, searchTerm, pageable);
+        Page<DocumentResponse> dtoPage = docPage.map(this::mapToDocumentResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
     // ==========================================
-    // CHAT REPOSITORY METHODS
+    // CHAT REPOSITORY METHODS - WITH PAGINATION
     // ==========================================
 
     public List<ChatResponse> getAllUserChatsUnsorted(Long userId) {
@@ -73,6 +101,43 @@ public class UserActivityService {
         // Uses: findByDocumentIdOrderByCreatedAtDesc
         return chatRepository.findByDocumentIdOrderByCreatedAtDesc(documentId).stream()
                 .map(this::mapToChatResponse).collect(Collectors.toList());
+    }
+
+    // Paginated Chat Methods
+    public PaginatedResponse<ChatResponse> getRecentUserChatsPaged(Long userId, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+        Page<ChatResponse> dtoPage = chatPage.map(this::mapToChatResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
+    public PaginatedResponse<ChatResponse> searchUserChats(Long userId, String searchTerm, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.searchByUserIdAndTerm(userId, searchTerm, pageable);
+        Page<ChatResponse> dtoPage = chatPage.map(this::mapToChatResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
+    public PaginatedResponse<ChatResponse> getRecentDocumentChatsPaged(Long documentId, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.findByDocumentIdOrderByCreatedAtDesc(documentId, pageable);
+        Page<ChatResponse> dtoPage = chatPage.map(this::mapToChatResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
+    public PaginatedResponse<ChatResponse> searchDocumentChats(Long documentId, String searchTerm, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.searchByDocumentIdAndTerm(documentId, searchTerm, pageable);
+        Page<ChatResponse> dtoPage = chatPage.map(this::mapToChatResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
+    public PaginatedResponse<ChatResponse> getChatsBySessionPaged(String sessionId, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.findBySessionIdOrderByCreatedAtDesc(sessionId, pageable);
+        Page<ChatResponse> dtoPage = chatPage.map(this::mapToChatResponse);
+        return PaginatedResponse.fromPage(dtoPage);
+    }
+
+    public PaginatedResponse<ChatResponse> searchChatsBySession(String sessionId, String searchTerm, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.searchBySessionIdAndTerm(sessionId, searchTerm, pageable);
+        Page<ChatResponse> dtoPage = chatPage.map(this::mapToChatResponse);
+        return PaginatedResponse.fromPage(dtoPage);
     }
 
     // ==========================================
