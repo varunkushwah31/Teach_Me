@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,19 +28,19 @@ public class UserActivityService {
     public List<DocumentResponse> getAllUserDocumentsUnsorted(Long userId) {
         // Uses: findByUserId
         return documentRepository.findByUserId(userId).stream()
-                .map(this::mapToDocumentResponse).collect(Collectors.toList());
+                .map(this::mapToDocumentResponse).toList();
     }
 
     public List<DocumentResponse> getRecentUserDocuments(Long userId) {
         // Uses: findByUserIdOrderByCreatedAtDesc
         return documentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(this::mapToDocumentResponse).collect(Collectors.toList());
+                .map(this::mapToDocumentResponse).toList();
     }
 
     public List<DocumentResponse> getUserDocumentsByStatus(Long userId, Document.DocumentStatus status) {
         // Uses: findByUserIdAndStatus
         return documentRepository.findByUserIdAndStatus(userId, status).stream()
-                .map(this::mapToDocumentResponse).collect(Collectors.toList());
+                .map(this::mapToDocumentResponse).toList();
     }
 
     // Paginated Document Methods
@@ -76,31 +75,31 @@ public class UserActivityService {
     public List<ChatResponse> getAllUserChatsUnsorted(Long userId) {
         // Uses: findByUserId
         return chatRepository.findByUserId(userId).stream()
-                .map(this::mapToChatResponse).collect(Collectors.toList());
+                .map(this::mapToChatResponse).toList();
     }
 
     public List<ChatResponse> getRecentUserChats(Long userId) {
         // Uses: findByUserIdOrderByCreatedAtDesc
         return chatRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(this::mapToChatResponse).collect(Collectors.toList());
+                .map(this::mapToChatResponse).toList();
     }
 
     public List<ChatResponse> getChatsBySession(String sessionId) {
         // Uses: findBySessionId
         return chatRepository.findBySessionId(sessionId).stream()
-                .map(this::mapToChatResponse).collect(Collectors.toList());
+                .map(this::mapToChatResponse).toList();
     }
 
     public List<ChatResponse> getAllDocumentChatsUnsorted(Long documentId) {
         // Uses: findByDocumentId
         return chatRepository.findByDocumentId(documentId).stream()
-                .map(this::mapToChatResponse).collect(Collectors.toList());
+                .map(this::mapToChatResponse).toList();
     }
 
     public List<ChatResponse> getRecentDocumentChats(Long documentId) {
         // Uses: findByDocumentIdOrderByCreatedAtDesc
         return chatRepository.findByDocumentIdOrderByCreatedAtDesc(documentId).stream()
-                .map(this::mapToChatResponse).collect(Collectors.toList());
+                .map(this::mapToChatResponse).toList();
     }
 
     // Paginated Chat Methods
