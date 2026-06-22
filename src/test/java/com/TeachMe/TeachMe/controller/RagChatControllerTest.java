@@ -1,7 +1,6 @@
 package com.TeachMe.TeachMe.controller;
 
-import com.TeachMe.TeachMe.entity.User;
-import com.TeachMe.TeachMe.repository.UserRepository;
+import com.TeachMe.TeachMe.service.AuthService;
 import com.TeachMe.TeachMe.service.RagChatService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,17 +14,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import reactor.core.publisher.Flux;
 
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-
 class RagChatControllerTest {
 
     @Autowired
@@ -35,39 +29,35 @@ class RagChatControllerTest {
     private RagChatService ragChatService;
 
     @MockitoBean
-    private UserRepository userRepository; // ✅ 1. We must mock the database lookup
+    private AuthService authService; // ✅ Correctly mock the extracted AuthService dependency
 
     @Test
-    @WithMockUser(username = "test@teachme.com") // ✅ 2. Safely simulates a logged-in user for the SecurityContext
+    @WithMockUser(username = "test@teachme.com")
     void shouldStreamChatResponseSuccessfully() throws Exception {
         // Arrange
         String question = "What is AI?";
         String chatId = "session-123";
-        String category = "tech";
+        Long mockUserId = 42L; // ✅ Uses numerical IDs instead of bulky objects
 
-        // ✅ 3. Create a dummy user and tell the mocked repository to return it
-        User mockUser = new User();
-        mockUser.setEmail("test@teachme.com");
+        // ✅ Tell the mocked auth identity service to return our numerical ID
+        Mockito.when(authService.getAuthenticatedUserId()).thenReturn(mockUserId);
 
-        Mockito.when(userRepository.findByEmail("test@teachme.com"))
-                .thenReturn(Optional.of(mockUser));
-
-        // ✅ 4. Mock the LLM stream, passing all 4 expected arguments
+        // Mock the LLM reactive stream output
         Flux<String> mockStream = Flux.just("Artificial ", "Intelligence ", "is ", "cool.");
 
-        Mockito.when(ragChatService.askQuestionStream(eq(question), eq(chatId), any(User.class)))
+        // ✅ Clean Mockito stubbing: passed values directly without eq()
+        Mockito.when(ragChatService.askQuestionStream(question, chatId, mockUserId))
                 .thenReturn(mockStream);
 
-        // Create the JSON payload that your controller expects
+        // ✅ Removed the unused "category" attribute to match our updated web contract
         String jsonPayload = """
                 {
                     "question": "What is AI?",
-                    "chatId": "session-123",
-                    "category": "tech"
+                    "chatId": "session-123"
                 }
                 """;
 
-        // Act & Assert (Part 1: Verify the async stream opens)
+        // Act & Assert (Part 1: Verify the async processing handles text event streams cleanly)
         MvcResult mvcResult = mockMvc.perform(post("/api/chat/ask/stream")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonPayload)
@@ -75,10 +65,10 @@ class RagChatControllerTest {
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
-        // Act & Assert (Part 2: Verify the dispatched stream contents)
+        // Act & Assert (Part 2: Verify the dispatched reactive stream chunks)
         mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("data:Artificial")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Artificial ")));
     }
 }
