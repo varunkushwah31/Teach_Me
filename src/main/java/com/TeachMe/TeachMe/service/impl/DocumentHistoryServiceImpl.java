@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class DocumentHistoryServiceImpl implements DocumentHistoryService {
@@ -38,5 +40,24 @@ public class DocumentHistoryServiceImpl implements DocumentHistoryService {
     public PaginatedResponse<DocumentHistoryDTO> searchHistoryByUserAndStatus(Long userId, Document.DocumentStatus status, String searchTerm, Pageable pageable) {
         Page<Document> docPage = documentRepository.searchByUserIdStatusAndTerm(userId, status, searchTerm, pageable);
         return PaginatedResponse.fromPage(docPage.map(DocumentHistoryDTO::fromEntity));
+    }
+
+    // Consume the unpaginated List methods for Data Export features
+    public List<DocumentHistoryDTO> getAllDocumentsForExport(Long userId) {
+        return documentRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(DocumentHistoryDTO::fromEntity)
+                .toList();
+    }
+
+    public List<DocumentHistoryDTO> getUnsortedDocuments(Long userId) {
+        return documentRepository.findByUserId(userId).stream()
+                .map(DocumentHistoryDTO::fromEntity)
+                .toList();
+    }
+
+    public List<DocumentHistoryDTO> getDocumentsByStatusForExport(Long userId, Document.DocumentStatus status) {
+        return documentRepository.findByUserIdAndStatus(userId, status).stream()
+                .map(DocumentHistoryDTO::fromEntity)
+                .toList();
     }
 }

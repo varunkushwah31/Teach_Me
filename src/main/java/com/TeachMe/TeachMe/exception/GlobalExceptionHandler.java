@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
-                LocalDateTime.now(),
+                LocalDateTime.now(ZoneId.systemDefault()),
                 null
         );
 
@@ -34,7 +35,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.UNPROCESSABLE_CONTENT.value(),
                 ex.getMessage(),
-                LocalDateTime.now(),
+                LocalDateTime.now(ZoneId.systemDefault()),
                 null
         );
 
@@ -52,7 +53,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation Failed",
-                LocalDateTime.now(),
+                LocalDateTime.now(ZoneId.systemDefault()),
                 errors
         );
 
@@ -65,7 +66,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "An unexpected error occurred on the server. Please try again later.",
-                LocalDateTime.now(),
+                LocalDateTime.now(ZoneId.systemDefault()),
                 null
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -77,7 +78,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.TOO_MANY_REQUESTS.value(),
                 ex.getMessage(),
-                LocalDateTime.now(),
+                LocalDateTime.now(ZoneId.systemDefault()),
                 null
         );
         return new ResponseEntity<>(error, HttpStatus.TOO_MANY_REQUESTS);
@@ -90,7 +91,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 401,
                 "Invalid email or password",
-                java.time.LocalDateTime.now(),
+                LocalDateTime.now(ZoneId.systemDefault()),
                 null
         );
         return ResponseEntity.status(401).body(error);

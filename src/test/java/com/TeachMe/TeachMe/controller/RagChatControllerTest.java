@@ -55,7 +55,7 @@ class RagChatControllerTest {
         // ✅ 4. Mock the LLM stream, passing all 4 expected arguments
         Flux<String> mockStream = Flux.just("Artificial ", "Intelligence ", "is ", "cool.");
 
-        Mockito.when(ragChatService.askQuestionStream(eq(question), eq(chatId), eq(category), any(User.class)))
+        Mockito.when(ragChatService.askQuestionStream(eq(question), eq(chatId), any(User.class)))
                 .thenReturn(mockStream);
 
         // Create the JSON payload that your controller expects

@@ -26,6 +26,7 @@ public class DocumentIngestionService {
     private final VectorStore vectorStore;
     private final JobStatusManager jobStatusManager;
     private final DocumentRepository documentRepository;
+    private final DocumentSummarizationService summarizationService;
 
     private final Counter documentUploadCounter;
     private final Counter vectorChunkCounter;
@@ -33,10 +34,12 @@ public class DocumentIngestionService {
     public DocumentIngestionService(VectorStore vectorStore,
                                     JobStatusManager jobStatusManager,
                                     DocumentRepository documentRepository,
+                                    DocumentSummarizationService summarizationService,
                                     MeterRegistry meterRegistry) {
         this.vectorStore = vectorStore;
         this.jobStatusManager = jobStatusManager;
         this.documentRepository = documentRepository;
+        this.summarizationService = summarizationService;
 
         this.documentUploadCounter = Counter.builder("rag.documents.uploaded.total")
                 .description("Total number of PDF documents ingested")
@@ -70,7 +73,7 @@ public class DocumentIngestionService {
             TikaDocumentReader reader = new TikaDocumentReader(new InputStreamResource(fileStream));
             List<Document> rawDocuments = reader.get();
 
-            // ✅ Cleaned up metadata mapping - stamps the vector with chatId and userId directly
+            // Cleaned up metadata mapping - stamps the vector with chatId and userId directly
             List<Document> enrichedDocuments = rawDocuments.stream()
                     .map(doc -> {
                         Map<String, Object> newMetadata = new HashMap<>(doc.getMetadata());
@@ -108,6 +111,13 @@ public class DocumentIngestionService {
 
             dbDocument.setStatus(com.TeachMe.TeachMe.entity.Document.DocumentStatus.COMPLETED);
             documentRepository.save(dbDocument);
+
+            // AUTO-TRIGGER SUMMARIZATION for large documents (100+ pages estimated from chunk count)
+            if (splitDocuments.size() > 50) { // Rough estimate: 50+ chunks ≈ 100+ pages
+                log.info("Document {} has {} chunks, triggering auto-summarization",
+                        dbDocument.getId(), splitDocuments.size());
+                summarizationService.generateSummaryAsync(dbDocument.getId());
+            }
 
         } catch (Exception e) {
             log.error("Job {}: Failed to process document", jobId, e);

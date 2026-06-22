@@ -2,14 +2,14 @@ package com.TeachMe.TeachMe.controller;
 
 import com.TeachMe.TeachMe.entity.User;
 import com.TeachMe.TeachMe.repository.UserRepository;
+import com.TeachMe.TeachMe.service.AuthService;
 import com.TeachMe.TeachMe.service.DocumentIngestionService;
 import com.TeachMe.TeachMe.service.JobStatusManager;
+import com.TeachMe.TeachMe.service.QuizGenerationService;
+import com.TeachMe.TeachMe.dto.QuizDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,13 +18,16 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/documents")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class DocumentController {
 
     private final DocumentIngestionService ingestionService;
+    private final QuizGenerationService quizGenerationService;
     private final JobStatusManager jobStatusManager;
     private final UserRepository userRepository;
+    private final AuthService authService;
+
+    private static final String ERROR_KEY = "error";
 
     @PostMapping("/upload")
     public ResponseEntity<Map<String, String>> uploadPdf(
@@ -32,18 +35,12 @@ public class DocumentController {
             @RequestParam("chatId") String chatId,
             @RequestParam(value = "category", defaultValue = "general") String category) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "User is not authenticated"));
-            }
-
-            String userEmail = authentication.getName();
-            User currentUser = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            Long userId = authService.getAuthenticatedUserId();
+            User currentUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found in repository"));
 
             String jobId = UUID.randomUUID().toString();
 
-            // ✅ Correctly passes 7 parameters down to match the new Service signature
             ingestionService.ingestPdfAsync(
                     file.getInputStream(),
                     file.getOriginalFilename(),
@@ -59,7 +56,7 @@ public class DocumentController {
                     "jobId", jobId
             ));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to initialize upload: " + e.getMessage()));
+            return ResponseEntity.internalServerError().body(Map.of(ERROR_KEY, "Failed to initialize upload: " + e.getMessage()));
         }
     }
 
@@ -70,5 +67,24 @@ public class DocumentController {
                 "jobId", jobId,
                 "status", status
         ));
+    }
+
+    @PostMapping("/{documentId}/generate-quiz")
+    public ResponseEntity<Map<String, Object>> generateDocumentQuiz(@PathVariable Long documentId) {
+        try {
+            Long userId = authService.getAuthenticatedUserId();
+            User currentUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found in repository"));
+
+            QuizDTO quiz = quizGenerationService.generateQuiz(documentId, currentUser);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "message", "Quiz generated successfully",
+                    "quiz", quiz
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(ERROR_KEY, "Failed to generate quiz: " + e.getMessage()));
+        }
     }
 }

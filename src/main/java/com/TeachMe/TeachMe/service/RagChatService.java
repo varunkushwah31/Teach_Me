@@ -3,20 +3,19 @@ package com.TeachMe.TeachMe.service;
 import com.TeachMe.TeachMe.entity.Chat;
 import com.TeachMe.TeachMe.entity.User;
 import com.TeachMe.TeachMe.repository.ChatRepository;
+import com.TeachMe.TeachMe.dto.CitationDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,60 +25,79 @@ public class RagChatService {
 
     private final ChatClient mainChatClient;
     private final ChatClient rewriteClient;
-    private final VectorStore vectorStore;
     private final ChatMemory chatMemory;
     private final ChatRepository chatRepository;
+    private final HybridSearchService hybridSearchService;
+    private final ReRankingService reRankingService;
+    private final CitationService citationService;
 
+    // ✅ Removed vectorStore from constructor injection and class fields
     public RagChatService(ChatClient.Builder chatClientBuilder,
-                          VectorStore vectorStore,
                           ChatMemory chatMemory,
-                          ChatRepository chatRepository) {
+                          ChatRepository chatRepository,
+                          HybridSearchService hybridSearchService,
+                          ReRankingService reRankingService,
+                          CitationService citationService) {
         this.mainChatClient = chatClientBuilder
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
         this.rewriteClient = chatClientBuilder.build();
-        this.vectorStore = vectorStore;
         this.chatMemory = chatMemory;
         this.chatRepository = chatRepository;
+        this.hybridSearchService = hybridSearchService;
+        this.reRankingService = reRankingService;
+        this.citationService = citationService;
     }
 
-    public Flux<String> askQuestionStream(String question, String chatId, String category, User currentUser) {
+    // Removed unused 'category' parameter
+    public Flux<String> askQuestionStream(String question, String chatId, User currentUser) {
         log.info("Session {}: Received Original Question: '{}'", chatId, question);
 
         String optimizedQuery = optimizeSearchQuery(question, chatId);
         log.info("Session {}: Optimized Database Query: '{}'", chatId, optimizedQuery);
 
-        SearchRequest.Builder requestBuilder = SearchRequest.builder()
-                .query(optimizedQuery)
-                .topK(4);
-
-        // Strict Multi-Tenant Isolation Filter
-        FilterExpressionBuilder b = new FilterExpressionBuilder();
-        var dynamicFilter = b.and(
-                b.eq("userId", currentUser.getId()),
-                b.eq("chatId", chatId)
+        // HYBRID SEARCH: Combine vector search and full-text search
+        List<Document> similarDocuments = hybridSearchService.hybridSearch(
+                optimizedQuery,
+                currentUser.getId(),
+                chatId,
+                8 // Retrieve more documents for re-ranking
         );
+        log.info("Hybrid search returned {} documents", similarDocuments.size());
 
-        if (category != null && !category.equalsIgnoreCase("all")) {
-            dynamicFilter = b.and(dynamicFilter, b.eq("category", category));
+        // RE-RANKING: Score chunks for relevance before sending to LLM
+        List<Document> reRankedDocuments = reRankingService.reRankChunks(
+                optimizedQuery,
+                similarDocuments,
+                4 // Keep top 4 after re-ranking
+        );
+        log.info("Re-ranking reduced to {} documents", reRankedDocuments.size());
+
+        // Build context with numbered citations
+        StringBuilder contextBuilder = new StringBuilder();
+        // Explicitly declared ArrayList to avoid the verbose java.util prefix
+        List<String> sourceChunks = new ArrayList<>();
+
+        for (int i = 0; i < reRankedDocuments.size(); i++) {
+            Document doc = reRankedDocuments.get(i);
+            contextBuilder.append("[").append(i + 1).append("] ");
+            contextBuilder.append(doc.getText());
+            contextBuilder.append("\n\n");
+            sourceChunks.add(doc.getText());
         }
 
-        // Pass the complete compiled expression directly to the vector store request
-        requestBuilder.filterExpression(dynamicFilter.build());
-
-        List<Document> similarDocuments = vectorStore.similaritySearch(requestBuilder.build());
-
-        String context = similarDocuments.stream()
-                .map(Document::getText)
-                .collect(Collectors.joining("\n\n---\n\n"));
-
-        log.info("Found {} relevant chunks matching this chat session.", similarDocuments.size());
+        String context = contextBuilder.toString();
+        log.info("Found {} relevant chunks matching this chat session.", reRankedDocuments.size());
 
         String systemInstruction = """
                 You are an expert academic tutor. Answer the user's question using ONLY the provided context below.
+                
+                IMPORTANT: When citing information from the context, include citations in the format [1], [2], etc., where the number refers to the numbered sources below.
+                Example: "According to the documentation [1], the process works as follows..."
+                
                 If the answer cannot be found in the context, clearly state that you do not have enough information.
                 
-                Context:
+                Numbered Context Sources:
                 """ + context;
 
         StringBuilder aiResponseBuffer = new StringBuilder();
@@ -100,7 +118,20 @@ public class RagChatService {
                             .user(currentUser)
                             .build();
 
-                    chatRepository.save(chatRecord);
+                    Chat savedChat = chatRepository.save(chatRecord);
+
+                    // Extract and save citations
+                    try {
+                        List<CitationDTO> citations = citationService.extractAndSaveCitations(
+                                savedChat,
+                                aiResponseBuffer.toString(),
+                                sourceChunks
+                        );
+                        log.info("Session {}: Extracted {} citations", chatId, citations.size());
+                    } catch (Exception e) {
+                        log.warn("Failed to extract citations", e);
+                    }
+
                     log.info("Session {}: Chat history securely saved to PostgreSQL.", chatId);
                 }).subscribeOn(Schedulers.boundedElastic()).subscribe());
     }

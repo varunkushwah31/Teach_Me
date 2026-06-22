@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ChatHistoryServiceImpl implements ChatHistoryService {
@@ -50,5 +52,36 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     public PaginatedResponse<ChatHistoryDTO> searchHistoryBySession(String sessionId, String searchTerm, Pageable pageable) {
         Page<Chat> chatPage = chatRepository.searchBySessionIdAndTerm(sessionId, searchTerm, pageable);
         return PaginatedResponse.fromPage(chatPage.map(ChatHistoryDTO::fromEntity));
+    }
+
+    // Consume unpaginated List methods for Session Rebuilding and Data Export
+    public List<ChatHistoryDTO> getFullSessionHistory(String sessionId) {
+        return chatRepository.findBySessionId(sessionId).stream()
+                .map(ChatHistoryDTO::fromEntity)
+                .toList();
+    }
+
+    public List<ChatHistoryDTO> exportUserChats(Long userId) {
+        return chatRepository.findByUserId(userId).stream()
+                .map(ChatHistoryDTO::fromEntity)
+                .toList();
+    }
+
+    public List<ChatHistoryDTO> exportUserChatsSorted(Long userId) {
+        return chatRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(ChatHistoryDTO::fromEntity)
+                .toList();
+    }
+
+    public List<ChatHistoryDTO> getChatsForDocument(Long documentId) {
+        return chatRepository.findByDocumentId(documentId).stream()
+                .map(ChatHistoryDTO::fromEntity)
+                .toList();
+    }
+
+    public List<ChatHistoryDTO> getChatsForDocumentSorted(Long documentId) {
+        return chatRepository.findByDocumentIdOrderByCreatedAtDesc(documentId).stream()
+                .map(ChatHistoryDTO::fromEntity)
+                .toList();
     }
 }

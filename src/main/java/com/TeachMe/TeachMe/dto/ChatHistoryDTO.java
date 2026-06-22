@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,7 +29,10 @@ public class ChatHistoryDTO {
     @JsonProperty("documentName")
     private String documentName;
 
-    // ✅ Added the static mapping method here
+    @JsonProperty("citations")
+    private List<CitationDTO> citations;
+
+    // Added the static mapping method here
     public static ChatHistoryDTO fromEntity(Chat chat) {
         return ChatHistoryDTO.builder()
                 .id(chat.getId())
