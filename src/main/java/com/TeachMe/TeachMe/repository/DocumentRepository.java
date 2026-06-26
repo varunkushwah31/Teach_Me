@@ -26,6 +26,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     List<Document> findByCreatedAtBefore(LocalDateTime cutoff);
 
+    List<Document> findByStatus(Document.DocumentStatus status);
+
     @Query("SELECT d FROM Document d WHERE d.user.id = :userId AND LOWER(d.fileName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     Page<Document> searchByUserIdAndTerm(@Param("userId") Long userId, @Param("searchTerm") String searchTerm, Pageable pageable);
 

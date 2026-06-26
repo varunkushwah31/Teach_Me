@@ -43,7 +43,8 @@ public class FlashcardController {
                 documentId = Long.valueOf(request.get("documentId").toString());
             }
 
-            FlashcardDTO flashcard = flashcardService.createFlashcard(front, back, sourceContent, deckName, documentId, currentUser);
+            FlashcardDTO flashcard = flashcardService.createFlashcard(
+                    front, back, sourceContent, deckName, documentId, currentUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(flashcard);
 
         } catch (Exception e) {
@@ -56,9 +57,7 @@ public class FlashcardController {
     public ResponseEntity<Page<FlashcardDTO>> getUserFlashcards(Pageable pageable) {
         try {
             Long userId = authService.getAuthenticatedUserId();
-            Page<FlashcardDTO> flashcards = flashcardService.getUserFlashcards(userId, pageable);
-            return ResponseEntity.ok(flashcards);
-
+            return ResponseEntity.ok(flashcardService.getUserFlashcards(userId, pageable));
         } catch (Exception e) {
             log.error("Failed to fetch user flashcards", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -66,12 +65,11 @@ public class FlashcardController {
     }
 
     @GetMapping("/deck/{deckName}")
-    public ResponseEntity<Page<FlashcardDTO>> getFlashcardsByDeck(@PathVariable String deckName, Pageable pageable) {
+    public ResponseEntity<Page<FlashcardDTO>> getFlashcardsByDeck(
+            @PathVariable String deckName, Pageable pageable) {
         try {
             Long userId = authService.getAuthenticatedUserId();
-            Page<FlashcardDTO> flashcards = flashcardService.getFlashcardsByDeck(userId, deckName, pageable);
-            return ResponseEntity.ok(flashcards);
-
+            return ResponseEntity.ok(flashcardService.getFlashcardsByDeck(userId, deckName, pageable));
         } catch (Exception e) {
             log.error("Failed to fetch flashcards for deck: {}", deckName, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -82,9 +80,7 @@ public class FlashcardController {
     public ResponseEntity<List<FlashcardDTO>> getDueFlashcards() {
         try {
             Long userId = authService.getAuthenticatedUserId();
-            List<FlashcardDTO> dueCards = flashcardService.getDueFlashcards(userId);
-            return ResponseEntity.ok(dueCards);
-
+            return ResponseEntity.ok(flashcardService.getDueFlashcards(userId));
         } catch (Exception e) {
             log.error("Failed to fetch due flashcards", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -92,18 +88,27 @@ public class FlashcardController {
     }
 
     @PostMapping("/{flashcardId}/review")
-    public ResponseEntity<FlashcardDTO> reviewFlashcard(@PathVariable Long flashcardId,
-                                                        @RequestBody Map<String, Integer> request) {
+    public ResponseEntity<FlashcardDTO> reviewFlashcard(
+            @PathVariable Long flashcardId,
+            @RequestBody Map<String, Integer> request) {
         try {
-            // Safely unbox the Integer to prevent NullPointerExceptions
             Integer quality = request.get("quality");
             if (quality == null || quality < 0 || quality > 5) {
-                log.warn("Invalid or missing quality score for flashcard review: {}", quality);
+                log.warn("Invalid quality score for flashcard review: {}", quality);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-            FlashcardDTO updated = flashcardService.reviewFlashcard(flashcardId, quality);
-            return ResponseEntity.ok(updated);
+            Long userId = authService.getAuthenticatedUserId();
+
+            // Ownership check: a user must not be able to update another user's
+            // SM-2 schedule by guessing or enumerating flashcard IDs.
+            if (!flashcardService.isOwnedByUser(flashcardId, userId)) {
+                log.warn("User {} attempted to review flashcard {} they do not own",
+                        userId, flashcardId);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            return ResponseEntity.ok(flashcardService.reviewFlashcard(flashcardId, quality));
 
         } catch (Exception e) {
             log.error("Failed to submit review for flashcard ID: {}", flashcardId, e);
@@ -114,6 +119,14 @@ public class FlashcardController {
     @DeleteMapping("/{flashcardId}")
     public ResponseEntity<Void> deleteFlashcard(@PathVariable Long flashcardId) {
         try {
+            Long userId = authService.getAuthenticatedUserId();
+
+            if (!flashcardService.isOwnedByUser(flashcardId, userId)) {
+                log.warn("User {} attempted to delete flashcard {} they do not own",
+                        userId, flashcardId);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
             flashcardService.deleteFlashcard(flashcardId);
             return ResponseEntity.noContent().build();
 
@@ -126,9 +139,7 @@ public class FlashcardController {
     @GetMapping("/document/{documentId}")
     public ResponseEntity<List<FlashcardDTO>> getFlashcardsByDocument(@PathVariable Long documentId) {
         try {
-            List<FlashcardDTO> flashcards = flashcardService.getFlashcardsByDocument(documentId);
-            return ResponseEntity.ok(flashcards);
-
+            return ResponseEntity.ok(flashcardService.getFlashcardsByDocument(documentId));
         } catch (Exception e) {
             log.error("Failed to fetch flashcards for document ID: {}", documentId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

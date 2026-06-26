@@ -2,20 +2,17 @@ spring:
   application:
     name: TeachMe
 
-  # --- File Upload Limits ---
   servlet:
     multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
+      max-file-size: 8388608
+      max-request-size: 8388608
 
-  # --- PostgreSQL Connection ---
   datasource:
-    url: jdbc:postgresql://localhost:5433/vectordb # Point to the safe port
+    url: jdbc:postgresql://localhost:5433/vectordb
     username: springai
     password: secret
     driver-class-name: org.postgresql.Driver
 
-  # --- JPA & Hibernate Configuration ---
   jpa:
     hibernate:
       ddl-auto: update
@@ -31,7 +28,6 @@ spring:
     show-sql: false
     open-in-view: false
 
-  # --- Spring AI & Ollama Configuration ---
   ai:
     ollama:
       base-url: http://localhost:11434
@@ -42,7 +38,6 @@ spring:
         model: nomic-embed-text
         keep-alive: 0m
 
-    # --- pgvector Configuration ---
     vectorstore:
       pgvector:
         dimensions: 768
@@ -50,23 +45,18 @@ spring:
         index-type: HNSW
         initialize-schema: true
 
-  # --- DevTools ---
   devtools:
     restart:
       enabled: true
 
-# --- Spring Boot Server (Tomcat) Configuration ---
 server:
   port: 8081
   tomcat:
     connection-timeout: 10000ms
     keep-alive-timeout: 60000ms
-    max-http-form-post-size: 10MB # Helpful for uploading large PDF documents
+    max-http-form-post-size: 10MB
   max-http-request-header-size: 16KB
 
-# ==========================================
-# ACTUATOR & OBSERVABILITY CONFIGURATION
-# ==========================================
 management:
   endpoints:
     web:
@@ -81,17 +71,24 @@ management:
     tags:
       application: TeachMe-RAG-Engine
 
-# --- Application Info Metadata ---
 info:
   app:
     name: "TeachMe AI Backend"
     description: "Enterprise RAG Pipeline"
     version: "1.0.0"
 
-# --- Custom Security Configuration ---
 application:
   security:
     jwt:
-      # This is a generated 256-bit secure hex key. In production, inject this via environment variables!
-      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      expiration: 86400000 # 1 day in milliseconds
+      # Inject via environment variable — no fallback default, so the app fails
+      # fast with a clear error rather than starting with an insecure literal key.
+      # Generate a key: openssl rand -base64 32
+      # Set in production: JWT_SECRET_KEY=<your-key>
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: 86400000  # 1 day in milliseconds
+
+# CORS allowed origins.
+# Default covers local development on Vite (5173) and CRA (3000).
+# Override in production: CORS_ALLOWED_ORIGINS=https://app.teachme.example.com
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}

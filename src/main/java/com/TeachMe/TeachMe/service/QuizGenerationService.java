@@ -7,14 +7,16 @@ import com.TeachMe.TeachMe.entity.Quiz;
 import com.TeachMe.TeachMe.entity.QuizQuestion;
 import com.TeachMe.TeachMe.entity.User;
 import com.TeachMe.TeachMe.exception.FileProcessingException;
-import com.TeachMe.TeachMe.repository.QuizRepository;
 import com.TeachMe.TeachMe.repository.DocumentRepository;
+import com.TeachMe.TeachMe.repository.QuizRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -40,31 +42,35 @@ public class QuizGenerationService {
     }
 
     public QuizDTO generateQuiz(Long documentId, User currentUser) {
-        log.info("Starting structured quiz generation for document ID: {}", documentId);
+        log.info("Generating quiz for document ID: {}", documentId);
 
         com.TeachMe.TeachMe.entity.Document doc = documentRepository.findById(documentId)
-                .orElseThrow(() -> new FileProcessingException("Document not found"));
+                .orElseThrow(() -> new FileProcessingException("Document not found: " + documentId));
 
+        // topK rose from 5 → 25, so quiz questions sample a representative slice
+        // of the document rather than just the first five chunks. The combined
+        // context string is then passed to the LLM, which already handles large inputs.
         SearchRequest searchRequest = SearchRequest.builder()
-                .topK(5)
-                .filterExpression(new FilterExpressionBuilder().eq("dbDocumentId", documentId).build())
+                .topK(25)
+                .filterExpression(
+                        new FilterExpressionBuilder().eq("dbDocumentId", documentId).build())
                 .build();
 
         List<Document> documentChunks = vectorStore.similaritySearch(searchRequest);
+        log.info("Retrieved {} chunks for quiz generation (documentId={})",
+                documentChunks.size(), documentId);
 
         String combinedContext = documentChunks.stream()
                 .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
-        log.info("Retrieved {} chunks for quiz context generation", documentChunks.size());
-
-        String systemPrompt = "You are an expert educational assessment designer. " +
-                "Generate a 5-question multiple-choice quiz based strictly on the provided document content.";
+        String systemPrompt = "You are an expert educational assessment designer. "
+                + "Generate a 5-question multiple-choice quiz based strictly on "
+                + "the provided document content.";
 
         String userPrompt = "Create a quiz using this document context:\n\n" + combinedContext;
 
         try {
-            // ✅ Spring AI automatically handles JSON parsing and Markdown stripping via .entity()
             AiQuizResponse aiResponse = chatClient.prompt()
                     .system(systemPrompt)
                     .user(userPrompt)
@@ -72,23 +78,23 @@ public class QuizGenerationService {
                     .entity(AiQuizResponse.class);
 
             if (aiResponse == null || aiResponse.questions() == null) {
-                throw new IllegalStateException("LLM returned an empty response or invalid schema");
+                throw new IllegalStateException("LLM returned an empty or invalid quiz response");
             }
 
             Quiz quiz = createQuizFromAiResponse(aiResponse, doc, currentUser);
             Quiz savedQuiz = quizRepository.save(quiz);
-
-            log.info("Quiz generated and saved successfully with ID: {}", savedQuiz.getId());
+            log.info("Quiz saved with ID: {}", savedQuiz.getId());
             return mapQuizToDTO(savedQuiz);
 
         } catch (Exception e) {
-            log.error("Failed to generate quiz", e);
-            // ✅ Using specific custom exception
+            log.error("Failed to generate quiz for document {}", documentId, e);
             throw new FileProcessingException("Quiz generation failed: " + e.getMessage(), e);
         }
     }
 
-    private Quiz createQuizFromAiResponse(AiQuizResponse data, com.TeachMe.TeachMe.entity.Document doc, User currentUser) {
+    private Quiz createQuizFromAiResponse(AiQuizResponse data,
+                                          com.TeachMe.TeachMe.entity.Document doc,
+                                          User currentUser) {
         Quiz quiz = Quiz.builder()
                 .title(data.title())
                 .description(data.description() != null ? data.description() : "")
@@ -98,21 +104,18 @@ public class QuizGenerationService {
                 .build();
 
         Set<QuizQuestion> questions = new HashSet<>();
-        List<AiQuizResponse.QuestionItem> questionItems = data.questions();
+        List<AiQuizResponse.QuestionItem> items = data.questions();
 
-        for (int i = 0; i < questionItems.size(); i++) {
-            AiQuizResponse.QuestionItem item = questionItems.get(i);
-
-            QuizQuestion question = QuizQuestion.builder()
+        for (int i = 0; i < items.size(); i++) {
+            AiQuizResponse.QuestionItem item = items.get(i);
+            questions.add(QuizQuestion.builder()
                     .questionText(item.questionText())
                     .questionOrder(i)
                     .options(item.options())
                     .correctAnswerIndex(item.correctAnswerIndex())
                     .explanation(item.explanation() != null ? item.explanation() : "")
                     .quiz(quiz)
-                    .build();
-
-            questions.add(question);
+                    .build());
         }
 
         quiz.setQuestions(questions);
@@ -131,7 +134,7 @@ public class QuizGenerationService {
                         .correctAnswerIndex(q.getCorrectAnswerIndex())
                         .explanation(q.getExplanation())
                         .build())
-                .toList(); // ✅ Modern Java 16+ .toList()
+                .toList();
 
         return QuizDTO.builder()
                 .id(quiz.getId())
@@ -147,7 +150,7 @@ public class QuizGenerationService {
 
     public QuizDTO getQuiz(Long quizId) {
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new FileProcessingException("Quiz not found"));
+                .orElseThrow(() -> new FileProcessingException("Quiz not found: " + quizId));
         return mapQuizToDTO(quiz);
     }
 
@@ -163,8 +166,7 @@ public class QuizGenerationService {
                 .toList();
     }
 
-    public org.springframework.data.domain.Page<QuizDTO> getPaginatedQuizzesForUser(Long userId, org.springframework.data.domain.Pageable pageable) {
-        return quizRepository.findByUserId(userId, pageable)
-                .map(this::mapQuizToDTO);
+    public Page<QuizDTO> getPaginatedQuizzesForUser(Long userId, Pageable pageable) {
+        return quizRepository.findByUserId(userId, pageable).map(this::mapQuizToDTO);
     }
 }

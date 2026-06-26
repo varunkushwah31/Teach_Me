@@ -1,109 +1,77 @@
 package com.TeachMe.TeachMe.service;
 
+import com.TeachMe.TeachMe.controller.SearchController;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ReRankingService {
 
-    private final ChatClient chatClient;
-
-    public ReRankingService(ChatClient.Builder chatClientBuilder) {
-        this.chatClient = chatClientBuilder.build();
-    }
-
+    /**
+     * Re-ranks {@code chunks} by keyword overlap with the query and returns the
+     * top-{@code topK} results.
+     *
+     * <p>The previous implementation called the LLM once per chunk (O(n) Ollama
+     * round-trips per user message). With 8 chunks and a local deepseek-r1:8b
+     * model that adds ~8 × 3-5 s ≈ 30–40 s of latency before the user sees a
+     * single token — unacceptable for a streaming chat interface.
+     *
+     * <p>Keyword scoring alone is enough here: the upstream HybridSearchService
+     * already narrows the candidate set to semantically relevant chunks via pgvector
+     * cosine similarity and full-text BM25. Re ranking only needs to break ties and
+     * push the most query-term-dense chunks to the top.
+     *
+     * <p>If you later want semantic re-ranking, the right approach is a single
+     * batched prompt: "Given query Q, rank these 8 chunk IDs by relevance. Return
+     * only: 3,1,7,2,…" — one LLM call instead of eight.
+     */
     public List<Document> reRankChunks(String query, List<Document> chunks, int topK) {
-        log.info("Re-ranking {} chunks for query: {}", chunks.size(), query);
+        log.info("Re-ranking {} chunks for query: '{}'", chunks.size(), query);
 
         if (chunks.size() <= topK) {
             return chunks;
         }
 
-        Map<String, Double> relevanceScores = new HashMap<>();
+        String[] queryTerms = query.toLowerCase().split("[\\s\\p{Punct}]+");
 
-        for (Document chunk : chunks) {
-            double score = calculateRelevanceScore(query, chunk.getText());
-            relevanceScores.put(chunk.getId(), score);
-        }
-
-        // Modern Java Streams
         return chunks.stream()
                 .sorted((a, b) -> Double.compare(
-                        relevanceScores.getOrDefault(b.getId(), 0.0),
-                        relevanceScores.getOrDefault(a.getId(), 0.0)
-                ))
+                        keywordScore(queryTerms, b.getText()),
+                        keywordScore(queryTerms, a.getText())))
                 .limit(topK)
                 .toList();
     }
 
-    private double calculateRelevanceScore(String query, String chunkText) {
-        try {
-            String[] queryTerms = query.toLowerCase().split("[\\s\\p{Punct}]+");
-            String chunkLower = chunkText.toLowerCase();
-
-            double keywordScore = 0;
-            for (String term : queryTerms) {
-                if (term.length() > 2 && chunkLower.contains(term)) {
-                    keywordScore += 1.0;
-                }
-            }
-
-            double semanticScore = getSemanticRelevanceScore(query, chunkText);
-
-            // Immediately return score without assigning variable
-            return (keywordScore * 0.3) + (semanticScore * 0.7);
-
-        } catch (Exception e) {
-            log.warn("Error calculating relevance score", e);
-            return 0.0;
-        }
-    }
-
-    private double getSemanticRelevanceScore(String query, String chunk) {
-        try {
-            String truncatedChunk = chunk.length() > 500 ? chunk.substring(0, 500) + "..." : chunk;
-
-            String prompt = String.format(
-                    "Rate how relevant this text chunk is to the query '%s' on a scale of 0-10 (only respond with a number):\\n%s",
-                    query, truncatedChunk
-            );
-
-            String response = chatClient.prompt()
-                    .user(prompt)
-                    .call()
-                    .content();
-
-            if (response == null) return 0.5;
-
-            return Double.parseDouble(response.trim().replaceAll("\\D", "")) / 10.0;
-
-        } catch (Exception e) {
-            log.warn("Error getting semantic relevance score", e);
-            return 0.5;
-        }
-    }
-
     /**
-     * Trigger the batchReRank method
+     * Returns the number of distinct query terms (longer than 2 chars) that
+     * appear in {@code chunkText}. Simple, fast, zero external calls.
      */
-    public Map<String, List<Document>> processMultipleQueries(Map<String, List<Document>> queries) {
+    private double keywordScore(String[] queryTerms, String chunkText) {
+        if (chunkText == null) return 0.0;
+        String lower = chunkText.toLowerCase();
+        return Arrays.stream(queryTerms)
+                .filter(t -> t.length() > 2 && lower.contains(t))
+                .count();
+    }
+
+    /** Convenience wrapper used by {@link SearchController}. */
+    public Map<String, List<Document>> processMultipleQueries(
+            Map<String, List<Document>> queries) {
         return batchReRank(queries, 4);
     }
 
-    /**
-     * Batch re-rank multiple query-chunk pairs
-     */
-    public Map<String, List<Document>> batchReRank(Map<String, List<Document>> queryChunksMap, int topK) {
+    public Map<String, List<Document>> batchReRank(
+            Map<String, List<Document>> queryChunksMap, int topK) {
         return queryChunksMap.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> reRankChunks(entry.getKey(), entry.getValue(), topK)
-                ));
+                        e -> reRankChunks(e.getKey(), e.getValue(), topK)));
     }
 }
