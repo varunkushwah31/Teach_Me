@@ -32,13 +32,14 @@ public class DocumentSummary {
     // produces content. Setting nullable=false here causes a NOT NULL constraint
     // violation on that initial insert. The column becomes non-null only after the
     // async job completes and sets status=COMPLETED.
-    @Column(columnDefinition = "TEXT")
+
+    @Column(columnDefinition = "TEXT", nullable = true)
     private String executiveSummary;
 
-    @Column(name = "summary_length")
+    @Column(name = "summary_length", nullable = true)
     private Integer summaryLength;
 
-    @Column(name = "word_count")
+    @Column(name = "word_count", nullable = true)
     private Integer wordCount;
 
     @Enumerated(EnumType.STRING)
@@ -80,4 +81,5 @@ public class DocumentSummary {
                 ? hp.getHibernateLazyInitializer().getPersistentClass().hashCode()
                 : getClass().hashCode();
     }
+
 }
