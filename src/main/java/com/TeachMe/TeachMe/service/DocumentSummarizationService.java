@@ -42,10 +42,12 @@ public class DocumentSummarizationService {
         com.TeachMe.TeachMe.entity.Document dbDocument = documentRepository.findById(documentId)
                 .orElseThrow(() -> new RuntimeException("Document not found"));
 
-        DocumentSummary summary = DocumentSummary.builder()
-                .document(dbDocument)
-                .status(DocumentSummary.SummaryStatus.PROCESSING)
-                .build();
+        //  UPSERT PATTERN: Find the existing summary row or create a new one if it doesn't exist.
+        DocumentSummary summary = documentSummaryRepository.findByDocumentId(documentId)
+                .orElse(DocumentSummary.builder().document(dbDocument).build());
+
+        // Now safely update the status to PROCESSING
+        summary.setStatus(DocumentSummary.SummaryStatus.PROCESSING);
         documentSummaryRepository.save(summary);
 
         try {
@@ -57,12 +59,11 @@ public class DocumentSummarizationService {
             List<String> chunkSummaries = mapPhase(documentChunks);
             log.info("Map phase complete: {} summaries generated", chunkSummaries.size());
 
-            // Reduce phase: Combine chunk summaries into executive summary (Removed unused param)
+            // Reduce phase: Combine chunk summaries into executive summary
             String executiveSummary = reducePhase(chunkSummaries);
             log.info("Reduce phase complete");
 
             // Update summary record
-            // Safe null check before splitting
             int wordCount = (executiveSummary != null) ? executiveSummary.split("\\s+").length : 0;
             int length = (executiveSummary != null) ? executiveSummary.length() : 0;
 

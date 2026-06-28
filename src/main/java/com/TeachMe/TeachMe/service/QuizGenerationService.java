@@ -11,6 +11,7 @@ import com.TeachMe.TeachMe.repository.DocumentRepository;
 import com.TeachMe.TeachMe.repository.QuizRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -47,9 +48,6 @@ public class QuizGenerationService {
         com.TeachMe.TeachMe.entity.Document doc = documentRepository.findById(documentId)
                 .orElseThrow(() -> new FileProcessingException("Document not found: " + documentId));
 
-        // topK rose from 5 → 25, so quiz questions sample a representative slice
-        // of the document rather than just the first five chunks. The combined
-        // context string is then passed to the LLM, which already handles large inputs.
         SearchRequest searchRequest = SearchRequest.builder()
                 .topK(25)
                 .filterExpression(
@@ -68,18 +66,30 @@ public class QuizGenerationService {
                 + "Generate a 5-question multiple-choice quiz based strictly on "
                 + "the provided document content.";
 
-        String userPrompt = "Create a quiz using this document context:\n\n" + combinedContext;
+        // 1. Manually instantiate Spring AI's structured output converter
+        BeanOutputConverter<AiQuizResponse> converter = new BeanOutputConverter<>(AiQuizResponse.class);
+
+        // 2. Append the required JSON schema format instructions directly to the prompt
+        String userPrompt = "@question_retrieval Create a quiz based on this document context:\n\n" + combinedContext
+                + "\n\n" + converter.getFormat();
 
         try {
-            AiQuizResponse aiResponse = chatClient.prompt()
+            // 3. Request RAW text (.content()) instead of an automated entity mapping (.entity())
+            String rawResponse = chatClient.prompt()
                     .system(systemPrompt)
                     .user(userPrompt)
                     .call()
-                    .entity(AiQuizResponse.class);
+                    .content();
 
-            if (aiResponse == null || aiResponse.questions() == null) {
+            if (rawResponse == null || rawResponse.isBlank()) {
                 throw new IllegalStateException("LLM returned an empty or invalid quiz response");
             }
+
+            // 4. Surgically remove DeepSeek reasoning tags
+            String cleanJson = cleanDeepSeekTags(rawResponse);
+
+            // 5. Safely parse the pure JSON string
+            AiQuizResponse aiResponse = converter.convert(cleanJson);
 
             Quiz quiz = createQuizFromAiResponse(aiResponse, doc, currentUser);
             Quiz savedQuiz = quizRepository.save(quiz);
@@ -90,6 +100,14 @@ public class QuizGenerationService {
             log.error("Failed to generate quiz for document {}", documentId, e);
             throw new FileProcessingException("Quiz generation failed: " + e.getMessage(), e);
         }
+    }
+
+    private String cleanDeepSeekTags(String response) {
+        if (response == null) return "";
+        if (response.contains("</think>")) {
+            response = response.substring(response.indexOf("</think>") + 8);
+        }
+        return response.trim();
     }
 
     private Quiz createQuizFromAiResponse(AiQuizResponse data,

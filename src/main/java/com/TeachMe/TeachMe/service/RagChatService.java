@@ -1,6 +1,5 @@
 package com.TeachMe.TeachMe.service;
 
-import com.TeachMe.TeachMe.dto.CitationDTO;
 import com.TeachMe.TeachMe.entity.Chat;
 import com.TeachMe.TeachMe.repository.ChatRepository;
 import com.TeachMe.TeachMe.repository.UserRepository;
@@ -64,32 +63,21 @@ public class RagChatService {
     }
 
     public Flux<String> askQuestionStream(String question, String chatId, Long userId) {
-        // Resolve the blocking JPA call safely on an elastic scheduler before
-        // entering the reactive pipeline.
         return Mono.fromCallable(() -> userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found")))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(currentUser -> {
-
                     log.info("Session {}: question='{}' userId={}", chatId, question, userId);
 
                     String optimizedQuery = optimizeSearchQuery(question, chatId);
-                    log.info("Session {}: optimized query='{}'", chatId, optimizedQuery);
-
-                    List<Document> similarDocuments = hybridSearchService.hybridSearch(
-                            optimizedQuery, currentUser.getId(), chatId, 8);
-                    log.info("Hybrid search returned {} documents", similarDocuments.size());
-
-                    List<Document> reRankedDocuments = reRankingService.reRankChunks(
-                            optimizedQuery, similarDocuments, 4);
-                    log.info("Re-ranking produced {} documents", reRankedDocuments.size());
+                    List<Document> similarDocuments = hybridSearchService.hybridSearch(optimizedQuery, currentUser.getId(), chatId, 8);
+                    List<Document> reRankedDocuments = reRankingService.reRankChunks(optimizedQuery, similarDocuments, 4);
 
                     StringBuilder contextBuilder = new StringBuilder();
                     List<String> sourceChunks = new ArrayList<>();
                     for (int i = 0; i < reRankedDocuments.size(); i++) {
                         Document doc = reRankedDocuments.get(i);
-                        contextBuilder.append("[").append(i + 1).append("] ")
-                                .append(doc.getText()).append("\n\n");
+                        contextBuilder.append("[").append(i + 1).append("] ").append(doc.getText()).append("\n\n");
                         sourceChunks.add(doc.getText());
                     }
 
@@ -97,40 +85,33 @@ public class RagChatService {
                     String systemInstruction = SYSTEM_INSTRUCTION_TEMPLATE + context;
                     StringBuilder aiResponseBuffer = new StringBuilder();
 
-                    Flux<String> tokenStream = mainChatClient.prompt()
+                    return mainChatClient.prompt()
                             .system(systemInstruction)
                             .user(question)
                             .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
                             .stream()
                             .content()
-                            .doOnNext(aiResponseBuffer::append);
-
-                    // ✅ Explicitly specify the type parameter <Void> to clear up compiler ambiguity
-                    Mono<Void> persistMono = Mono.<Void>fromRunnable(() -> {
-                        try {
-                            Chat chatRecord = Chat.builder()
-                                    .sessionId(chatId)
-                                    .question(question)
-                                    .answer(aiResponseBuffer.toString())
-                                    .context(context)
-                                    .user(currentUser)
-                                    .build();
-
-                            Chat savedChat = chatRepository.save(chatRecord);
-
-                            List<CitationDTO> citations = citationService.extractAndSaveCitations(
-                                    savedChat, aiResponseBuffer.toString(), sourceChunks);
-                            log.info("Session {}: saved chat #{}, {} citations",
-                                    chatId, savedChat.getId(), citations.size());
-                        } catch (Exception e) {
-                            // Log but don't surface — the user already received their answer.
-                            log.error("Session {}: failed to persist chat record", chatId, e);
-                        }
-                    }).subscribeOn(Schedulers.boundedElastic());
-
-                    // Use concatWith + cast to seamlessly append the DB task
-                    // without altering the Flux<String> return requirement.
-                    return tokenStream.concatWith(persistMono.cast(String.class));
+                            .doOnNext(aiResponseBuffer::append)
+                            .publishOn(Schedulers.boundedElastic())
+                            // ✅ Detach persistence: Trigger this only after the stream finishes
+                            .doFinally(signalType -> {
+                                if (signalType == reactor.core.publisher.SignalType.ON_COMPLETE) {
+                                    try {
+                                        Chat chatRecord = Chat.builder()
+                                                .sessionId(chatId)
+                                                .question(question)
+                                                .answer(aiResponseBuffer.toString())
+                                                .context(context)
+                                                .user(currentUser)
+                                                .build();
+                                        Chat savedChat = chatRepository.save(chatRecord);
+                                        citationService.extractAndSaveCitations(savedChat, aiResponseBuffer.toString(), sourceChunks);
+                                        log.info("Successfully persisted chat session {}", chatId);
+                                    } catch (Exception e) {
+                                        log.error("Failed to persist chat record", e);
+                                    }
+                                }
+                            });
                 });
     }
 
