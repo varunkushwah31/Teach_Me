@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/quiz")
 @RequiredArgsConstructor
+@Tag(name = "Quizzes", description = "Endpoints for generating, taking, and submitting document-based learning quizzes.")
 public class QuizController {
 
     private final QuizGenerationService quizGenerationService;

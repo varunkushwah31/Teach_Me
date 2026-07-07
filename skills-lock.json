@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "java-springboot": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/java-springboot/SKILL.md",
+      "computedHash": "f1b9c6b1277178fc33e5a612761c1cd1cf6ab5f946d05d69d52026d142c0a0c1"
+    },
+    "spring-ai": {
+      "source": "claude-dev-suite/claude-dev-suite",
+      "sourceType": "github",
+      "skillPath": "skills/backend-frameworks/spring-ai/SKILL.md",
+      "computedHash": "0a1a4270e588e9f72dcc460e2e0442f0fa9403ac56a89d7a9ec34b726e807465"
+    },
+    "spring-ai-mcp-server-patterns": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-java/skills/spring-ai-mcp-server-patterns/SKILL.md",
+      "computedHash": "0efedf3c3af42cf694f0fdd609a64a279aab0d18d2c1f22836edea6008712980"
+    },
+    "spring-boot-actuator": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-java/skills/spring-boot-actuator/SKILL.md",
+      "computedHash": "33b92e2c3bb04be3c093356a89217e3720d5bf4f11950b52b8c432d855eca27d"
+    },
+    "spring-boot-engineer": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/spring-boot-engineer/SKILL.md",
+      "computedHash": "293d15785cda1eaebdce24f99a6f363be5c25390e383324df1feeda158bba10d"
+    },
+    "spring-boot-openapi-documentation": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-java/skills/spring-boot-openapi-documentation/SKILL.md",
+      "computedHash": "bdd0f7da4a072d014a9e65235773cc3f38ca0d0925edd5d3fe85ab33b29bcd9d"
+    },
+    "spring-boot-security-jwt": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-java/skills/spring-boot-security-jwt/SKILL.md",
+      "computedHash": "f04cfa9e9e9cc68eefbfc7eb9e7a8d4f7e23f1a5545894f94aa88ce2dc2fe065"
+    },
+    "springboot-patterns": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "skillPath": "skills/springboot-patterns/SKILL.md",
+      "computedHash": "d2c003485e50a3e0f7ca325df55ea72c2810e9a0ab099313bd350b979733015c"
+    }
+  }
+}

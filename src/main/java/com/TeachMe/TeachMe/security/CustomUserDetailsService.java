@@ -3,6 +3,7 @@ package com.TeachMe.TeachMe.security;
 import com.TeachMe.TeachMe.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     @NonNull
+    @Cacheable(value = "users", key = "#username")
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
         // Fetch your custom JPA User entity from Postgres
         com.TeachMe.TeachMe.entity.User appUser = userRepository.findByEmail(username)

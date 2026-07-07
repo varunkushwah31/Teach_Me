@@ -10,6 +10,7 @@ import com.TeachMe.TeachMe.dto.QuizDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/documents")
 @RequiredArgsConstructor
+@Tag(name = "Documents", description = "Endpoints for uploading PDFs, checking ingestion status, and triggering study generation.")
 public class DocumentController {
 
     private final DocumentIngestionService ingestionService;
@@ -41,8 +43,10 @@ public class DocumentController {
 
             String jobId = UUID.randomUUID().toString();
 
+            byte[] fileBytes = file.getBytes();
+
             ingestionService.ingestPdfAsync(
-                    file.getInputStream(),
+                    fileBytes,
                     file.getOriginalFilename(),
                     file.getSize(),
                     category,

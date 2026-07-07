@@ -39,6 +39,7 @@ public class SearchController {
 
             // 1. Perform Hybrid Search for every query in the batch
             Map<String, List<Document>> searchResults = queries.stream()
+                    .distinct()
                     .collect(Collectors.toMap(
                             query -> query,
                             query -> hybridSearchService.hybridSearch(query, userId, chatId, 8)

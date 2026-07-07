@@ -5,6 +5,7 @@ import com.TeachMe.TeachMe.service.RagChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
+@Tag(name = "AI Chat", description = "Endpoints for RAG (Retrieval-Augmented Generation) chat sessions.")
 public class ChatController {
 
     private final RagChatService chatService;

@@ -45,6 +45,16 @@ public class ChatHistoryDTO {
                 // Safely handle lazy-loaded document relationships to avoid NullPointerExceptions
                 .documentId(chat.getDocument() != null ? chat.getDocument().getId() : null)
                 .documentName(chat.getDocument() != null ? chat.getDocument().getFileName() : null)
+                .citations(chat.getCitations() != null ? chat.getCitations().stream()
+                        .map(c -> CitationDTO.builder()
+                                .id(c.getId())
+                                .citationIndex(c.getCitationIndex())
+                                .documentName(c.getDocumentName())
+                                .pageNumber(c.getPageNumber())
+                                .quote(c.getQuote())
+                                .sourceChunkId(c.getSourceChunkId())
+                                .build())
+                        .toList() : List.of())
                 .build();
     }
 }

@@ -2,6 +2,8 @@ package com.TeachMe.TeachMe.exception;
 
 public class FileProcessingException extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
     // Constructor 1: Accepts just a message (1 argument)
     public FileProcessingException(String message) {
         super(message);

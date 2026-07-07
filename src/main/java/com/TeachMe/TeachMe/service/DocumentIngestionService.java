@@ -11,9 +11,11 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
+@Transactional
 public class DocumentIngestionService {
 
     private final VectorStore vectorStore;
@@ -75,7 +78,7 @@ public class DocumentIngestionService {
     }
 
     @Async("taskExecutor")
-    public void ingestPdfAsync(InputStream fileStream, String originalFilename, Long fileSize,
+    public void ingestPdfAsync(byte[] fileBytes, String originalFilename, Long fileSize,
                                String category, String chatId, String jobId, User currentUser) {
 
         com.TeachMe.TeachMe.entity.Document dbDocument =
@@ -93,7 +96,13 @@ public class DocumentIngestionService {
             log.info("Job {}: starting ingestion for '{}'", jobId, originalFilename);
             jobStatusManager.updateStatus(jobId, "PROCESSING");
 
-            TikaDocumentReader reader = new TikaDocumentReader(new InputStreamResource(fileStream));
+            ByteArrayResource resource = new ByteArrayResource(fileBytes) {
+                @Override
+                public String getFilename() {
+                    return originalFilename;
+                }
+            };
+            TikaDocumentReader reader = new TikaDocumentReader(resource);
             List<org.springframework.ai.document.Document> rawDocuments = reader.get();
 
             List<org.springframework.ai.document.Document> enrichedDocuments = rawDocuments.stream()

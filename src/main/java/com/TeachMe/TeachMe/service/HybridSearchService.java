@@ -1,5 +1,6 @@
 package com.TeachMe.TeachMe.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -9,15 +10,18 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class HybridSearchService {
 
     private final VectorStore vectorStore;
     private final JdbcTemplate jdbcTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Counts how often the full-text leg of the hybrid search silently fell back
@@ -43,7 +47,7 @@ public class HybridSearchService {
         List<Document> vectorResults = vectorSearchResults(query, userId, chatId, topK);
         log.info("Vector search returned {} results", vectorResults.size());
 
-        List<Map<String, Object>> fullTextResults = fullTextSearchResults(query, userId, chatId, topK);
+        List<Document> fullTextResults = fullTextSearchResults(query, userId, chatId, topK);
         log.info("Full-text search returned {} results", fullTextResults.size());
 
         List<Document> fused = reciprocalRankFusion(vectorResults, fullTextResults, topK);
@@ -62,11 +66,11 @@ public class HybridSearchService {
         return vectorStore.similaritySearch(request);
     }
 
-    private List<Map<String, Object>> fullTextSearchResults(
+    private List<Document> fullTextSearchResults(
             String query, Long userId, String chatId, int topK) {
         try {
             String sql = """
-                    SELECT id, content, ts_rank_cd(to_tsvector('english', content), q) AS rank
+                    SELECT id, content, metadata, ts_rank_cd(to_tsvector('english', content), q) AS rank
                     FROM vector_store,
                          plainto_tsquery('english', ?) q
                     WHERE to_tsvector('english', content) @@ q
@@ -75,7 +79,15 @@ public class HybridSearchService {
                     ORDER BY rank DESC
                     LIMIT ?
                     """;
-            return jdbcTemplate.queryForList(sql, query, String.valueOf(userId), chatId, topK);
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, query, String.valueOf(userId), chatId, topK);
+            List<Document> docs = new ArrayList<>();
+            for (Map<String, Object> row : rows) {
+                String id = String.valueOf(row.get("id"));
+                String content = String.valueOf(row.get("content"));
+                Map<String, Object> metadata = parseMetadata(row.get("metadata"));
+                docs.add(new Document(id, content, metadata));
+            }
+            return docs;
         } catch (Exception e) {
             // Increment the Micrometer counter so dashboards can detect silent
             // degradation (e.g., pg_trgm not installed) without manual log scraping.
@@ -86,8 +98,21 @@ public class HybridSearchService {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> parseMetadata(Object metadataObj) {
+        if (metadataObj == null) {
+            return new HashMap<>();
+        }
+        try {
+            return objectMapper.readValue(metadataObj.toString(), Map.class);
+        } catch (Exception e) {
+            log.warn("Failed to parse document metadata JSON: {}", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
     private List<Document> reciprocalRankFusion(List<Document> vectorResults,
-                                                List<Map<String, Object>> fullTextResults,
+                                                List<Document> fullTextResults,
                                                 int topK) {
         Map<String, Double> rrfScores = new HashMap<>();
         Map<String, Document> documentMap = new HashMap<>();
@@ -101,8 +126,12 @@ public class HybridSearchService {
         }
 
         for (int rank = 0; rank < fullTextResults.size(); rank++) {
-            String docId = String.valueOf(fullTextResults.get(rank).get("id"));
+            Document doc = fullTextResults.get(rank);
+            String docId = doc.getId();
             rrfScores.merge(docId, 1.0 / (k + rank + 1), Double::sum);
+            if (!documentMap.containsKey(docId)) {
+                documentMap.put(docId, doc);
+            }
         }
 
         return rrfScores.entrySet().stream()

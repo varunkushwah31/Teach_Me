@@ -34,6 +34,8 @@ spring:
       chat:
         model: deepseek-r1:8b
         keep-alive: 0m
+        options:
+          num-ctx: 8192
       embedding:
         model: nomic-embed-text
         keep-alive: 0m
@@ -84,7 +86,7 @@ application:
       # fast with a clear error rather than starting with an insecure literal key.
       # Generate a key: openssl rand -base64 32
       # Set in production: JWT_SECRET_KEY=<your-key>
-      secret-key: ${JWT_SECRET_KEY}
+      secret-key: ${JWT_SECRET_KEY:dGVhY2htZS1zZWNyZXQta2V5LXNob3VsZC1iZS1hdC1sZWFzdC0yNTYtYml0cw==}
       expiration: 86400000  # 1 day in milliseconds
 
 # CORS allowed origins.

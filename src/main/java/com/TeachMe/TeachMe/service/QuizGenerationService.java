@@ -20,11 +20,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class QuizGenerationService {
 
     private final ChatClient chatClient;
@@ -42,6 +45,7 @@ public class QuizGenerationService {
         this.documentRepository = documentRepository;
     }
 
+    @Transactional
     public QuizDTO generateQuiz(Long documentId, User currentUser) {
         log.info("Generating quiz for document ID: {}", documentId);
 
@@ -49,7 +53,7 @@ public class QuizGenerationService {
                 .orElseThrow(() -> new FileProcessingException("Document not found: " + documentId));
 
         SearchRequest searchRequest = SearchRequest.builder()
-                .topK(25)
+                .topK(8)
                 .filterExpression(
                         new FilterExpressionBuilder().eq("dbDocumentId", documentId).build())
                 .build();

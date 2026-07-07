@@ -2,6 +2,7 @@ package com.TeachMe.TeachMe.service;
 
 import com.TeachMe.TeachMe.entity.Chat;
 import com.TeachMe.TeachMe.repository.ChatRepository;
+import com.TeachMe.TeachMe.repository.DocumentRepository;
 import com.TeachMe.TeachMe.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -10,6 +11,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional
 public class RagChatService {
 
     private final ChatClient mainChatClient;
@@ -27,6 +30,7 @@ public class RagChatService {
     private final ChatMemory chatMemory;
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
     private final HybridSearchService hybridSearchService;
     private final ReRankingService reRankingService;
     private final CitationService citationService;
@@ -47,6 +51,7 @@ public class RagChatService {
                           ChatMemory chatMemory,
                           ChatRepository chatRepository,
                           UserRepository userRepository,
+                          DocumentRepository documentRepository,
                           HybridSearchService hybridSearchService,
                           ReRankingService reRankingService,
                           CitationService citationService) {
@@ -57,6 +62,7 @@ public class RagChatService {
         this.chatMemory = chatMemory;
         this.chatRepository = chatRepository;
         this.userRepository = userRepository;
+        this.documentRepository = documentRepository;
         this.hybridSearchService = hybridSearchService;
         this.reRankingService = reRankingService;
         this.citationService = citationService;
@@ -74,16 +80,29 @@ public class RagChatService {
                     List<Document> reRankedDocuments = reRankingService.reRankChunks(optimizedQuery, similarDocuments, 4);
 
                     StringBuilder contextBuilder = new StringBuilder();
-                    List<String> sourceChunks = new ArrayList<>();
                     for (int i = 0; i < reRankedDocuments.size(); i++) {
                         Document doc = reRankedDocuments.get(i);
                         contextBuilder.append("[").append(i + 1).append("] ").append(doc.getText()).append("\n\n");
-                        sourceChunks.add(doc.getText());
                     }
 
                     String context = contextBuilder.toString();
                     String systemInstruction = SYSTEM_INSTRUCTION_TEMPLATE + context;
                     StringBuilder aiResponseBuffer = new StringBuilder();
+
+                    // Extract the document ID from the metadata of the first retrieved chunk to associate the Chat session with the Document.
+                    com.TeachMe.TeachMe.entity.Document documentAssoc = null;
+                    if (!reRankedDocuments.isEmpty()) {
+                        Object dbDocIdObj = reRankedDocuments.get(0).getMetadata().get("dbDocumentId");
+                        if (dbDocIdObj != null) {
+                            try {
+                                Long docId = Long.valueOf(dbDocIdObj.toString());
+                                documentAssoc = documentRepository.findById(docId).orElse(null);
+                            } catch (Exception e) {
+                                log.warn("Failed to parse dbDocumentId from chunk metadata", e);
+                            }
+                        }
+                    }
+                    final com.TeachMe.TeachMe.entity.Document finalDocAssoc = documentAssoc;
 
                     return mainChatClient.prompt()
                             .system(systemInstruction)
@@ -103,9 +122,10 @@ public class RagChatService {
                                                 .answer(aiResponseBuffer.toString())
                                                 .context(context)
                                                 .user(currentUser)
+                                                .document(finalDocAssoc)
                                                 .build();
                                         Chat savedChat = chatRepository.save(chatRecord);
-                                        citationService.extractAndSaveCitations(savedChat, aiResponseBuffer.toString(), sourceChunks);
+                                        citationService.extractAndSaveCitations(savedChat, aiResponseBuffer.toString(), reRankedDocuments);
                                         log.info("Successfully persisted chat session {}", chatId);
                                     } catch (Exception e) {
                                         log.error("Failed to persist chat record", e);

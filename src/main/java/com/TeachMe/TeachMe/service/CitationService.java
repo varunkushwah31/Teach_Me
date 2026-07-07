@@ -5,7 +5,9 @@ import com.TeachMe.TeachMe.entity.Chat;
 import com.TeachMe.TeachMe.entity.Citation;
 import com.TeachMe.TeachMe.repository.CitationRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Service
+@Transactional
 public class CitationService {
 
     private final CitationRepository citationRepository;
@@ -22,7 +25,7 @@ public class CitationService {
         this.citationRepository = citationRepository;
     }
 
-    public List<CitationDTO> extractAndSaveCitations(Chat chat, String aiResponse, List<String> sourceChunks) {
+    public List<CitationDTO> extractAndSaveCitations(Chat chat, String aiResponse, List<Document> sourceDocs) {
         log.info("Extracting citations from AI response");
 
         List<Citation> citations = new ArrayList<>();
@@ -34,16 +37,21 @@ public class CitationService {
         while (matcher.find()) {
             int sourceIndex = Integer.parseInt(matcher.group(1)) - 1;
 
-            if (sourceIndex >= 0 && sourceIndex < sourceChunks.size()) {
-                String sourceChunk = sourceChunks.get(sourceIndex);
+            if (sourceIndex >= 0 && sourceIndex < sourceDocs.size()) {
+                Document sourceDoc = sourceDocs.get(sourceIndex);
+                String sourceChunk = sourceDoc.getText();
+                String docName = "Unknown";
+                if (sourceDoc.getMetadata() != null && sourceDoc.getMetadata().containsKey("fileName")) {
+                    docName = String.valueOf(sourceDoc.getMetadata().get("fileName"));
+                }
 
                 Citation citation = Citation.builder()
                         .chat(chat)
                         .citationIndex(citationIndex)
-                        .documentName(chat.getDocument() != null ? chat.getDocument().getFileName() : "Unknown")
+                        .documentName(docName)
                         .pageNumber(extractPageNumber(sourceChunk))
                         .quote(extractQuote(sourceChunk))
-                        .sourceChunkId(String.valueOf(sourceIndex))
+                        .sourceChunkId(sourceDoc.getId())
                         .build();
 
                 citations.add(citation);

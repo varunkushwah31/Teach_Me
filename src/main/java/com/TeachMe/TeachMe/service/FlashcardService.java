@@ -11,12 +11,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class FlashcardService {
 
     private final FlashcardRepository flashcardRepository;
@@ -40,6 +43,7 @@ public class FlashcardService {
                 .orElse(false); // not found → treat as not owned
     }
 
+    @Transactional
     public FlashcardDTO createFlashcard(String front, String back, String sourceContent,
                                         String deckName, Long documentId, User currentUser) {
         log.info("Creating flashcard for user {} in deck '{}'", currentUser.getId(), deckName);
@@ -82,9 +86,9 @@ public class FlashcardService {
     }
 
     /**
-     * SM-2 spaced-repetition review. The controller is responsible for verifying
-     * ownership before calling this method.
+     * @Transactional
      */
+    @Transactional
     public FlashcardDTO reviewFlashcard(Long flashcardId, int quality) {
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
                 .orElseThrow(() -> new RuntimeException("Flashcard not found: " + flashcardId));
@@ -120,6 +124,7 @@ public class FlashcardService {
         return mapToDTO(updated);
     }
 
+    @Transactional
     public void deleteFlashcard(Long flashcardId) {
         flashcardRepository.deleteById(flashcardId);
         log.info("Flashcard {} deleted", flashcardId);
