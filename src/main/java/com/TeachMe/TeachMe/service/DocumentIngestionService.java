@@ -28,7 +28,6 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-@Transactional
 public class DocumentIngestionService {
 
     private final VectorStore vectorStore;
@@ -61,6 +60,7 @@ public class DocumentIngestionService {
      * shows an actionable error instead of a permanently spinning indicator.
      */
     @EventListener(ApplicationReadyEvent.class)
+    @Transactional
     public void healStuckDocuments() {
         List<com.TeachMe.TeachMe.entity.Document> stuck =
                 documentRepository.findByStatus(

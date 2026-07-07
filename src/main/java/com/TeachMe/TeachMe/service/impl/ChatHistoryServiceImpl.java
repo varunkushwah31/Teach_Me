@@ -33,32 +33,33 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     }
 
     @Override
-    public PaginatedResponse<ChatHistoryDTO> getHistoryByDocument(Long documentId, Pageable pageable) {
-        Page<Chat> chatPage = chatRepository.findByDocumentIdOrderByCreatedAtDesc(documentId, pageable);
+    public PaginatedResponse<ChatHistoryDTO> getHistoryByDocument(Long documentId, Long userId, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.findByDocumentIdAndUserIdOrderByCreatedAtDesc(documentId, userId, pageable);
         return PaginatedResponse.fromPage(chatPage.map(ChatHistoryDTO::fromEntity));
     }
 
     @Override
-    public PaginatedResponse<ChatHistoryDTO> searchHistoryByDocument(Long documentId, String searchTerm, Pageable pageable) {
-        Page<Chat> chatPage = chatRepository.searchByDocumentIdAndTerm(documentId, searchTerm, pageable);
+    public PaginatedResponse<ChatHistoryDTO> searchHistoryByDocument(Long documentId, Long userId, String searchTerm, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.searchByDocumentIdAndUserIdAndTerm(documentId, userId, searchTerm, pageable);
         return PaginatedResponse.fromPage(chatPage.map(ChatHistoryDTO::fromEntity));
     }
 
     @Override
-    public PaginatedResponse<ChatHistoryDTO> getHistoryBySession(String sessionId, Pageable pageable) {
-        Page<Chat> chatPage = chatRepository.findBySessionIdOrderByCreatedAtDesc(sessionId, pageable);
+    public PaginatedResponse<ChatHistoryDTO> getHistoryBySession(String sessionId, Long userId, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.findBySessionIdAndUserIdOrderByCreatedAtDesc(sessionId, userId, pageable);
         return PaginatedResponse.fromPage(chatPage.map(ChatHistoryDTO::fromEntity));
     }
 
     @Override
-    public PaginatedResponse<ChatHistoryDTO> searchHistoryBySession(String sessionId, String searchTerm, Pageable pageable) {
-        Page<Chat> chatPage = chatRepository.searchBySessionIdAndTerm(sessionId, searchTerm, pageable);
+    public PaginatedResponse<ChatHistoryDTO> searchHistoryBySession(String sessionId, Long userId, String searchTerm, Pageable pageable) {
+        Page<Chat> chatPage = chatRepository.searchBySessionIdAndUserIdAndTerm(sessionId, userId, searchTerm, pageable);
         return PaginatedResponse.fromPage(chatPage.map(ChatHistoryDTO::fromEntity));
     }
 
     // Consume unpaginated List methods for Session Rebuilding and Data Export
-    public List<ChatHistoryDTO> getFullSessionHistory(String sessionId) {
-        return chatRepository.findBySessionId(sessionId).stream()
+    @Override
+    public List<ChatHistoryDTO> getFullSessionHistory(String sessionId, Long userId) {
+        return chatRepository.findBySessionIdAndUserId(sessionId, userId).stream()
                 .map(ChatHistoryDTO::fromEntity)
                 .toList();
     }
@@ -75,14 +76,16 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
                 .toList();
     }
 
-    public List<ChatHistoryDTO> getChatsForDocument(Long documentId) {
-        return chatRepository.findByDocumentId(documentId).stream()
+    @Override
+    public List<ChatHistoryDTO> getChatsForDocument(Long documentId, Long userId) {
+        return chatRepository.findByDocumentIdAndUserId(documentId, userId).stream()
                 .map(ChatHistoryDTO::fromEntity)
                 .toList();
     }
 
-    public List<ChatHistoryDTO> getChatsForDocumentSorted(Long documentId) {
-        return chatRepository.findByDocumentIdOrderByCreatedAtDesc(documentId).stream()
+    @Override
+    public List<ChatHistoryDTO> getChatsForDocumentSorted(Long documentId, Long userId) {
+        return chatRepository.findByDocumentIdAndUserIdOrderByCreatedAtDesc(documentId, userId).stream()
                 .map(ChatHistoryDTO::fromEntity)
                 .toList();
     }

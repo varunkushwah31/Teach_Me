@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -22,6 +24,8 @@ public class ChatController {
     private final AuthService authService;
 
     @PostMapping(value = "/ask/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "Ask question (streaming)", description = "Submits a question to the AI tutor and streams the response chunks back in Real-time (Server-Sent Events) using document context.")
+    @ApiResponse(responseCode = "200", description = "Real-time response stream initialized successfully")
     public Flux<String> streamQuestion(@RequestBody Map<String, String> payload) {
 
         String question = payload.get("question");

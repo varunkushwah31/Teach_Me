@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +34,9 @@ public class DocumentController {
     private static final String ERROR_KEY = "error";
 
     @PostMapping("/upload")
+    @Operation(summary = "Upload PDF document", description = "Accepts a PDF document upload, and launches an asynchronous background ingestion job to parse and embed it.")
+    @ApiResponse(responseCode = "202", description = "Document accepted for background processing")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
     public ResponseEntity<Map<String, String>> uploadPdf(
             @RequestParam("file") MultipartFile file,
             @RequestParam("chatId") String chatId,
@@ -65,6 +70,8 @@ public class DocumentController {
     }
 
     @GetMapping("/status/{jobId}")
+    @Operation(summary = "Get ingestion job status", description = "Checks the background processing status (e.g. PROCESSING, COMPLETED, FAILED) of a document upload job.")
+    @ApiResponse(responseCode = "200", description = "Job status retrieved successfully")
     public ResponseEntity<Map<String, String>> getJobStatus(@PathVariable String jobId) {
         String status = jobStatusManager.getStatus(jobId);
         return ResponseEntity.ok(Map.of(
@@ -74,6 +81,10 @@ public class DocumentController {
     }
 
     @PostMapping("/{documentId}/generate-quiz")
+    @Operation(summary = "Generate quiz from library", description = "Triggers multiple-choice quiz generation for a document in the library, validating user ownership.")
+    @ApiResponse(responseCode = "201", description = "Quiz generated successfully")
+    @ApiResponse(responseCode = "403", description = "Access denied: Document not owned by user")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
     public ResponseEntity<Map<String, Object>> generateDocumentQuiz(@PathVariable Long documentId) {
         try {
             Long userId = authService.getAuthenticatedUserId();

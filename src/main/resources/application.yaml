@@ -88,6 +88,7 @@ application:
       # Set in production: JWT_SECRET_KEY=<your-key>
       secret-key: ${JWT_SECRET_KEY:dGVhY2htZS1zZWNyZXQta2V5LXNob3VsZC1iZS1hdC1sZWFzdC0yNTYtYml0cw==}
       expiration: 86400000  # 1 day in milliseconds
+      refresh-token-expiration: 604800000  # 7 days in milliseconds
 
 # CORS allowed origins.
 # Default covers local development on Vite (5173) and CRA (3000).

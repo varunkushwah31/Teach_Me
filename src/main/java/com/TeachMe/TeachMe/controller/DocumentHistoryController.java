@@ -9,12 +9,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/history/documents")
 @RequiredArgsConstructor
+@Tag(name = "Document History", description = "Endpoints for retrieving and searching history of uploaded learning documents.")
 public class DocumentHistoryController {
 
     private final DocumentHistoryService documentHistoryService;
@@ -22,6 +26,8 @@ public class DocumentHistoryController {
     private static final String DEFAULT_SORT_COLUMN = "createdAt";
 
     @GetMapping
+    @Operation(summary = "Get document history", description = "Retrieves a paginated list of all document ingestion histories belonging to the authenticated user.")
+    @ApiResponse(responseCode = "200", description = "Document history retrieved successfully")
     public ResponseEntity<PaginatedResponse<DocumentHistoryDTO>> getDocumentHistory(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -32,6 +38,8 @@ public class DocumentHistoryController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Search document history", description = "Searches the user's document history for the given query term, returning paginated results.")
+    @ApiResponse(responseCode = "200", description = "Document search results retrieved successfully")
     public ResponseEntity<PaginatedResponse<DocumentHistoryDTO>> searchDocumentHistory(
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
@@ -42,6 +50,8 @@ public class DocumentHistoryController {
     }
 
     @GetMapping("/status/{status}")
+    @Operation(summary = "Get document history by status", description = "Retrieves a paginated list of user documents filtered by processing status (PENDING, PROCESSING, COMPLETED, FAILED).")
+    @ApiResponse(responseCode = "200", description = "Documents retrieved successfully")
     public ResponseEntity<PaginatedResponse<DocumentHistoryDTO>> getDocumentHistoryByStatus(
             @PathVariable String status,
             @RequestParam(defaultValue = "0") int page,
@@ -54,6 +64,8 @@ public class DocumentHistoryController {
     }
 
     @GetMapping("/status/{status}/search")
+    @Operation(summary = "Search document history by status", description = "Searches user documents of a specific processing status, returning paginated results.")
+    @ApiResponse(responseCode = "200", description = "Documents search results retrieved successfully")
     public ResponseEntity<PaginatedResponse<DocumentHistoryDTO>> searchDocumentHistoryByStatus(
             @PathVariable String status,
             @RequestParam String q,

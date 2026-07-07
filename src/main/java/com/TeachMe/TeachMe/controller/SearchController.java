@@ -14,10 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/search")
 @RequiredArgsConstructor
+@Tag(name = "AI Search", description = "Endpoints for hybrid vector search and semantic re-ranking.")
 public class SearchController {
 
     private final HybridSearchService hybridSearchService;
@@ -30,6 +35,8 @@ public class SearchController {
      * and uses the ReRankingService's batch processing to score them all.
      */
     @PostMapping("/batch/{chatId}")
+    @Operation(summary = "Batch search & Re-rank", description = "Accepts multiple parallel search queries, performs hybrid vector searches, and semantically re-ranks top chunks.")
+    @ApiResponse(responseCode = "200", description = "Search query results re-ranked and returned successfully")
     public ResponseEntity<Map<String, List<String>>> batchSearchAndReRank(
             @PathVariable String chatId,
             @RequestBody List<String> queries) {

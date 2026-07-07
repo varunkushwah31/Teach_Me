@@ -130,8 +130,8 @@ public class FlashcardService {
         log.info("Flashcard {} deleted", flashcardId);
     }
 
-    public List<FlashcardDTO> getFlashcardsByDocument(Long documentId) {
-        return flashcardRepository.findByDocumentId(documentId).stream()
+    public List<FlashcardDTO> getFlashcardsByDocument(Long userId, Long documentId) {
+        return flashcardRepository.findByUserIdAndDocumentId(userId, documentId).stream()
                 .map(this::mapToDTO)
                 .toList();
     }

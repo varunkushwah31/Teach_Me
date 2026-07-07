@@ -33,29 +33,32 @@ public class CitationService {
         Pattern citationPattern = Pattern.compile("\\[(\\d+)]");
         Matcher matcher = citationPattern.matcher(aiResponse);
 
-        int citationIndex = 1;
+        java.util.Set<Integer> processedSourceIndices = new java.util.HashSet<>();
+
         while (matcher.find()) {
-            int sourceIndex = Integer.parseInt(matcher.group(1)) - 1;
+            int docNumber = Integer.parseInt(matcher.group(1));
+            int sourceIndex = docNumber - 1;
 
             if (sourceIndex >= 0 && sourceIndex < sourceDocs.size()) {
-                Document sourceDoc = sourceDocs.get(sourceIndex);
-                String sourceChunk = sourceDoc.getText();
-                String docName = "Unknown";
-                if (sourceDoc.getMetadata() != null && sourceDoc.getMetadata().containsKey("fileName")) {
-                    docName = String.valueOf(sourceDoc.getMetadata().get("fileName"));
+                if (processedSourceIndices.add(sourceIndex)) {
+                    Document sourceDoc = sourceDocs.get(sourceIndex);
+                    String sourceChunk = sourceDoc.getText();
+                    String docName = "Unknown";
+                    if (sourceDoc.getMetadata() != null && sourceDoc.getMetadata().containsKey("fileName")) {
+                        docName = String.valueOf(sourceDoc.getMetadata().get("fileName"));
+                    }
+
+                    Citation citation = Citation.builder()
+                            .chat(chat)
+                            .citationIndex(docNumber)
+                            .documentName(docName)
+                            .pageNumber(extractPageNumber(sourceChunk))
+                            .quote(extractQuote(sourceChunk))
+                            .sourceChunkId(sourceDoc.getId())
+                            .build();
+
+                    citations.add(citation);
                 }
-
-                Citation citation = Citation.builder()
-                        .chat(chat)
-                        .citationIndex(citationIndex)
-                        .documentName(docName)
-                        .pageNumber(extractPageNumber(sourceChunk))
-                        .quote(extractQuote(sourceChunk))
-                        .sourceChunkId(sourceDoc.getId())
-                        .build();
-
-                citations.add(citation);
-                citationIndex++;
             }
         }
 

@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +31,8 @@ public class FlashcardController {
     private final AuthService authService;
 
     @PostMapping("/create")
+    @Operation(summary = "Create flashcard", description = "Creates a new flashcard with front, back, and optional source context and document references.")
+    @ApiResponse(responseCode = "201", description = "Flashcard created successfully")
     public ResponseEntity<FlashcardDTO> createFlashcard(@RequestBody Map<String, Object> request) {
         try {
             Long userId = authService.getAuthenticatedUserId();
@@ -56,6 +60,8 @@ public class FlashcardController {
     }
 
     @GetMapping("/my-cards")
+    @Operation(summary = "Get user flashcards", description = "Retrieves a paginated list of all flashcards belonging to the authenticated user.")
+    @ApiResponse(responseCode = "200", description = "Flashcards retrieved successfully")
     public ResponseEntity<Page<FlashcardDTO>> getUserFlashcards(Pageable pageable) {
         try {
             Long userId = authService.getAuthenticatedUserId();
@@ -67,6 +73,8 @@ public class FlashcardController {
     }
 
     @GetMapping("/deck/{deckName}")
+    @Operation(summary = "Get deck flashcards", description = "Retrieves a paginated list of flashcards from a specific deck belonging to the user.")
+    @ApiResponse(responseCode = "200", description = "Flashcards retrieved successfully")
     public ResponseEntity<Page<FlashcardDTO>> getFlashcardsByDeck(
             @PathVariable String deckName, Pageable pageable) {
         try {
@@ -79,6 +87,8 @@ public class FlashcardController {
     }
 
     @GetMapping("/due")
+    @Operation(summary = "Get due flashcards", description = "Retrieves all flashcards due for SM-2 spaced repetition review.")
+    @ApiResponse(responseCode = "200", description = "Due flashcards retrieved successfully")
     public ResponseEntity<List<FlashcardDTO>> getDueFlashcards() {
         try {
             Long userId = authService.getAuthenticatedUserId();
@@ -90,6 +100,10 @@ public class FlashcardController {
     }
 
     @PostMapping("/{flashcardId}/review")
+    @Operation(summary = "Review flashcard", description = "Submits an SM-2 study review quality score (0-5) for a specific flashcard.")
+    @ApiResponse(responseCode = "200", description = "Flashcard review scheduled successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid quality score")
+    @ApiResponse(responseCode = "403", description = "Access denied: Flashcard not owned by user")
     public ResponseEntity<FlashcardDTO> reviewFlashcard(
             @PathVariable Long flashcardId,
             @RequestBody Map<String, Integer> request) {
@@ -106,7 +120,7 @@ public class FlashcardController {
             // SM-2 schedule by guessing or enumerating flashcard IDs.
             if (!flashcardService.isOwnedByUser(flashcardId, userId)) {
                 log.warn("User {} attempted to review flashcard {} they do not own",
-                        userId, flashcardId);
+                         userId, flashcardId);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -119,13 +133,16 @@ public class FlashcardController {
     }
 
     @DeleteMapping("/{flashcardId}")
+    @Operation(summary = "Delete flashcard", description = "Permanently deletes a flashcard if it is owned by the authenticated user.")
+    @ApiResponse(responseCode = "244", description = "Flashcard deleted successfully (No Content)")
+    @ApiResponse(responseCode = "403", description = "Access denied: Flashcard not owned by user")
     public ResponseEntity<Void> deleteFlashcard(@PathVariable Long flashcardId) {
         try {
             Long userId = authService.getAuthenticatedUserId();
 
             if (!flashcardService.isOwnedByUser(flashcardId, userId)) {
                 log.warn("User {} attempted to delete flashcard {} they do not own",
-                        userId, flashcardId);
+                         userId, flashcardId);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -139,9 +156,12 @@ public class FlashcardController {
     }
 
     @GetMapping("/document/{documentId}")
+    @Operation(summary = "Get document flashcards", description = "Retrieves all flashcards created by the user for a specific document.")
+    @ApiResponse(responseCode = "200", description = "Flashcards retrieved successfully")
     public ResponseEntity<List<FlashcardDTO>> getFlashcardsByDocument(@PathVariable Long documentId) {
         try {
-            return ResponseEntity.ok(flashcardService.getFlashcardsByDocument(documentId));
+            Long userId = authService.getAuthenticatedUserId();
+            return ResponseEntity.ok(flashcardService.getFlashcardsByDocument(userId, documentId));
         } catch (Exception e) {
             log.error("Failed to fetch flashcards for document ID: {}", documentId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -149,6 +169,8 @@ public class FlashcardController {
     }
 
     @GetMapping("/deck/{deckName}/study")
+    @Operation(summary = "Study entire deck", description = "Retrieves all flashcards in a specific deck for sequential studying.")
+    @ApiResponse(responseCode = "200", description = "Flashcards retrieved successfully")
     public ResponseEntity<List<FlashcardDTO>> getEntireDeckForStudy(@PathVariable String deckName) {
         try {
             Long userId = authService.getAuthenticatedUserId();

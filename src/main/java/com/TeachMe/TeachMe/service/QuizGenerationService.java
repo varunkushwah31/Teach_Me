@@ -52,6 +52,10 @@ public class QuizGenerationService {
         com.TeachMe.TeachMe.entity.Document doc = documentRepository.findById(documentId)
                 .orElseThrow(() -> new FileProcessingException("Document not found: " + documentId));
 
+        if (!doc.getUser().getId().equals(currentUser.getId())) {
+            throw new FileProcessingException("Access denied: You do not own this document.");
+        }
+
         SearchRequest searchRequest = SearchRequest.builder()
                 .topK(8)
                 .filterExpression(
@@ -170,13 +174,21 @@ public class QuizGenerationService {
                 .build();
     }
 
-    public QuizDTO getQuiz(Long quizId) {
+    public QuizDTO getQuiz(Long quizId, Long userId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new FileProcessingException("Quiz not found: " + quizId));
+        if (!quiz.getUser().getId().equals(userId)) {
+            throw new FileProcessingException("Access denied: You do not own this quiz.");
+        }
         return mapQuizToDTO(quiz);
     }
 
-    public List<QuizDTO> getAllQuizzesForDocument(Long documentId) {
+    public List<QuizDTO> getAllQuizzesForDocument(Long documentId, Long userId) {
+        com.TeachMe.TeachMe.entity.Document doc = documentRepository.findById(documentId)
+                .orElseThrow(() -> new FileProcessingException("Document not found: " + documentId));
+        if (!doc.getUser().getId().equals(userId)) {
+            throw new FileProcessingException("Access denied: You do not own this document.");
+        }
         return quizRepository.findByDocumentId(documentId).stream()
                 .map(this::mapQuizToDTO)
                 .toList();
