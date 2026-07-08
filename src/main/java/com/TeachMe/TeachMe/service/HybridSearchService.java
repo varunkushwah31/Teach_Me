@@ -32,8 +32,8 @@ public class HybridSearchService {
     private final Counter fullTextFallbackCounter;
 
     public HybridSearchService(VectorStore vectorStore,
-                               JdbcTemplate jdbcTemplate,
-                               MeterRegistry meterRegistry) {
+            JdbcTemplate jdbcTemplate,
+            MeterRegistry meterRegistry) {
         this.vectorStore = vectorStore;
         this.jdbcTemplate = jdbcTemplate;
         this.fullTextFallbackCounter = Counter.builder("rag.fulltext.fallback.total")
@@ -79,7 +79,8 @@ public class HybridSearchService {
                     ORDER BY rank DESC
                     LIMIT ?
                     """;
-            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, query, String.valueOf(userId), chatId, topK);
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, query, String.valueOf(userId), chatId,
+                    topK);
             List<Document> docs = new ArrayList<>();
             for (Map<String, Object> row : rows) {
                 String id = String.valueOf(row.get("id"));
@@ -112,8 +113,8 @@ public class HybridSearchService {
     }
 
     private List<Document> reciprocalRankFusion(List<Document> vectorResults,
-                                                List<Document> fullTextResults,
-                                                int topK) {
+            List<Document> fullTextResults,
+            int topK) {
         Map<String, Double> rrfScores = new HashMap<>();
         Map<String, Document> documentMap = new HashMap<>();
         final int k = 60;
