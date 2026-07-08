@@ -115,7 +115,7 @@ public class AuthController {
         try {
             return refreshTokenService.findByToken(tokenStr)
                     .map(refreshTokenService::verifyExpiration)
-                    .map(RefreshToken::getUser)
+                    .map(rt -> rt.getUser())
                     .map(user -> {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
                         String accessToken = jwtService.generateToken(userDetails);

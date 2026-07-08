@@ -58,8 +58,8 @@ public class SearchController {
             // 3. Map the complex Document objects to simple text chunks for the frontend
             Map<String, List<String>> finalResults = reRankedResults.entrySet().stream()
                     .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            entry -> entry.getValue().stream().map(Document::getText).toList()
+                            e -> e.getKey(),
+                            entry -> entry.getValue().stream().map(doc -> doc.getText()).toList()
                     ));
 
             return ResponseEntity.ok(finalResults);

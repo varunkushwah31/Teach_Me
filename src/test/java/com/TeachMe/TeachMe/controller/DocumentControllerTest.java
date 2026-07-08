@@ -62,4 +62,4 @@ class DocumentControllerTest {
                         .param("category", "computer-science"))
                 .andExpect(status().is2xxSuccessful());
     }
-}
+}

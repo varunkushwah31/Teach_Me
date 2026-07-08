@@ -71,7 +71,7 @@ public class ReRankingService {
             Map<String, List<Document>> queryChunksMap, int topK) {
         return queryChunksMap.entrySet().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey,
+                        e -> e.getKey(),
                         e -> reRankChunks(e.getKey(), e.getValue(), topK)));
     }
 }
