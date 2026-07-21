@@ -31,5 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
-
 postgres-data/
+
+AGENTS.md
+/.agents/
+/postgres-data/

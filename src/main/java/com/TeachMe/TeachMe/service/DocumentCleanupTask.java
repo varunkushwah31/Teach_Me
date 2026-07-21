@@ -15,7 +15,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+
+import static java.time.LocalDateTime.now;
 
 @Slf4j
 @Service
@@ -28,7 +31,7 @@ public class DocumentCleanupTask {
     @Scheduled(cron = "0 0 3 * * ?")
     @Transactional
     public void cleanupExpiredDocuments() {
-        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(30);
+        LocalDateTime cutoffDate = now(ZoneId.systemDefault()).minusDays(30);
         log.info("Starting automated cleanup of documents older than 30 days (Before: {})", cutoffDate);
 
         List<Document> expiredDocs = documentRepository.findByCreatedAtBefore(cutoffDate);

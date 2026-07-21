@@ -3,10 +3,9 @@ package com.TeachMe.TeachMe.controller;
 import com.TeachMe.TeachMe.service.AuthService;
 import com.TeachMe.TeachMe.service.RagChatService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -14,13 +13,29 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import reactor.core.publisher.Flux;
 
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.chat.model.ChatModel;
+
+@ActiveProfiles("test")
+@WebMvcTest(RagChatController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class RagChatControllerTest {
+
+    @MockitoBean
+    private VectorStore vectorStore;
+
+    @MockitoBean
+    private ChatModel chatModel;
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,13 +55,13 @@ class RagChatControllerTest {
         Long mockUserId = 42L; // ✅ Uses numerical IDs instead of bulky objects
 
         // ✅ Tell the mocked auth identity service to return our numerical ID
-        Mockito.when(authService.getAuthenticatedUserId()).thenReturn(mockUserId);
+        when(authService.getAuthenticatedUserId()).thenReturn(mockUserId);
 
         // Mock the LLM reactive stream output
         Flux<String> mockStream = Flux.just("Artificial ", "Intelligence ", "is ", "cool.");
 
         // ✅ Clean Mockito stubbing: passed values directly without eq()
-        Mockito.when(ragChatService.askQuestionStream(question, chatId, mockUserId))
+        when(ragChatService.askQuestionStream(question, chatId, mockUserId))
                 .thenReturn(mockStream);
 
         // ✅ Removed the unused "category" attribute to match our updated web contract

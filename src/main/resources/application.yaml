@@ -12,6 +12,12 @@ spring:
     username: springai
     password: secret
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 5000
 
   jpa:
     hibernate:
@@ -34,8 +40,7 @@ spring:
       chat:
         model: deepseek-r1:8b
         keep-alive: 0m
-        options:
-          num-ctx: 8192
+        num-ctx: 8192
       embedding:
         model: nomic-embed-text
         keep-alive: 0m

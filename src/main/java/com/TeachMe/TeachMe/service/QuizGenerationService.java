@@ -67,7 +67,7 @@ public class QuizGenerationService {
                 documentChunks.size(), documentId);
 
         String combinedContext = documentChunks.stream()
-                .map(chunk -> chunk.getText())
+                .map(Document::getText)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
         String systemPrompt = "You are an expert educational assessment designer. "
@@ -151,7 +151,7 @@ public class QuizGenerationService {
 
     private QuizDTO mapQuizToDTO(Quiz quiz) {
         List<QuizQuestionDTO> questionDTOs = quiz.getQuestions().stream()
-                .sorted(Comparator.comparingInt(q -> q.getQuestionOrder()))
+                .sorted(Comparator.comparingInt(QuizQuestion::getQuestionOrder))
                 .map(q -> QuizQuestionDTO.builder()
                         .id(q.getId())
                         .questionText(q.getQuestionText())

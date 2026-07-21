@@ -7,9 +7,9 @@ import com.TeachMe.TeachMe.service.DocumentIngestionService;
 import com.TeachMe.TeachMe.service.JobStatusManager;
 import com.TeachMe.TeachMe.service.QuizGenerationService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,10 +19,22 @@ import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
+import org.springframework.test.context.ActiveProfiles;
+
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+
+@ActiveProfiles("test")
+@WebMvcTest(DocumentController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class DocumentControllerTest {
+
+    @MockitoBean
+    private VectorStore vectorStore;
+
+    @MockitoBean
+    private ChatModel chatModel;
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,11 +56,9 @@ class DocumentControllerTest {
 
     @Test
     void shouldAcceptPdfUploadSuccessfully() throws Exception {
-        // Mock authentication context
-        Mockito.when(authService.getAuthenticatedUserId()).thenReturn(1L);
-        Mockito.when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+        when(authService.getAuthenticatedUserId()).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
 
-        // Create a fake PDF file in memory
         MockMultipartFile fakePdf = new MockMultipartFile(
                 "file",
                 "syllabus.pdf",
@@ -62,4 +72,4 @@ class DocumentControllerTest {
                         .param("category", "computer-science"))
                 .andExpect(status().is2xxSuccessful());
     }
-}
+}

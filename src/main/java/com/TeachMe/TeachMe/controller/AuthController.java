@@ -29,13 +29,17 @@ import java.util.Map;
 public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+    private static final String EMAIL = "email";
+    private static final String PASSWORD = "password";
+    private static final String TOKEN = "token";
+    private static final String REFRESH_TOKEN = "refreshToken";
+    private static final String MESSAGE = "message";
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
-    private static final String EMAIL = "email";
 
     @PostMapping("/login")
     @Operation(summary = "Authenticate user", description = "Verifies user credentials and returns an access JWT and a refresh token.")
@@ -45,7 +49,7 @@ public class AuthController {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.get(EMAIL),
-                        request.get("password")
+                        request.get(PASSWORD)
                 )
         );
 
@@ -56,8 +60,8 @@ public class AuthController {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
         return ResponseEntity.ok(Map.of(
-                "token", jwtToken,
-                "refreshToken", refreshToken.getToken()
+                TOKEN, jwtToken,
+                REFRESH_TOKEN, refreshToken.getToken()
         ));
     }
 
@@ -68,11 +72,11 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
         try {
             String email = request.get(EMAIL);
-            String rawPassword = request.get("password");
+            String rawPassword = request.get(PASSWORD);
 
             if (userRepository.existsByEmail(email)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(Map.of("message", "User already exists"));
+                        .body(Map.of(MESSAGE, "User already exists"));
             }
 
             // Create your JPA Entity
@@ -91,14 +95,14 @@ public class AuthController {
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser.getId());
 
             return ResponseEntity.ok(Map.of(
-                    "token", jwtToken,
-                    "refreshToken", refreshToken.getToken()
+                    TOKEN, jwtToken,
+                    REFRESH_TOKEN, refreshToken.getToken()
             ));
 
         } catch (Exception e) {
             log.error("Registration failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Registration failed. Please try again."));
+                    .body(Map.of(MESSAGE, "Registration failed. Please try again."));
         }
     }
 
@@ -107,30 +111,30 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "Successful rotation")
     @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
-        String tokenStr = request.get("refreshToken");
+        String tokenStr = request.get(REFRESH_TOKEN);
         if (tokenStr == null || tokenStr.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Refresh token is missing"));
+            return ResponseEntity.badRequest().body(Map.of(MESSAGE, "Refresh token is missing"));
         }
 
         try {
             return refreshTokenService.findByToken(tokenStr)
                     .map(refreshTokenService::verifyExpiration)
-                    .map(rt -> rt.getUser())
+                    .map(RefreshToken::getUser)
                     .map(user -> {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
                         String accessToken = jwtService.generateToken(userDetails);
                         RefreshToken rotatedRefreshToken = refreshTokenService.createRefreshToken(user.getId());
                         return ResponseEntity.ok(Map.of(
-                                "token", accessToken,
-                                "refreshToken", rotatedRefreshToken.getToken()
+                                TOKEN, accessToken,
+                                REFRESH_TOKEN, rotatedRefreshToken.getToken()
                         ));
                     })
                     .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(Map.of("message", "Refresh token not found in database")));
+                            .body(Map.of(MESSAGE, "Refresh token not found in database")));
         } catch (Exception e) {
             log.error("Token refresh failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", e.getMessage()));
+                    .body(Map.of(MESSAGE, e.getMessage()));
         }
     }
 
@@ -139,18 +143,18 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "Logged out successfully")
     public ResponseEntity<?> logout(@RequestBody(required = false) Map<String, String> request) {
         try {
-            if (request != null && request.containsKey("refreshToken")) {
-                String tokenStr = request.get("refreshToken");
-                refreshTokenService.findByToken(tokenStr).ifPresent(token -> {
-                    refreshTokenService.deleteByUserId(token.getUser().getId());
-                });
+            if (request != null && request.containsKey(REFRESH_TOKEN)) {
+                String tokenStr = request.get(REFRESH_TOKEN);
+                refreshTokenService.findByToken(tokenStr).ifPresent(token ->
+                    refreshTokenService.deleteByUserId(token.getUser().getId())
+                );
             } else {
                 org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
                 if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
                     userRepository.findByEmail(auth.getName()).ifPresent(user -> refreshTokenService.deleteByUserId(user.getId()));
                 }
             }
-            return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+            return ResponseEntity.ok(Map.of(MESSAGE, "Logged out successfully"));
         } catch (Exception e) {
             log.error("Logout failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

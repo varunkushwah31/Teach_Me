@@ -15,9 +15,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.chat.model.ChatModel;
+
+@ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthControllerTest {
+
+    @MockitoBean
+    private VectorStore vectorStore;
+
+    @MockitoBean
+    private ChatModel chatModel;
 
     @Autowired
     private MockMvc mockMvc;

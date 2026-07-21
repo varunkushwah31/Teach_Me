@@ -25,7 +25,7 @@ public class CitationService {
         this.citationRepository = citationRepository;
     }
 
-    public List<CitationDTO> extractAndSaveCitations(Chat chat, String aiResponse, List<Document> sourceDocs) {
+    public void extractAndSaveCitations(Chat chat, String aiResponse, List<Document> sourceDocs) {
         log.info("Extracting citations from AI response");
 
         List<Citation> citations = new ArrayList<>();
@@ -39,36 +39,27 @@ public class CitationService {
             int docNumber = Integer.parseInt(matcher.group(1));
             int sourceIndex = docNumber - 1;
 
-            if (sourceIndex >= 0 && sourceIndex < sourceDocs.size()) {
-                if (processedSourceIndices.add(sourceIndex)) {
-                    Document sourceDoc = sourceDocs.get(sourceIndex);
-                    String sourceChunk = sourceDoc.getText();
-                    String docName = "Unknown";
-                    if (sourceDoc.getMetadata() != null && sourceDoc.getMetadata().containsKey("fileName")) {
-                        docName = String.valueOf(sourceDoc.getMetadata().get("fileName"));
-                    }
+            if (sourceIndex >= 0 && sourceIndex < sourceDocs.size() && processedSourceIndices.add(sourceIndex)) {
+                Document sourceDoc = sourceDocs.get(sourceIndex);
+                String sourceChunk = sourceDoc.getText();
+                String docName = sourceDoc.getMetadata().containsKey("fileName")
+                        ? String.valueOf(sourceDoc.getMetadata().get("fileName"))
+                        : "Unknown";
 
-                    Citation citation = Citation.builder()
-                            .chat(chat)
-                            .citationIndex(docNumber)
-                            .documentName(docName)
-                            .pageNumber(extractPageNumber(sourceChunk))
-                            .quote(extractQuote(sourceChunk))
-                            .sourceChunkId(sourceDoc.getId())
-                            .build();
+                Citation citation = Citation.builder()
+                        .chat(chat)
+                        .citationIndex(docNumber)
+                        .documentName(docName)
+                        .pageNumber(sourceChunk != null ? extractPageNumber(sourceChunk) : null)
+                        .quote(sourceChunk != null ? extractQuote(sourceChunk) : "")
+                        .sourceChunkId(sourceDoc.getId())
+                        .build();
 
-                    citations.add(citation);
-                }
+                citations.add(citation);
             }
         }
 
-        List<Citation> saved = citationRepository.saveAll(citations);
-        log.info("Saved {} citations for chat {}", saved.size(), chat.getId());
-
-        // ✅ Modern Java Streams
-        return saved.stream()
-                .map(this::mapToDTO)
-                .toList();
+        citationRepository.saveAll(citations);
     }
 
     private Integer extractPageNumber(String chunk) {

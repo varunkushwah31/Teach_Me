@@ -10,10 +10,13 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,6 +38,7 @@ public class DocumentSummarizationService {
         this.documentRepository = documentRepository;
     }
 
+    @CacheEvict(value = "documentSummaries", key = "#documentId")
     @Async("taskExecutor")
     public void generateSummaryAsync(Long documentId) {
         log.info("Starting async summary generation for document ID: {}", documentId);
@@ -112,11 +116,12 @@ public class DocumentSummarizationService {
                         return summary != null ? summary.strip() : "";
                     } catch (Exception e) {
                         log.warn("Error summarizing chunk", e);
-                        // Safe null check before substring
                         String text = chunk.getText();
-                        return (text != null && text.length() > 200)
-                                ? text.substring(0, 200)
-                                : (text != null ? text : "");
+                        String fallback;
+                        if (text != null && text.length() > 200) {
+                            fallback = text.substring(0, 200);
+                        } else fallback = Objects.requireNonNullElse(text, "");
+                        return fallback;
                     }
                 })
                 .toList(); // Using modern Java 16+ .toList()
@@ -152,6 +157,7 @@ public class DocumentSummarizationService {
         }
     }
 
+    @Cacheable(value = "documentSummaries", key = "#documentId", unless = "#result == null || #result.status != 'COMPLETED'")
     public DocumentSummaryDTO getSummary(Long documentId) {
         DocumentSummary summary = documentSummaryRepository.findByDocumentId(documentId)
                 .orElseThrow(() -> new RuntimeException("Summary not found for document"));
