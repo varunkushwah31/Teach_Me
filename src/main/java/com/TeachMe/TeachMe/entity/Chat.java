@@ -57,8 +57,7 @@ public class Chat {
     @ToString.Exclude
     private java.util.Set<Citation> citations = new java.util.HashSet<>();
 
-    @Override
-    public final boolean equals(Object o) {
+    public afinal boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
 

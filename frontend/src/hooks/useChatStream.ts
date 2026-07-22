@@ -38,7 +38,7 @@ export function useChatStream(chatId: string = 'default-session') {
     });
   }, [chatId]);
 
-  const sendMessage = useCallback((query: string) => {
+  const sendMessage = useCallback((query: string, selectedDocIds?: number[]) => {
     if (!query.trim() || isStreaming) return;
 
     const userMsg: Message = {
@@ -71,7 +71,8 @@ export function useChatStream(chatId: string = 'default-session') {
       (err) => {
         console.error('Chat stream error', err);
         setIsStreaming(false);
-      }
+      },
+      selectedDocIds
     );
   }, [chatId, isStreaming]);
 

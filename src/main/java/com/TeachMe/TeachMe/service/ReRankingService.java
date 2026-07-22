@@ -2,12 +2,11 @@ package com.TeachMe.TeachMe.service;
 
 import com.TeachMe.TeachMe.controller.SearchController;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -18,33 +17,99 @@ import io.micrometer.core.annotation.Timed;
 @Service
 public class ReRankingService {
 
-    /**
-     * Re-ranks {@code chunks} by keyword overlap with the query and returns the
-     * top-{@code topK} results.
-     *
-     * <p>The previous implementation called the LLM once per chunk (O(n) Ollama
-     * round-trips per user message). With 8 chunks and a local deepseek-r1:8b
-     * model that adds ~8 × 3-5 s ≈ 30–40 s of latency before the user sees a
-     * single token — unacceptable for a streaming chat interface.
-     *
-     * <p>Keyword scoring alone is enough here: the upstream HybridSearchService
-     * already narrows the candidate set to semantically relevant chunks via pgvector
-     * cosine similarity and full-text BM25. Re ranking only needs to break ties and
-     * push the most query-term-dense chunks to the top.
-     *
-     * <p>If you later want semantic re-ranking, the right approach is a single
-     * batched prompt: "Given query Q, rank these 8 chunk IDs by relevance. Return
-     * only: 3,1,7,2,…" — one LLM call instead of eight.
-     */
-    public List<Document> reRankChunks(String query, List<Document> chunks, int topK) {
-        log.info("Re-ranking {} chunks for query: '{}'", chunks.size(), query);
+    private final ChatClient chatClient;
 
+    public ReRankingService(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
+    }
+
+    public List<Document> reRankChunks(String query, List<Document> chunks, int topK) {
+        if (chunks == null || chunks.isEmpty()) {
+            return List.of();
+        }
         if (chunks.size() <= topK) {
             return chunks;
         }
 
-        String[] queryTerms = query.toLowerCase().split("[\\s\\p{Punct}]+");
+        log.info("Single-batch LLM re-ranking starting for {} candidate chunks for query: '{}'", chunks.size(), query);
 
+        List<Document> llmResult = tryLlmReRank(query, chunks, topK);
+        if (llmResult != null) {
+            return llmResult;
+        }
+
+        return fallbackKeywordRank(query, chunks, topK);
+    }
+
+    private List<Document> tryLlmReRank(String query, List<Document> chunks, int topK) {
+        try {
+            String prompt = buildReRankPrompt(query, chunks);
+            String response = chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
+
+            if (response != null && response.contains("\u200B")) {
+                response = response.substring(response.indexOf("\u200B") + 1);
+            }
+
+            if (response != null && !response.isBlank()) {
+                return parseReRankResponse(response, chunks, topK);
+            }
+        } catch (Exception e) {
+            log.warn("Single-batch LLM re-ranking failed - falling back to keyword overlap ranking. Error: {}", e.getMessage());
+        }
+        return List.of();
+    }
+
+    private String buildReRankPrompt(String query, List<Document> chunks) {
+        StringBuilder promptBuilder = new StringBuilder();
+        promptBuilder.append("User Query: \"").append(query).append("\"\n\n");
+        promptBuilder.append("Candidate Chunks:\n");
+        for (int i = 0; i < chunks.size(); i++) {
+            String textSnippet = chunks.get(i).getText();
+            if (textSnippet != null && textSnippet.length() > 300) {
+                textSnippet = textSnippet.substring(0, 300) + "...";
+            }
+            promptBuilder.append("[").append(i + 1).append("] ").append(textSnippet).append("\n");
+        }
+        promptBuilder.append("\nInstructions: Rank the candidate chunk IDs from most relevant to least relevant for the user query. ");
+        promptBuilder.append("Output ONLY a comma-separated list of indices (e.g. 2,1,4,3). Do not output any reasoning or extra text.");
+        return promptBuilder.toString();
+    }
+
+    private List<Document> parseReRankResponse(String response, List<Document> chunks, int topK) {
+        String cleaned = response.replaceAll("[^0-9,]", "");
+        String[] indexStrs = cleaned.split(",");
+        List<Document> reRanked = new ArrayList<>();
+        Set<Integer> addedIndices = new HashSet<>();
+
+        for (String s : indexStrs) {
+            if (s.isBlank()) {
+                continue;
+            }
+            try {
+                int idx = Integer.parseInt(s.trim()) - 1;
+                if (idx >= 0 && idx < chunks.size() && !addedIndices.contains(idx)) {
+                    reRanked.add(chunks.get(idx));
+                    addedIndices.add(idx);
+                }
+            } catch (NumberFormatException _) {
+                // Ignore non-numeric indices in the response
+            }
+        }
+
+        for (int i = 0; i < chunks.size(); i++) {
+            if (!addedIndices.contains(i)) {
+                reRanked.add(chunks.get(i));
+            }
+        }
+
+        return reRanked.stream().limit(topK).toList();
+    }
+
+    private List<Document> fallbackKeywordRank(String query, List<Document> chunks, int topK) {
+        String[] queryTerms = query.toLowerCase().split("[\\s\\p{Punct}]+");
         return chunks.stream()
                 .sorted((a, b) -> Double.compare(
                         keywordScore(queryTerms, b.getText()),
@@ -53,21 +118,17 @@ public class ReRankingService {
                 .toList();
     }
 
-    /**
-     * Returns the number of distinct query terms (longer than 2 chars) that
-     * appear in {@code chunkText}. Simple, fast, zero external calls.
-     */
     private double keywordScore(String[] queryTerms, String chunkText) {
-        if (chunkText == null) return 0.0;
+        if (chunkText == null) {
+            return 0.0;
+        }
         String lower = chunkText.toLowerCase();
         return Arrays.stream(queryTerms)
                 .filter(t -> t.length() > 2 && lower.contains(t))
                 .count();
     }
 
-    /** Convenience wrapper used by {@link SearchController}. */
-    public Map<String, List<Document>> processMultipleQueries(
-            Map<String, List<Document>> queries) {
+    public Map<String, List<Document>> processMultipleQueries(Map<String, List<Document>> queries) {
         return batchReRank(queries, 4);
     }
 
@@ -76,7 +137,7 @@ public class ReRankingService {
             Map<String, List<Document>> queryChunksMap, int topK) {
         return queryChunksMap.entrySet().stream()
                 .collect(Collectors.toMap(
-                        (@NonNull Entry<String, List<Document>> e) -> e.getKey(),
-                        (@NonNull Entry<String, List<Document>> e) -> reRankChunks(e.getKey(), e.getValue(), topK)));
+                        Entry::getKey,
+                        e -> reRankChunks(e.getKey(), e.getValue(), topK)));
     }
 }

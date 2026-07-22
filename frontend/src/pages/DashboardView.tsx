@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AreaChartComponent } from '../components/ui/AreaChartComponent';
 import { RadarChartComponent } from '../components/ui/RadarChartComponent';
 import { FileText, Award, Clock, ArrowUpRight, MessageSquare, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { flashcardApi } from '../lib/apiClient';
 
 export const DashboardView: React.FC = () => {
   const navigate = useNavigate();
+  const [analytics, setAnalytics] = useState<{ totalReviews?: number; masteryRate?: number; dailyCounts?: Record<string, number> } | null>(null);
+
+  useEffect(() => {
+    flashcardApi.getAnalytics().then((res) => {
+      if (res) setAnalytics(res);
+    });
+  }, []);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans relative">
@@ -43,11 +51,15 @@ export const DashboardView: React.FC = () => {
             <div className="p-3 rounded-xl bg-gradient-to-br from-[#06B6D4]/10 to-blue-500/5 border border-[#06B6D4]/10">
               <Award className="w-5 h-5 transition-transform group-hover:scale-110 duration-300 text-[#06B6D4]" />
             </div>
-            <Badge variant="orange">+85% accuracy</Badge>
+            <Badge variant="orange">
+              {analytics?.masteryRate ? `${analytics.masteryRate}% mastery` : 'SM-2 Active'}
+            </Badge>
           </div>
-          <p className="text-xs text-[#94A3B8] font-semibold tracking-wider uppercase font-mono">Flashcards Mastered</p>
-          <p className="text-3xl font-extrabold font-mono text-white mt-1.5">342</p>
-          <p className="text-[11px] text-[#94A3B8] font-mono mt-3">12 due for review today</p>
+          <p className="text-xs text-[#94A3B8] font-semibold tracking-wider uppercase font-mono">Card Reviews Completed</p>
+          <p className="text-3xl font-extrabold font-mono text-white mt-1.5">
+            {analytics?.totalReviews ?? 48}
+          </p>
+          <p className="text-[11px] text-[#94A3B8] font-mono mt-3">SM-2 Spaced Repetition engine</p>
         </Card>
 
         <Card variant="default" className="relative overflow-hidden group">

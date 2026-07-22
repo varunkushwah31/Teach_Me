@@ -57,12 +57,17 @@ public class HybridSearchService {
 
     @Timed("rag.search.hybrid")
     public List<Document> hybridSearch(String query, Long userId, String chatId, int topK) {
-        log.info("Hybrid search: query='{}' topK={}", query, topK);
+        return hybridSearch(query, userId, chatId, List.of(), topK);
+    }
 
-        List<Document> vectorResults = vectorSearchResults(query, userId, chatId, topK);
+    @Timed("rag.search.hybrid.filtered")
+    public List<Document> hybridSearch(String query, Long userId, String chatId, List<Long> documentIds, int topK) {
+        log.info("Hybrid search: query='{}' topK={} documentFilterCount={}", query, topK, documentIds != null ? documentIds.size() : 0);
+
+        List<Document> vectorResults = vectorSearchResults(query, userId, chatId, documentIds, topK);
         log.info("Vector search returned {} results", vectorResults.size());
 
-        List<Document> fullTextResults = fullTextSearchResults(query, userId, chatId, topK);
+        List<Document> fullTextResults = fullTextSearchResults(query, userId, chatId, documentIds, topK);
         log.info("Full-text search returned {} results", fullTextResults.size());
 
         List<Document> fused = reciprocalRankFusion(vectorResults, fullTextResults, topK);
@@ -71,31 +76,59 @@ public class HybridSearchService {
         return fused;
     }
 
-    private List<Document> vectorSearchResults(String query, Long userId, String chatId, int topK) {
+    private List<Document> vectorSearchResults(String query, Long userId, String chatId, List<Long> documentIds, int topK) {
         FilterExpressionBuilder b = new FilterExpressionBuilder();
+        var baseGroup = b.and(b.eq("userId", userId), b.eq("chatId", chatId));
+        
+        org.springframework.ai.vectorstore.filter.Filter.Expression filterExp;
+        if (documentIds != null && !documentIds.isEmpty()) {
+            if (documentIds.size() == 1) {
+                filterExp = b.and(baseGroup, b.eq("dbDocumentId", documentIds.get(0))).build();
+            } else {
+                filterExp = b.and(baseGroup, b.in("dbDocumentId", documentIds.toArray())).build();
+            }
+        } else {
+            filterExp = baseGroup.build();
+        }
+
         SearchRequest request = SearchRequest.builder()
                 .query(query)
                 .topK(topK)
-                .filterExpression(b.and(b.eq("userId", userId), b.eq("chatId", chatId)).build())
+                .filterExpression(filterExp)
                 .build();
         return vectorStore.similaritySearch(request);
     }
 
     private List<Document> fullTextSearchResults(
-            String query, Long userId, String chatId, int topK) {
+            String query, Long userId, String chatId, List<Long> documentIds, int topK) {
         try {
-            String sql = """
+            StringBuilder sqlBuilder = new StringBuilder("""
                     SELECT id, content, metadata, ts_rank_cd(to_tsvector('english', content), q) AS rank
                     FROM vector_store,
                          plainto_tsquery('english', ?) q
                     WHERE to_tsvector('english', content) @@ q
                       AND metadata->>'userId' = ?
                       AND metadata->>'chatId' = ?
-                    ORDER BY rank DESC
-                    LIMIT ?
-                    """;
-            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, query, String.valueOf(userId), chatId,
-                    topK);
+                    """);
+
+            List<Object> params = new ArrayList<>();
+            params.add(query);
+            params.add(String.valueOf(userId));
+            params.add(chatId);
+
+            if (documentIds != null && !documentIds.isEmpty()) {
+                sqlBuilder.append(" AND (metadata->>'dbDocumentId')::bigint IN (");
+                for (int i = 0; i < documentIds.size(); i++) {
+                    sqlBuilder.append(i > 0 ? ",?" : "?");
+                    params.add(documentIds.get(i));
+                }
+                sqlBuilder.append(")");
+            }
+
+            sqlBuilder.append(" ORDER BY rank DESC LIMIT ?");
+            params.add(topK);
+
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sqlBuilder.toString(), params.toArray());
             List<Document> docs = new ArrayList<>();
             for (Map<String, Object> row : rows) {
                 String id = String.valueOf(row.get("id"));
@@ -105,11 +138,8 @@ public class HybridSearchService {
             }
             return docs;
         } catch (Exception e) {
-            // Increment the Micrometer counter so dashboards can detect silent
-            // degradation (e.g., pg_trgm not installed) without manual log scraping.
             fullTextFallbackCounter.increment();
-            log.warn("Full-text search failed — falling back to vector-only. Error: {}",
-                    e.getMessage());
+            log.warn("Full-text search failed — falling back to vector-only. Error: {}", e.getMessage());
             return new ArrayList<>();
         }
     }

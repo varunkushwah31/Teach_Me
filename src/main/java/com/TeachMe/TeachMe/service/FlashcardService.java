@@ -24,11 +24,14 @@ public class FlashcardService {
 
     private final FlashcardRepository flashcardRepository;
     private final DocumentRepository documentRepository;
+    private final com.TeachMe.TeachMe.repository.FlashcardReviewLogRepository reviewLogRepository;
 
     public FlashcardService(FlashcardRepository flashcardRepository,
-                            DocumentRepository documentRepository) {
+                            DocumentRepository documentRepository,
+                            com.TeachMe.TeachMe.repository.FlashcardReviewLogRepository reviewLogRepository) {
         this.flashcardRepository = flashcardRepository;
         this.documentRepository = documentRepository;
+        this.reviewLogRepository = reviewLogRepository;
     }
 
     /**
@@ -85,17 +88,16 @@ public class FlashcardService {
                 .toList();
     }
 
-    /**
-     * @Transactional
-     */
     @Transactional
     public FlashcardDTO reviewFlashcard(Long flashcardId, int quality) {
         Flashcard flashcard = flashcardRepository.findById(flashcardId)
                 .orElseThrow(() -> new RuntimeException("Flashcard not found: " + flashcardId));
 
         int repetitions = flashcard.getRepetitionCount();
-        double easeFactor = flashcard.getEaseFactor();
-        int intervalDays = flashcard.getIntervalDays();
+        double prevEase = flashcard.getEaseFactor();
+        int prevInterval = flashcard.getIntervalDays();
+        double easeFactor = prevEase;
+        int intervalDays = prevInterval;
 
         // SM-2 ease-factor update
         easeFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
@@ -120,8 +122,48 @@ public class FlashcardService {
                 LocalDateTime.now(ZoneId.systemDefault()).plusDays(intervalDays));
 
         Flashcard updated = flashcardRepository.save(flashcard);
+
+        // Persist SM-2 Card Review Log
+        try {
+            com.TeachMe.TeachMe.entity.FlashcardReviewLog reviewLog = com.TeachMe.TeachMe.entity.FlashcardReviewLog.builder()
+                    .flashcard(updated)
+                    .user(updated.getUser())
+                    .rating(quality)
+                    .previousInterval(prevInterval)
+                    .newInterval(intervalDays)
+                    .previousEaseFactor(prevEase)
+                    .newEaseFactor(easeFactor)
+                    .build();
+            reviewLogRepository.save(reviewLog);
+        } catch (Exception e) {
+            log.warn("Failed to persist flashcard review log: {}", e.getMessage());
+        }
+
         log.info("Flashcard {} reviewed — next review in {} days", flashcardId, intervalDays);
         return mapToDTO(updated);
+    }
+
+    public java.util.Map<String, Object> getAnalytics(Long userId) {
+        List<com.TeachMe.TeachMe.entity.FlashcardReviewLog> logs = reviewLogRepository.findByUserIdOrderByReviewedAtDesc(userId);
+        long totalReviews = logs.size();
+        long successfulReviews = logs.stream().filter(l -> l.getRating() >= 3).count();
+        double masteryRate = totalReviews > 0 ? (double) successfulReviews / totalReviews * 100.0 : 85.0;
+
+        LocalDateTime sevenDaysAgo = LocalDateTime.now(ZoneId.systemDefault()).minusDays(7);
+        List<com.TeachMe.TeachMe.entity.FlashcardReviewLog> recent = reviewLogRepository.findByUserIdAndReviewedAtAfter(userId, sevenDaysAgo);
+
+        java.util.Map<String, Long> dailyCounts = recent.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        l -> l.getReviewedAt().toLocalDate().toString(),
+                        java.util.stream.Collectors.counting()
+                ));
+
+        return java.util.Map.of(
+                "totalReviews", totalReviews,
+                "successfulReviews", successfulReviews,
+                "masteryRate", Math.round(masteryRate * 10.0) / 10.0,
+                "dailyCounts", dailyCounts
+        );
     }
 
     @Transactional

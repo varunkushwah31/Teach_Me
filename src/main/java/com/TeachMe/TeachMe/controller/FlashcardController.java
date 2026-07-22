@@ -180,4 +180,17 @@ public class FlashcardController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/analytics")
+    @Operation(summary = "Get flashcard analytics", description = "Retrieves mastery rates, total reviews completed, and daily study velocity stats.")
+    @ApiResponse(responseCode = "200", description = "Analytics retrieved successfully")
+    public ResponseEntity<Map<String, Object>> getAnalytics() {
+        try {
+            Long userId = authService.getAuthenticatedUserId();
+            return ResponseEntity.ok(flashcardService.getAnalytics(userId));
+        } catch (Exception e) {
+            log.error("Failed to fetch flashcard analytics", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

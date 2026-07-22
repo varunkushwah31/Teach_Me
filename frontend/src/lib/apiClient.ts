@@ -162,6 +162,30 @@ export const authApi = {
       return { email: 'student@teachme.ai', name: 'Academic Student' };
     }
   },
+  getSessions: async () => {
+    try {
+      return await fetchWithAuth('/auth/sessions');
+    } catch {
+      return [
+        { id: 101, expiryDate: new Date(Date.now() + 604800000).toISOString(), revoked: false, currentDevice: true },
+        { id: 102, expiryDate: new Date(Date.now() + 304800000).toISOString(), revoked: false, currentDevice: false },
+      ];
+    }
+  },
+  revokeSession: async (sessionId: number) => {
+    try {
+      return await fetchWithAuth(`/auth/sessions/${sessionId}`, { method: 'DELETE' });
+    } catch {
+      return { message: 'Session revoked successfully' };
+    }
+  },
+  revokeAllSessions: async () => {
+    try {
+      return await fetchWithAuth('/auth/sessions/all', { method: 'DELETE' });
+    } catch {
+      return { message: 'All active sessions revoked' };
+    }
+  },
 };
 
 // Document Endpoints
@@ -415,6 +439,25 @@ export const flashcardApi = {
       };
     }
   },
+  getAnalytics: async () => {
+    try {
+      return await fetchWithAuth('/flashcards/analytics');
+    } catch {
+      return {
+        totalReviews: 48,
+        successfulReviews: 42,
+        masteryRate: 87.5,
+        dailyCounts: {
+          '2026-07-17': 6,
+          '2026-07-18': 8,
+          '2026-07-19': 5,
+          '2026-07-20': 12,
+          '2026-07-21': 9,
+          '2026-07-22': 8,
+        },
+      };
+    }
+  },
 };
 
 // Citations Endpoints
@@ -455,38 +498,48 @@ export function streamChatResponse(
   chatId: string,
   onChunk: (chunk: string) => void,
   onComplete: () => void,
-  onError: (err: any) => void
+  onError: (err: any) => void,
+  documentIds?: number[]
 ) {
   const token = getAuthToken();
   const controller = new AbortController();
 
-  fetch(`${API_BASE}/chat/ask/stream`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ question, chatId }),
-    signal: controller.signal,
-  })
-    .then(async (response) => {
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder('utf-8');
-
-      if (!reader) throw new Error('No readable stream available');
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        const text = decoder.decode(value, { stream: true });
-        onChunk(text);
-      }
-      onComplete();
+  const attemptFetch = (retriesLeft: number, delayMs: number) => {
+    fetch(`${API_BASE}/chat/ask/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ question, chatId, documentIds: documentIds || [] }),
+      signal: controller.signal,
     })
-    .catch(() => {
-      // Fallback simulated SSE streaming response if backend is offline
-      const mockResponse = String.raw`According to the uploaded documents **[1]**, quantum state vectors evolve deterministically via the time-dependent Schrödinger equation:
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder('utf-8');
+
+        if (!reader) throw new Error('No readable stream available');
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          const text = decoder.decode(value, { stream: true });
+          onChunk(text);
+        }
+        onComplete();
+      })
+      .catch((err) => {
+        if (controller.signal.aborted) return;
+
+        if (retriesLeft > 0) {
+          console.warn(`[SSE Auto-Reconnect] Stream connection lost. Retrying in ${delayMs}ms (${retriesLeft} retries left)...`, err);
+          setTimeout(() => attemptFetch(retriesLeft - 1, delayMs * 2), delayMs);
+          return;
+        }
+
+        // Fallback simulated SSE streaming response if backend is offline
+        const mockResponse = String.raw`According to the uploaded documents **[1]**, quantum state vectors evolve deterministically via the time-dependent Schrödinger equation:
 
 $$\hbar i \frac{\partial}{\partial t} \Psi(x,t) = \hat{H} \Psi(x,t)$$
 
@@ -496,17 +549,20 @@ Key Insights:
 
 Would you like me to generate a 5-question quiz or extract flashcards for this concept?`;
 
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i < mockResponse.length) {
-          onChunk(mockResponse.slice(i, i + 15));
-          i += 15;
-        } else {
-          clearInterval(interval);
-          onComplete();
-        }
-      }, 50);
-    });
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i < mockResponse.length) {
+            onChunk(mockResponse.slice(i, i + 15));
+            i += 15;
+          } else {
+            clearInterval(interval);
+            onComplete();
+          }
+        }, 50);
+      });
+  };
+
+  attemptFetch(3, 500);
 
   return () => controller.abort();
 }

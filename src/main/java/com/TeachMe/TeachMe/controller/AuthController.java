@@ -37,6 +37,7 @@ public class AuthController {
     private static final String TOKEN = "token";
     private static final String REFRESH_TOKEN = "refreshToken";
     private static final String MESSAGE = "message";
+    private static final String ANONYMOUS_USER = "anonymousUser";
     public static final String AUTH_PATH = "/api/auth";
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
@@ -142,14 +143,12 @@ public class AuthController {
 
         try {
             return refreshTokenService.findByToken(tokenStr)
-                    .map(refreshTokenService::verifyExpiration)
-                    .map(t -> t.getUser())
-                    .map(user -> {
-                        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+                    .map(token -> {
+                        RefreshToken rotated = refreshTokenService.rotateRefreshToken(token);
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(token.getUser().getEmail());
                         String accessToken = jwtService.generateToken(userDetails);
-                        RefreshToken rotatedRefreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-                        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, rotatedRefreshToken.getToken())
+                        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, rotated.getToken())
                                 .httpOnly(true)
                                 .secure(secureCookie)
                                 .path(AUTH_PATH)
@@ -170,6 +169,61 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/sessions")
+    @Operation(summary = "List active sessions", description = "Retrieves all active device sessions for the authenticated user.")
+    public ResponseEntity<java.util.List<Map<String, Object>>> getActiveSessions() {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || ANONYMOUS_USER.equals(auth.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return userRepository.findByEmail(auth.getName())
+                .map(user -> {
+                    java.util.List<RefreshToken> tokens = refreshTokenService.getUserSessions(user.getId());
+                    java.util.List<Map<String, Object>> response = tokens.stream()
+                            .map(t -> Map.<String, Object>of(
+                                    "id", t.getId(),
+                                    "expiryDate", t.getExpiryDate().toString(),
+                                    "revoked", t.isRevoked()
+                            ))
+                            .toList();
+                    return ResponseEntity.ok(response);
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    @DeleteMapping("/sessions/{sessionId}")
+    @Operation(summary = "Revoke specific session", description = "Invalidates a specific device session.")
+    public ResponseEntity<Map<String, String>> revokeSession(@PathVariable Long sessionId) {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || ANONYMOUS_USER.equals(auth.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return userRepository.findByEmail(auth.getName())
+                .map(user -> {
+                    refreshTokenService.revokeSession(sessionId, user.getId());
+                    return ResponseEntity.ok(Map.of(MESSAGE, "Session revoked successfully"));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    @DeleteMapping("/sessions/all")
+    @Operation(summary = "Revoke all sessions", description = "Forces logout across all devices.")
+    public ResponseEntity<Map<String, String>> revokeAllSessions() {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || ANONYMOUS_USER.equals(auth.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return userRepository.findByEmail(auth.getName())
+                .map(user -> {
+                    refreshTokenService.deleteByUserId(user.getId());
+                    return ResponseEntity.ok(Map.of(MESSAGE, "All active sessions revoked"));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
     @PostMapping("/logout")
     @Operation(summary = "Log out user", description = "Revokes and deletes the user's active refresh tokens.")
     @ApiResponse(responseCode = "200", description = "Logged out successfully")
@@ -186,7 +240,7 @@ public class AuthController {
                 );
             } else {
                 org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-                if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+                if (auth != null && auth.isAuthenticated() && !ANONYMOUS_USER.equals(auth.getName())) {
                     userRepository.findByEmail(auth.getName()).ifPresent(user -> refreshTokenService.deleteByUserId(user.getId()));
                 }
             }

@@ -69,14 +69,19 @@ public class RagChatService {
 
     @Timed("rag.chat.ask")
     public Flux<String> askQuestionStream(String question, String chatId, Long userId) {
+        return askQuestionStream(question, chatId, userId, List.of());
+    }
+
+    @Timed("rag.chat.ask.filtered")
+    public Flux<String> askQuestionStream(String question, String chatId, Long userId, List<Long> documentIds) {
         return Mono.fromCallable(() -> userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found")))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(currentUser -> {
-                    log.info("Session {}: question='{}' userId={}", chatId, question, userId);
+                    log.info("Session {}: question='{}' userId={} docFilterCount={}", chatId, question, userId, documentIds != null ? documentIds.size() : 0);
 
                     String optimizedQuery = optimizeSearchQuery(question, chatId);
-                    List<Document> similarDocuments = hybridSearchService.hybridSearch(optimizedQuery, currentUser.getId(), chatId, 8);
+                    List<Document> similarDocuments = hybridSearchService.hybridSearch(optimizedQuery, currentUser.getId(), chatId, documentIds, 8);
                     List<Document> reRankedDocuments = reRankingService.reRankChunks(optimizedQuery, similarDocuments, 4);
 
                     String context = buildContextText(reRankedDocuments);
@@ -120,7 +125,11 @@ public class RagChatService {
         StringBuilder contextBuilder = new StringBuilder();
         for (int i = 0; i < documents.size(); i++) {
             Document doc = documents.get(i);
-            contextBuilder.append("[").append(i + 1).append("] ").append(doc.getText()).append("\n\n");
+            Object parentContentObj = doc.getMetadata().get("parentContent");
+            String contentToUse = (parentContentObj != null && !parentContentObj.toString().isBlank())
+                    ? parentContentObj.toString()
+                    : doc.getText();
+            contextBuilder.append("[").append(i + 1).append("] ").append(contentToUse).append("\n\n");
         }
         return contextBuilder.toString();
     }

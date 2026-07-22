@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import * as Tabs from '@radix-ui/react-tabs';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RotateCw, CheckCircle2, Sparkles, Award, Check, X } from 'lucide-react';
@@ -33,7 +34,11 @@ export const StudyView: React.FC = () => {
   const currentCard = dueCards[currentIndex];
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto font-sans relative">
+    <Tabs.Root
+      value={activeTab}
+      onValueChange={(val) => setActiveTab(val as any)}
+      className="space-y-6 max-w-5xl mx-auto font-sans relative"
+    >
       {/* Header Bar */}
       <div className="flex items-center justify-between pb-4 border-b border-white/5">
         <div>
@@ -43,33 +48,33 @@ export const StudyView: React.FC = () => {
           <p className="text-xs text-[#94A3B8] font-mono mt-1">SM-2 flashcard scheduler and AI-generated document quizzes.</p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="bg-white/5 p-1 rounded-xl border border-white/5 flex items-center gap-1 z-10">
-          <button
-            onClick={() => setActiveTab('flashcards')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer ${
+        {/* Tab Switcher (Radix Tabs.List) */}
+        <Tabs.List className="bg-white/5 p-1 rounded-xl border border-white/5 flex items-center gap-1 z-10">
+          <Tabs.Trigger
+            value="flashcards"
+            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#F97316]/50 ${
               activeTab === 'flashcards'
                 ? 'bg-gradient-to-r from-[#F97316] to-[#D946EF] text-white orange-glow shadow-md'
                 : 'text-[#94A3B8] hover:text-white'
             }`}
           >
             Flashcards ({dueCards.length} Due)
-          </button>
-          <button
-            onClick={() => setActiveTab('quiz')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer ${
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="quiz"
+            className={`px-4 py-2 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#F97316]/50 ${
               activeTab === 'quiz'
                 ? 'bg-gradient-to-r from-[#F97316] to-[#D946EF] text-white orange-glow shadow-md'
                 : 'text-[#94A3B8] hover:text-white'
             }`}
           >
             Active Quiz
-          </button>
-        </div>
+          </Tabs.Trigger>
+        </Tabs.List>
       </div>
 
       {/* FLASHCARD TAB */}
-      {activeTab === 'flashcards' && (
+      <Tabs.Content value="flashcards" className="focus:outline-none">
         <div className="flex flex-col items-center justify-center space-y-6 py-4">
           {completed || dueCards.length === 0 ? (
             <Card variant="default" className="text-center py-16 px-12 max-w-lg w-full relative overflow-hidden">
@@ -190,11 +195,12 @@ export const StudyView: React.FC = () => {
             </>
           )}
         </div>
-      )}
+      </Tabs.Content>
 
       {/* QUIZ TAB */}
-      {activeTab === 'quiz' && activeQuiz && (
-        <div className="space-y-6">
+      <Tabs.Content value="quiz" className="focus:outline-none">
+        {activeQuiz ? (
+          <div className="space-y-6">
           <Card variant="default">
             <div className="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
               <div>
@@ -290,7 +296,16 @@ export const StudyView: React.FC = () => {
             </Card>
           )}
         </div>
-      )}
-    </div>
+        ) : (
+          <Card variant="default" className="text-center py-16 px-12 max-w-lg w-full mx-auto relative overflow-hidden">
+            <div className="glow-ambient-orange top-[0px] left-[0px]" />
+            <h2 className="text-lg font-bold text-white mb-2 font-heading z-10">No Active Quiz Generated</h2>
+            <p className="text-xs text-[#94A3B8] mb-6 z-10 font-sans">
+              Please upload or select an academic document in the Library and trigger 'Generate Study Quiz' to start testing your knowledge.
+            </p>
+          </Card>
+        )}
+      </Tabs.Content>
+    </Tabs.Root>
   );
 };

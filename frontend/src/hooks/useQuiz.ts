@@ -28,7 +28,7 @@ export function useQuiz(documentId: number = 1) {
     setLoading(true);
     try {
       const res = await quizApi.generate(docId);
-      if (res && res.questions) {
+      if (res?.questions) {
         setActiveQuiz(res as any);
       }
     } catch (err) {
@@ -49,7 +49,7 @@ export function useQuiz(documentId: number = 1) {
   const submitQuiz = useCallback(async () => {
     if (!activeQuiz) return;
     const answersArray = activeQuiz.questions.map((_, idx) =>
-      selectedAnswers[idx] !== undefined ? selectedAnswers[idx] : -1
+      selectedAnswers[idx] ?? -1
     );
 
     try {

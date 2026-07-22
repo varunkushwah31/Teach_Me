@@ -119,30 +119,58 @@ public class DocumentIngestionService {
                     })
                     .toList();
 
-            List<org.springframework.ai.document.Document> splitDocuments =
+            // Hierarchical Parent-Child Chunking Strategy
+            // 1. Split into large Parent Chunks (~600 tokens) for full semantic context
+            List<org.springframework.ai.document.Document> parentChunks =
                     TokenTextSplitter.builder()
-                            .withChunkSize(800)
-                            .withMinChunkSizeChars(100)
+                            .withChunkSize(600)
+                            .withMinChunkSizeChars(200)
                             .withMinChunkLengthToEmbed(5)
                             .withMaxNumChunks(10000)
                             .withKeepSeparator(true)
                             .build()
                             .apply(enrichedDocuments);
 
-            vectorStore.accept(splitDocuments);
+            // 2. Split each Parent Chunk into fine-grained Child Chunks (~150 tokens) with parentContent metadata
+            List<org.springframework.ai.document.Document> childChunks = new java.util.ArrayList<>();
+            TokenTextSplitter childSplitter = TokenTextSplitter.builder()
+                    .withChunkSize(150)
+                    .withMinChunkSizeChars(50)
+                    .withMinChunkLengthToEmbed(5)
+                    .withMaxNumChunks(10000)
+                    .withKeepSeparator(true)
+                    .build();
+
+            for (org.springframework.ai.document.Document parent : parentChunks) {
+                List<org.springframework.ai.document.Document> children = childSplitter.apply(List.of(parent));
+                for (org.springframework.ai.document.Document child : children) {
+                    Map<String, Object> childMeta = new HashMap<>(child.getMetadata());
+                    childMeta.put("parentId", parent.getId());
+                    childMeta.put("parentContent", parent.getText());
+                    childChunks.add(org.springframework.ai.document.Document.builder()
+                            .id(child.getId())
+                            .text(child.getText())
+                            .metadata(childMeta)
+                            .build());
+                }
+            }
+
+            vectorStore.accept(childChunks);
 
             documentUploadCounter.increment();
-            vectorChunkCounter.increment(splitDocuments.size());
+            vectorChunkCounter.increment(childChunks.size());
 
-            log.info("Job {}: embedded {} chunks", jobId, splitDocuments.size());
+            log.info("Job {}: embedded {} child chunks from {} parent blocks",
+                    jobId, childChunks.size(), parentChunks.size());
+
             jobStatusManager.updateStatus(jobId, "COMPLETED");
 
             dbDocument.setStatus(com.TeachMe.TeachMe.entity.Document.DocumentStatus.COMPLETED);
             documentRepository.save(dbDocument);
 
-            if (splitDocuments.size() > 50) {
+            if (childChunks.size() > 50) {
                 log.info("Document {} has {} chunks — triggering auto-summarization",
-                        dbDocument.getId(), splitDocuments.size());
+                        dbDocument.getId(), childChunks.size());
                 summarizationService.generateSummaryAsync(dbDocument.getId());
             }
 
