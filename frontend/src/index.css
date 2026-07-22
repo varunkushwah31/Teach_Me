@@ -1,0 +1,107 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@layer base {
+  :root {
+    --bg-base: #0F0F0F;
+    --bg-surface: #1A1A1A;
+    --bg-surface-hover: #27272A;
+    --primary-orange: #F97316;
+    --primary-orange-hover: #EA580C;
+    --primary-orange-glow: rgba(249, 115, 22, 0.25);
+    --accent-cyan: #06B6D4;
+    --accent-cyan-bg: rgba(6, 182, 212, 0.12);
+    --danger-red: #EF4444;
+    --danger-red-bg: rgba(239, 68, 68, 0.12);
+    --text-main: #FFFFFF;
+    --text-muted: #A1A1AA;
+    --border-color: #27272A;
+
+    --background: #0F0F0F;
+    --foreground: #FFFFFF;
+    --card: #1A1A1A;
+    --card-foreground: #FFFFFF;
+    --popover: #1A1A1A;
+    --popover-foreground: #FFFFFF;
+    --primary: #F97316;
+    --primary-foreground: #FFFFFF;
+    --secondary: #27272A;
+    --secondary-foreground: #FFFFFF;
+    --muted: #27272A;
+    --muted-foreground: #A1A1AA;
+    --accent: #06B6D4;
+    --accent-foreground: #FFFFFF;
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+    --border: #27272A;
+    --input: #27272A;
+    --ring: #F97316;
+    --radius: 0.75rem;
+
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  code, kbd, samp, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0F0F0F;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272A;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3F3F46;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(26, 26, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #27272A;
+}
+
+.glass-input {
+  background: rgba(39, 39, 42, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid #27272A;
+}
+
+/* Custom Glow Effects */
+.orange-glow {
+  box-shadow: 0 0 20px var(--primary-orange-glow);
+}
+
+.cyan-glow {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+/* Micro-animations */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
