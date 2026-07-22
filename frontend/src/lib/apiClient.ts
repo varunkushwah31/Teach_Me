@@ -19,6 +19,38 @@ export const clearAuthTokens = () => {
   localStorage.removeItem('teachme_refresh_token');
 };
 
+async function tryTokenRefresh(url: string, options: RequestInit, headers: Headers): Promise<any> {
+  const refToken = getRefreshToken();
+  if (!refToken) throw new Error("No refresh token available");
+
+  const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken: refToken }),
+  });
+  
+  if (!refreshRes.ok) {
+    clearAuthTokens();
+    throw new Error("Token refresh failed");
+  }
+
+  const data = await refreshRes.json();
+  setAuthTokens(data.token, data.refreshToken);
+  headers.set('Authorization', `Bearer ${data.token}`);
+
+  const retryRes = await fetch(`${API_BASE}${url}`, { ...options, headers });
+  if (!retryRes.ok) {
+    const errorText = await retryRes.text();
+    throw new Error(`API Error [${retryRes.status}]: ${errorText || retryRes.statusText}`);
+  }
+
+  const contentType = retryRes.headers.get('content-type');
+  if (contentType?.includes('application/json')) {
+    return await retryRes.json();
+  }
+  return await retryRes.text();
+}
+
 // Generic fetch wrapper with Bearer token header
 async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<any> {
   const token = getAuthToken();
@@ -38,27 +70,11 @@ async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<an
       headers,
     });
 
-    if (response.status === 401) {
-      // Attempt token refresh if available
-      const refToken = getRefreshToken();
-      if (refToken) {
-        try {
-          const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken: refToken }),
-          });
-          if (refreshRes.ok) {
-            const data = await refreshRes.json();
-            setAuthTokens(data.token, data.refreshToken);
-            headers.set('Authorization', `Bearer ${data.token}`);
-            // Retry original request
-            const retryRes = await fetch(`${API_BASE}${url}`, { ...options, headers });
-            if (retryRes.ok) return await retryRes.json();
-          }
-        } catch {
-          clearAuthTokens();
-        }
+    if (response.status === 401 && getRefreshToken()) {
+      try {
+        return await tryTokenRefresh(url, options, headers);
+      } catch {
+        clearAuthTokens();
       }
     }
 
@@ -68,7 +84,7 @@ async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<an
     }
 
     const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
+    if (contentType?.includes('application/json')) {
       return await response.json();
     }
     return await response.text();
@@ -446,9 +462,9 @@ export function streamChatResponse(
     })
     .catch(() => {
       // Fallback simulated SSE streaming response if backend is offline
-      const mockResponse = `According to the uploaded documents **[1]**, quantum state vectors evolve deterministically via the time-dependent Schrödinger equation:
+      const mockResponse = String.raw`According to the uploaded documents **[1]**, quantum state vectors evolve deterministically via the time-dependent Schrödinger equation:
 
-$$\\hbar i \\frac{\\partial}{\\partial t} \\Psi(x,t) = \\hat{H} \\Psi(x,t)$$
+$$\hbar i \frac{\partial}{\partial t} \Psi(x,t) = \hat{H} \Psi(x,t)$$
 
 Key Insights:
 1. **Superposition Principle**: Linear combinations of valid quantum states remain valid quantum states **[2]**.

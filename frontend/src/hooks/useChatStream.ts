@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { streamChatResponse, citationApi } from '../lib/apiClient';
 
 export interface CitationItem {
@@ -15,6 +15,10 @@ export interface Message {
   text: string;
   timestamp: string;
 }
+
+const appendChunkToMessage = (msgList: Message[], msgId: string, chunk: string): Message[] => {
+  return msgList.map((msg) => (msg.id === msgId ? { ...msg, text: msg.text + chunk } : msg));
+};
 
 export function useChatStream(chatId: string = 'default-session') {
   const [messages, setMessages] = useState<Message[]>([
@@ -59,9 +63,7 @@ export function useChatStream(chatId: string = 'default-session') {
       userMsg.text,
       chatId,
       (chunk) => {
-        setMessages((prev) =>
-          prev.map((msg) => (msg.id === aiMsgId ? { ...msg, text: msg.text + chunk } : msg))
-        );
+        setMessages((prev) => appendChunkToMessage(prev, aiMsgId, chunk));
       },
       () => {
         setIsStreaming(false);

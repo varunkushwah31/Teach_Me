@@ -15,7 +15,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent ) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -42,6 +42,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
       email: 'student@teachme.ai',
       name: 'Academic Student',
     });
+  };
+
+  const getSubmitButtonText = () => {
+    if (loading) return 'Authenticating...';
+    if (isRegister) return 'Create Account';
+    return 'Sign In';
   };
 
   return (
@@ -74,10 +80,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           {isRegister && (
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-[#A1A1AA] mb-1">First Name</label>
+                <label htmlFor="first-name-input" className="block text-xs font-medium text-[#A1A1AA] mb-1">First Name</label>
                 <div className="relative">
                   <UserIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" />
                   <input
+                    id="first-name-input"
                     type="text"
                     required
                     value={firstName}
@@ -88,8 +95,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#A1A1AA] mb-1">Last Name</label>
+                <label htmlFor="last-name-input" className="block text-xs font-medium text-[#A1A1AA] mb-1">Last Name</label>
                 <input
+                  id="last-name-input"
                   type="text"
                   required
                   value={lastName}
@@ -102,10 +110,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-[#A1A1AA] mb-1">Email Address</label>
+            <label htmlFor="email-input" className="block text-xs font-medium text-[#A1A1AA] mb-1">Email Address</label>
             <div className="relative">
               <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" />
               <input
+                id="email-input"
                 type="email"
                 required
                 value={email}
@@ -117,10 +126,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#A1A1AA] mb-1">Password</label>
+            <label htmlFor="password-input" className="block text-xs font-medium text-[#A1A1AA] mb-1">Password</label>
             <div className="relative">
               <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" />
               <input
+                id="password-input"
                 type="password"
                 required
                 value={password}
@@ -136,7 +146,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             disabled={loading}
             className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all orange-glow text-sm mt-6"
           >
-            <span>{loading ? 'Authenticating...' : isRegister ? 'Create Account' : 'Sign In'}</span>
+            <span>{getSubmitButtonText()}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, MessageSquare, BookOpen, FileCheck, RefreshCw, X, AlertTriangle, Sparkles } from 'lucide-react';
+import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles } from 'lucide-react';
 import { documentApi, summaryApi, quizApi } from '../lib/apiClient';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,6 +13,10 @@ interface DocumentItem {
   category: string;
   createdAt: string;
 }
+
+const updateDocumentStatus = (docList: DocumentItem[], docId: number, status: DocumentItem['status']): DocumentItem[] => {
+  return docList.map((d) => (d.id === docId ? { ...d, status } : d));
+};
 
 export const DocumentsView: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +36,7 @@ export const DocumentsView: React.FC = () => {
   const loadDocuments = async () => {
     try {
       const data = await documentApi.getHistory();
-      if (data && data.content) {
+      if (data?.content) {
         setDocuments(data.content);
       }
     } catch {
@@ -66,10 +70,8 @@ export const DocumentsView: React.FC = () => {
 
       // Poll status if jobId returned
       if (result.jobId) {
-        setTimeout(async () => {
-          setDocuments((prev) =>
-            prev.map((d) => (d.id === newDoc.id ? { ...d, status: 'ANALYZED' } : d))
-          );
+        setTimeout(() => {
+          setDocuments((prev) => updateDocumentStatus(prev, newDoc.id, 'ANALYZED'));
         }, 3000);
       }
     } catch (err) {

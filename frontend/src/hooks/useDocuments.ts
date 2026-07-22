@@ -10,6 +10,10 @@ export interface DocumentItem {
   createdAt: string;
 }
 
+const updateDocStatus = (docList: DocumentItem[], docId: number, status: DocumentItem['status']): DocumentItem[] => {
+  return docList.map((d) => (d.id === docId ? { ...d, status } : d));
+};
+
 export function useDocuments() {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +23,7 @@ export function useDocuments() {
     setLoading(true);
     try {
       const data = await documentApi.getHistory();
-      if (data && data.content) {
+      if (data?.content) {
         setDocuments(data.content);
       }
     } catch (err) {
@@ -49,9 +53,7 @@ export function useDocuments() {
 
       if (result.jobId) {
         setTimeout(() => {
-          setDocuments((prev) =>
-            prev.map((d) => (d.id === newDoc.id ? { ...d, status: 'ANALYZED' } : d))
-          );
+          setDocuments((prev) => updateDocStatus(prev, newDoc.id, 'ANALYZED'));
         }, 3000);
       }
       return result;

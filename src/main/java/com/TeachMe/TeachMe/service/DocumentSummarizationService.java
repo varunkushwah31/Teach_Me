@@ -132,7 +132,7 @@ public class DocumentSummarizationService {
                     .toList();
 
             return futures.stream()
-                    .map(CompletableFuture::join)
+                    .map(f -> f.join())
                     .toList();
         }
     }

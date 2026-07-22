@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Search, Bell, Share2, Download, Check } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { exportApi } from '../../lib/apiClient';
 
 export const TopNav: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,7 +12,7 @@ export const TopNav: React.FC = () => {
   };
 
   const handleExportAll = () => {
-    window.open('http://localhost:8080/api/export/documents/all', '_blank');
+    window.open('http://localhost:8080/api/export/documents/all', '_blank', 'noopener,noreferrer');
   };
 
   return (

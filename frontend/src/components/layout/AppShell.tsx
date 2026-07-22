@@ -7,7 +7,6 @@ import {
   Layers,
   Settings as SettingsIcon,
   Plus,
-  Zap,
   LogOut,
   Sparkles,
 } from 'lucide-react';

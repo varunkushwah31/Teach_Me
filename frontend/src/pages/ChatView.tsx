@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Send, Paperclip, Sparkles, BookmarkPlus, BookOpen, Quote, Check, Bot, User } from 'lucide-react';
+import { Send, Paperclip, BookmarkPlus, Quote, Check, Bot, User } from 'lucide-react';
 import { streamChatResponse, citationApi, flashcardApi } from '../lib/apiClient';
 import { Badge } from '@/components/ui/badge';
 
@@ -21,6 +21,10 @@ interface Message {
   citations?: CitationItem[];
 }
 
+const appendChunkToMessages = (msgList: Message[], msgId: string, chunk: string): Message[] => {
+  return msgList.map((msg) => (msg.id === msgId ? { ...msg, text: msg.text + chunk } : msg));
+};
+
 export const ChatView: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -33,7 +37,7 @@ export const ChatView: React.FC = () => {
   const [inputQuery, setInputQuery] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [citations, setCitations] = useState<CitationItem[]>([]);
-  const [selectedDocId, setSelectedDocId] = useState<string>('default-session');
+  const selectedDocId = 'default-session';
 
   // Flashcard save modal state
   const [flashcardModal, setFlashcardModal] = useState<{ open: boolean; front: string; back: string; deckName: string }>({
@@ -87,9 +91,7 @@ export const ChatView: React.FC = () => {
       userMsg.text,
       selectedDocId,
       (chunk) => {
-        setMessages((prev) =>
-          prev.map((msg) => (msg.id === aiMsgId ? { ...msg, text: msg.text + chunk } : msg))
-        );
+        setMessages((prev) => appendChunkToMessages(prev, aiMsgId, chunk));
       },
       () => {
         setIsStreaming(false);
@@ -258,8 +260,9 @@ export const ChatView: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-[#A1A1AA] mb-1">Deck Name</label>
+                <label htmlFor="deck-name-input" className="block text-[#A1A1AA] mb-1">Deck Name</label>
                 <input
+                  id="deck-name-input"
                   type="text"
                   value={flashcardModal.deckName}
                   onChange={(e) => setFlashcardModal((p) => ({ ...p, deckName: e.target.value }))}
@@ -268,8 +271,9 @@ export const ChatView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[#A1A1AA] mb-1">Front (Question / Prompt)</label>
+                <label htmlFor="front-prompt-input" className="block text-[#A1A1AA] mb-1">Front (Question / Prompt)</label>
                 <input
+                  id="front-prompt-input"
                   type="text"
                   value={flashcardModal.front}
                   onChange={(e) => setFlashcardModal((p) => ({ ...p, front: e.target.value }))}
@@ -278,8 +282,9 @@ export const ChatView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[#A1A1AA] mb-1">Back (AI Response Answer)</label>
+                <label htmlFor="back-answer-input" className="block text-[#A1A1AA] mb-1">Back (AI Response Answer)</label>
                 <textarea
+                  id="back-answer-input"
                   rows={4}
                   value={flashcardModal.back}
                   onChange={(e) => setFlashcardModal((p) => ({ ...p, back: e.target.value }))}
