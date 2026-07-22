@@ -26,15 +26,16 @@ export const RadarChartComponent: React.FC<RadarProps> = ({ data = sampleRadarDa
     <div className="w-full h-64 font-mono text-xs">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>
-          <PolarGrid stroke="#27272A" />
-          <PolarAngleAxis dataKey="subject" stroke="#A1A1AA" tick={{ fill: '#A1A1AA', fontSize: 11 }} />
-          <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#27272A" tick={false} />
+          <PolarGrid stroke="rgba(255, 255, 255, 0.05)" />
+          <PolarAngleAxis dataKey="subject" stroke="#94A3B8" tick={{ fill: '#94A3B8', fontSize: 10 }} />
+          <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="rgba(255, 255, 255, 0.05)" tick={false} />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1A1A1A',
-              borderColor: '#27272A',
-              borderRadius: '8px',
-              color: '#FFFFFF',
+              backgroundColor: 'rgba(13, 13, 23, 0.85)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '12px',
+              color: '#F8FAFC',
+              backdropFilter: 'blur(8px)',
             }}
           />
           <Radar

@@ -28,8 +28,8 @@ export const DashboardView: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <Card variant="default" className="relative overflow-hidden group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#F97316]/10 to-[#EA580C]/5 text-[#F97316] border border-orange-500/10">
-              <FileText className="w-5 h-5" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#F97316]/10 to-[#EA580C]/5 border border-orange-500/10">
+              <FileText className="w-5 h-5 transition-transform group-hover:scale-110 duration-300" style={{ stroke: 'url(#orange-grad)' }} />
             </div>
             <Badge variant="cyan">+4 this week</Badge>
           </div>
@@ -40,8 +40,8 @@ export const DashboardView: React.FC = () => {
 
         <Card variant="default" className="relative overflow-hidden group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#06B6D4]/10 to-blue-500/5 text-[#06B6D4] border border-[#06B6D4]/10">
-              <Award className="w-5 h-5" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#06B6D4]/10 to-blue-500/5 border border-[#06B6D4]/10">
+              <Award className="w-5 h-5 transition-transform group-hover:scale-110 duration-300" style={{ stroke: 'url(#cyan-grad)' }} />
             </div>
             <Badge variant="orange">+85% accuracy</Badge>
           </div>
@@ -52,8 +52,8 @@ export const DashboardView: React.FC = () => {
 
         <Card variant="default" className="relative overflow-hidden group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#D946EF]/10 to-violet-500/5 text-[#D946EF] border border-[#D946EF]/10">
-              <Clock className="w-5 h-5" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-[#D946EF]/10 to-violet-500/5 border border-[#D946EF]/10">
+              <Clock className="w-5 h-5 transition-transform group-hover:scale-110 duration-300" style={{ stroke: 'url(#purple-grad)' }} />
             </div>
             <Badge variant="cyan">+3.5h vs last week</Badge>
           </div>

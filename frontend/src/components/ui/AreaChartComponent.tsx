@@ -38,17 +38,18 @@ export const AreaChartComponent: React.FC<ChartProps> = ({ data = sampleData }) 
               <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#27272A" vertical={false} />
-          <XAxis dataKey="day" stroke="#A1A1AA" tickLine={false} />
-          <YAxis stroke="#A1A1AA" tickLine={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+          <XAxis dataKey="day" stroke="#94A3B8" tickLine={false} tick={{ fill: '#94A3B8', fontSize: 10 }} />
+          <YAxis stroke="#94A3B8" tickLine={false} tick={{ fill: '#94A3B8', fontSize: 10 }} />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1A1A1A',
-              borderColor: '#27272A',
-              borderRadius: '8px',
-              color: '#FFFFFF',
+              backgroundColor: 'rgba(13, 13, 23, 0.85)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '12px',
+              color: '#F8FAFC',
+              backdropFilter: 'blur(8px)',
             }}
-            itemStyle={{ color: '#A1A1AA' }}
+            itemStyle={{ color: '#94A3B8' }}
           />
           <Area
             type="monotone"

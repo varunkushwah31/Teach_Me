@@ -1,10 +1,60 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, BookOpen, Layers, MessageSquare, ShieldCheck, Cpu, FileText, CheckCircle2 } from 'lucide-react';
+import { Sparkles, ArrowRight, BookOpen, Layers, MessageSquare, Cpu, FileText, CheckCircle2 } from 'lucide-react';
 
 export const LandingView: React.FC = () => {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Live Interactive Sandbox States
+  const [sandboxTab, setSandboxTab] = useState<'chat' | 'citations' | 'quiz'>('chat');
+  const [sandboxMessages, setSandboxMessages] = useState([
+    { sender: 'user', text: "Explain Heisenberg's uncertainty principle." },
+    { sender: 'ai', text: "The uncertainty principle states that you cannot simultaneously measure the exact position and momentum of a particle with absolute precision. **[1]** This is a fundamental limit of quantum systems." }
+  ]);
+  const [sandboxInput, setSandboxInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [selectedQuizOpt, setSelectedQuizOpt] = useState<number | null>(null);
+  const [quizScore, setQuizScore] = useState<number | null>(null);
+
+  const handleSandboxSend = () => {
+    if (!sandboxInput.trim()) return;
+    const userMsg = sandboxInput;
+    setSandboxMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
+    setSandboxInput('');
+    setIsTyping(true);
+
+    setTimeout(() => {
+      let aiText = "";
+      if (userMsg.toLowerCase().includes('quantum') || userMsg.toLowerCase().includes('physics')) {
+        aiText = "Quantum systems exhibit wave-particle duality, meaning particles behave like waves of probabilities. **[2]**";
+      } else if (userMsg.toLowerCase().includes('limit') || userMsg.toLowerCase().includes('uncertainty')) {
+        aiText = "The uncertainty limit is dictated by Planck's constant (h/4π), preventing precise subatomic calculations. **[1]**";
+      } else {
+        aiText = "Based on your ingested notes, this topic forms the cornerstone of modern physical study and RRF vector retrieval. **[3]**";
+      }
+      setIsTyping(false);
+      setSandboxMessages(prev => [...prev, { sender: 'ai', text: aiText }]);
+    }, 1200);
+  };
+
+  const sandboxCitations = [
+    { index: 1, docName: 'Quantum_Physics.pdf', page: 42, text: "Planck's constant establishes the minimum quantum of action." },
+    { index: 2, docName: 'Quantum_Physics.pdf', page: 55, text: "Wavefunctions map probability density configurations." },
+    { index: 3, docName: 'Modern_Physics_101.pdf', page: 12, text: "Reciprocal Rank Fusion coordinates lexical and semantic indexes." }
+  ];
+
+  const sandboxQuiz = {
+    question: "What is the mathematical relation describing the uncertainty principle?",
+    options: [
+      "Δx * Δp ≥ h / 4π",
+      "E = mc²",
+      "F = G * (m1*m2)/r²",
+      "PV = nRT"
+    ],
+    correctIdx: 0,
+    explanation: "Δx * Δp ≥ h / 4π is Heisenberg's relation, where Δx is uncertainty in position and Δp is uncertainty in momentum."
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,7 +74,6 @@ export const LandingView: React.FC = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // Data stream line configurations
     const colors = ['#fde047', '#3b82f6', '#10b981', '#a855f7', '#ef4444', '#f97316', '#06b6d4'];
     const numLines = 50;
 
@@ -47,7 +96,6 @@ export const LandingView: React.FC = () => {
       const docLeft = centerX - 128;
       const docRight = centerX + 128;
 
-      // 1. Output Grid (Right Side)
       const gridSpacing = 16;
       const gridStartX = docRight + 40;
 
@@ -61,29 +109,24 @@ export const LandingView: React.FC = () => {
         }
       }
 
-      // 2. Connecting Lines from Central Document to Extracted Format Blocks
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.lineWidth = 1.5;
 
-      // Line to PDF Block
       ctx.beginPath();
       ctx.moveTo(docRight, centerY - 60);
       ctx.lineTo(centerX + 180, centerY - 60);
       ctx.stroke();
 
-      // Line to CSV/Quiz Block
       ctx.beginPath();
       ctx.moveTo(docRight, centerY + 15);
       ctx.lineTo(centerX + 240, centerY + 15);
       ctx.stroke();
 
-      // Line to JSON/Flashcard Block
       ctx.beginPath();
       ctx.moveTo(docRight, centerY + 85);
       ctx.lineTo(centerX + 160, centerY + 85);
       ctx.stroke();
 
-      // 3. Incoming Data Streams (Left Side to Central Document)
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const yPos = centerY + line.offsetY;
@@ -136,9 +179,7 @@ export const LandingView: React.FC = () => {
 
         <div className="hidden md:flex items-center gap-8 text-[11px] font-semibold text-[#94A3B8] tracking-widest uppercase font-mono">
           <a href="#features" className="hover:text-white transition-colors">Features</a>
-          <a href="#rag" className="hover:text-white transition-colors">RAG Engine</a>
-          <a href="#sm2" className="hover:text-white transition-colors">Spaced Repetition</a>
-          <a href="#quizzes" className="hover:text-white transition-colors">Map-Reduce</a>
+          <a href="#sandbox" className="hover:text-white transition-colors">Live Sandbox</a>
         </div>
 
         <div className="flex items-center gap-4">
@@ -215,8 +256,8 @@ export const LandingView: React.FC = () => {
             <span>Local RAG Ingestion + Map-Reduce Engine</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-white">
-            Unlock structured academic intelligence <span className="gradient-text-orange font-extrabold">from any source.</span>
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-white font-heading">
+            Unlock academic structure <br/> and insights <span className="gradient-text-orange font-extrabold">from any source.</span>
           </h1>
 
           <p className="mt-4 text-sm text-[#94A3B8] max-w-xl leading-relaxed">
@@ -242,11 +283,213 @@ export const LandingView: React.FC = () => {
         </div>
       </main>
 
+      {/* Sandbox Preview Section */}
+      <section id="sandbox" className="bg-[#0D0D17]/40 backdrop-blur-xl border-t border-white/5 py-20 px-6 relative z-20">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Side: Copy */}
+          <div className="lg:col-span-6 flex flex-col space-y-5">
+            <h2 className="text-3xl font-extrabold text-white tracking-tight font-heading">
+              Experience the Live <span className="gradient-text-orange font-extrabold">RAG Workspace</span>
+            </h2>
+            <p className="text-xs text-[#94A3B8] font-mono uppercase tracking-wider">Interactive Interface Preview</p>
+            <p className="text-sm text-[#94A3B8] leading-relaxed font-sans">
+              Interact with our live simulation interface. Type a custom query, browse underlying document quotes in the Citation Canvas, or complete study quizzes to test your grasp of the topic.
+            </p>
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-4 h-4 text-[#06B6D4]" />
+                <span className="text-xs text-white font-medium font-sans">Verify accuracy with page-specific footnote highlights</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-4 h-4 text-[#F97316]" />
+                <span className="text-xs text-white font-medium font-sans">Test active recall through custom multi-choice modules</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-4 h-4 text-[#D946EF]" />
+                <span className="text-xs text-white font-medium font-sans">Coordinate semantic vectors in a sleek tabbed dashboard</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side: Interactive Sandbox Component */}
+          <div className="lg:col-span-6 w-full min-h-[420px] bg-[#0D0D17]/85 border border-white/5 rounded-2xl shadow-2xl overflow-hidden flex flex-col glass-panel">
+            {/* Window bar */}
+            <div className="bg-[#06060A]/50 border-b border-white/5 px-4 py-3 flex items-center justify-between">
+              <div className="flex gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/60" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/60" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]/60" />
+              </div>
+              <span className="text-[10px] text-[#94A3B8] font-mono tracking-wider uppercase font-semibold">Live Sandbox Preview</span>
+              <div className="w-12" />
+            </div>
+
+            {/* Sandbox Tabs */}
+            <div className="bg-white/5 p-1 flex border-b border-white/5">
+              <button 
+                onClick={() => setSandboxTab('chat')}
+                className={`flex-1 py-1.5 text-[10px] font-semibold rounded-lg transition-colors cursor-pointer ${sandboxTab === 'chat' ? 'text-white bg-white/5 border border-white/5' : 'text-[#94A3B8] hover:text-white'}`}
+              >
+                AI Chat Response
+              </button>
+              <button 
+                onClick={() => setSandboxTab('citations')}
+                className={`flex-1 py-1.5 text-[10px] font-semibold rounded-lg transition-colors cursor-pointer ${sandboxTab === 'citations' ? 'text-white bg-white/5 border border-white/5' : 'text-[#94A3B8] hover:text-white'}`}
+              >
+                Citation Canvas
+              </button>
+              <button 
+                onClick={() => setSandboxTab('quiz')}
+                className={`flex-1 py-1.5 text-[10px] font-semibold rounded-lg transition-colors cursor-pointer ${sandboxTab === 'quiz' ? 'text-white bg-white/5 border border-white/5' : 'text-[#94A3B8] hover:text-white'}`}
+              >
+                Workspace Quiz
+              </button>
+            </div>
+
+            {/* Sandbox Body Content */}
+            <div className="flex-grow p-4 flex flex-col justify-between font-mono text-[11px] min-h-[300px]">
+              
+              {/* CHAT TAB */}
+              {sandboxTab === 'chat' && (
+                <div className="flex-grow flex flex-col justify-between h-full">
+                  <div className="space-y-3.5 overflow-y-auto max-h-[200px] pr-1">
+                    {sandboxMessages.map((msg, idx) => (
+                      <div key={idx} className={`space-y-1.5 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
+                        <div className="flex items-center gap-1.5 text-[9px] text-[#94A3B8]">
+                          <span className="font-semibold uppercase">{msg.sender === 'user' ? 'Student' : 'Tutor AI'}</span>
+                        </div>
+                        <div className={`p-3 rounded-xl border text-[11px] font-sans inline-block text-left ${msg.sender === 'user' ? 'bg-[#F97316]/10 border-[#F97316]/20 text-white' : 'bg-white/5 border-white/5 text-[#94A3B8]'}`}>
+                          {msg.text}
+                        </div>
+                      </div>
+                    ))}
+                    {isTyping && (
+                      <div className="text-left space-y-1.5">
+                        <span className="text-[9px] text-[#94A3B8] font-semibold uppercase">Tutor AI</span>
+                        <div className="p-3 bg-white/5 border border-white/5 rounded-xl text-[#94A3B8] font-sans italic animate-pulse">
+                          Searching semantic vectors and streaming response...
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Chat Input Footer */}
+                  <div className="mt-3 flex gap-2 border-t border-white/5 pt-3">
+                    <input
+                      type="text"
+                      value={sandboxInput}
+                      onChange={(e) => setSandboxInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSandboxSend()}
+                      placeholder="Ask: 'Explain quantum waves'..."
+                      className="flex-grow bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-white text-[11px] focus:outline-none focus:border-[#F97316]"
+                    />
+                    <button
+                      onClick={handleSandboxSend}
+                      className="bg-gradient-to-r from-[#F97316] to-[#D946EF] px-3.5 py-2 rounded-xl text-white font-bold text-[10px] cursor-pointer"
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* CITATIONS TAB */}
+              {sandboxTab === 'citations' && (
+                <div className="flex-grow space-y-3">
+                  <div className="text-[10px] text-[#94A3B8] mb-1">CITED RECONSTRUCTED TEXT SEGMENTS:</div>
+                  <div className="space-y-2.5 max-h-[250px] overflow-y-auto pr-1">
+                    {sandboxCitations.map((c) => (
+                      <div key={c.index} className="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-[#06B6D4]/30 transition-all font-sans text-xs">
+                        <div className="flex justify-between items-center mb-1.5 font-mono text-[10px]">
+                          <span className="text-[#06B6D4] font-bold">[{c.index}]</span>
+                          <span className="text-[#94A3B8]">{c.docName} • p. {c.page}</span>
+                        </div>
+                        <p className="text-[#94A3B8] italic">"{c.text}"</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* QUIZ TAB */}
+              {sandboxTab === 'quiz' && (
+                <div className="flex-grow flex flex-col justify-between">
+                  <div className="space-y-3 font-sans">
+                    <p className="text-xs font-bold text-white leading-relaxed">
+                      {sandboxQuiz.question}
+                    </p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {sandboxQuiz.options.map((opt, idx) => {
+                        const isSelected = selectedQuizOpt === idx;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              if (quizScore === null) setSelectedQuizOpt(idx);
+                            }}
+                            className={`text-left p-2.5 rounded-xl text-[11px] transition-all border cursor-pointer ${
+                              isSelected
+                                ? 'bg-gradient-to-r from-[#F97316]/10 to-[#D946EF]/5 border-[#F97316] text-white font-semibold'
+                                : 'bg-white/5 border-white/5 text-[#94A3B8] hover:bg-white/10'
+                            }`}
+                          >
+                            <span className="font-mono text-[#F97316] mr-1.5">{String.fromCharCode(65 + idx)}.</span>
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Quiz Grade Result */}
+                  <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between font-sans">
+                    {quizScore !== null ? (
+                      <div className="text-left text-[11px] w-full">
+                        <div className="flex justify-between items-center">
+                          <p className={`font-bold ${quizScore === 100 ? 'text-[#06B6D4]' : 'text-[#EF4444]'}`}>
+                            {quizScore === 100 ? '✓ Correct (100%)' : '✗ Incorrect (0%)'}
+                          </p>
+                          <button
+                            onClick={() => {
+                              setQuizScore(null);
+                              setSelectedQuizOpt(null);
+                            }}
+                            className="text-[10px] text-[#F97316] hover:underline"
+                          >
+                            Reset Quiz
+                          </button>
+                        </div>
+                        <p className="text-[#94A3B8] mt-1 leading-relaxed">{sandboxQuiz.explanation}</p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (selectedQuizOpt === sandboxQuiz.correctIdx) {
+                            setQuizScore(100);
+                          } else if (selectedQuizOpt !== null) {
+                            setQuizScore(0);
+                          }
+                        }}
+                        disabled={selectedQuizOpt === null}
+                        className="bg-gradient-to-r from-[#F97316] to-[#D946EF] px-5 py-2.5 rounded-xl text-white font-bold text-xs orange-glow disabled:opacity-40 ml-auto cursor-pointer"
+                      >
+                        Submit
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Feature Showcase Grid Section */}
       <section id="features" className="bg-[#0D0D17]/40 backdrop-blur-xl border-t border-white/5 py-20 px-6 relative z-20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold text-white tracking-tight">Enterprise Academic AI Stack</h2>
+            <h2 className="text-3xl font-bold text-white tracking-tight font-heading">Enterprise Academic AI Stack</h2>
             <p className="text-xs text-[#94A3B8] mt-2 font-mono">
               Powered by Spring AI, pgvector RRF Hybrid Search, Map-Reduce Summaries, and SM-2 Spaced Repetition.
             </p>
@@ -257,7 +500,7 @@ export const LandingView: React.FC = () => {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#06B6D4] to-[#3B82F6] text-white flex items-center justify-center mb-6 shadow-sm">
                 <MessageSquare className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-3">RRF Hybrid Search Chat</h3>
+              <h3 className="text-sm font-bold text-white mb-3 font-heading">RRF Hybrid Search Chat</h3>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Combines pgvector similarity with PostgreSQL full-text search for exact keyword precision and semantic comprehension.
               </p>
@@ -267,7 +510,7 @@ export const LandingView: React.FC = () => {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center mb-6 shadow-sm">
                 <BookOpen className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-3">Map-Reduce Summaries</h3>
+              <h3 className="text-sm font-bold text-white mb-3 font-heading">Map-Reduce Summaries</h3>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Automatically triggers 1-page executive summaries across 50+ vector chunks in parallel for 100+ page textbooks.
               </p>
@@ -277,7 +520,7 @@ export const LandingView: React.FC = () => {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D946EF] to-purple-600 text-white flex items-center justify-center mb-6 shadow-sm">
                 <Layers className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-3">SM-2 Spaced Repetition</h3>
+              <h3 className="text-sm font-bold text-white mb-3 font-heading">SM-2 Spaced Repetition</h3>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Highlight AI streaming responses to save flashcards. Evaluate recall quality (`Again`, `Hard`, `Good`, `Easy`) with custom ease factors.
               </p>
@@ -293,3 +536,5 @@ export const LandingView: React.FC = () => {
     </div>
   );
 };
+
+export default LandingView;

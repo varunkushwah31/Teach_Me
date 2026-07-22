@@ -37,8 +37,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
         <div>
           {/* Header Logo */}
           <div className="flex items-center gap-3 px-2 py-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F97316] to-[#D946EF] flex items-center justify-center orange-glow transition-transform hover:scale-105 duration-300">
-              <Sparkles className="w-5 h-5 text-white animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F97316]/10 to-[#D946EF]/5 border border-white/5 flex items-center justify-center orange-glow transition-transform hover:scale-105 duration-300">
+              <Sparkles className="w-5 h-5 animate-pulse" style={{ stroke: 'url(#orange-grad)' }} />
             </div>
             <div>
               <h1 className="font-heading font-bold text-lg tracking-tight text-white leading-none">
@@ -51,7 +51,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
           {/* Primary Action Button */}
           <button
             onClick={() => navigate('/documents')}
-            className="w-full bg-gradient-to-r from-[#F97316] to-[#D946EF] hover:opacity-95 text-white font-semibold px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 orange-glow mb-6 text-xs uppercase tracking-wider"
+            className="w-full bg-gradient-to-r from-[#F97316] to-[#D946EF] hover:opacity-95 text-white font-semibold px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 orange-glow mb-6 text-xs uppercase tracking-wider cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>New Analysis</span>
@@ -67,14 +67,14 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
                   key={item.path}
                   to={item.path}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all duration-200 relative ${
+                    `flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all duration-200 relative group ${
                       isActive
                         ? 'bg-gradient-to-r from-[#F97316]/10 to-[#D946EF]/5 text-white border-l-4 border-[#F97316] shadow-[inset_0_0_15px_rgba(249,115,22,0.05)]'
                         : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                     }`
                   }
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#F97316]' : 'text-[#94A3B8]'}`} />
+                  <Icon className="w-4 h-4 transition-transform group-hover:scale-110 duration-200" style={{ stroke: isActive ? 'url(#orange-grad)' : '#94A3B8' }} />
                   <span>{item.name}</span>
                 </NavLink>
               );
