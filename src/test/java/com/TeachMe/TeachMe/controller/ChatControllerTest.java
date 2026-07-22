@@ -4,8 +4,8 @@ import com.TeachMe.TeachMe.service.AuthService;
 import com.TeachMe.TeachMe.service.RagChatService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -14,10 +14,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import reactor.core.publisher.Flux;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -26,10 +22,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.chat.model.ChatModel;
 
+import org.junit.jupiter.api.BeforeEach;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Bandwidth;
+import java.time.Duration;
+import static org.mockito.ArgumentMatchers.anyString;
+
 @ActiveProfiles("test")
-@WebMvcTest(RagChatController.class)
+@WebMvcTest(ChatController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class RagChatControllerTest {
+class ChatControllerTest {
 
     @MockitoBean
     private VectorStore vectorStore;
@@ -44,7 +46,24 @@ class RagChatControllerTest {
     private RagChatService ragChatService;
 
     @MockitoBean
-    private AuthService authService; // ✅ Correctly mock the extracted AuthService dependency
+    private AuthService authService;
+
+    @MockitoBean
+    private com.TeachMe.TeachMe.security.RateLimitingService rateLimitingService;
+
+    @MockitoBean
+    private com.TeachMe.TeachMe.security.JwtService jwtService;
+
+    @MockitoBean
+    private org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+
+    @BeforeEach
+    void setUp() {
+        Bucket bucket = Bucket.builder()
+                .addLimit(Bandwidth.builder().capacity(100).refillGreedy(100, Duration.ofMinutes(1)).build())
+                .build();
+        when(rateLimitingService.resolveBucket(anyString())).thenReturn(bucket);
+    }
 
     @Test
     @WithMockUser(username = "test@teachme.com")
@@ -52,19 +71,15 @@ class RagChatControllerTest {
         // Arrange
         String question = "What is AI?";
         String chatId = "session-123";
-        Long mockUserId = 42L; // ✅ Uses numerical IDs instead of bulky objects
+        Long mockUserId = 42L;
 
-        // ✅ Tell the mocked auth identity service to return our numerical ID
         when(authService.getAuthenticatedUserId()).thenReturn(mockUserId);
 
-        // Mock the LLM reactive stream output
         Flux<String> mockStream = Flux.just("Artificial ", "Intelligence ", "is ", "cool.");
 
-        // ✅ Clean Mockito stubbing: passed values directly without eq()
         when(ragChatService.askQuestionStream(question, chatId, mockUserId))
                 .thenReturn(mockStream);
 
-        // ✅ Removed the unused "category" attribute to match our updated web contract
         String jsonPayload = """
                 {
                     "question": "What is AI?",

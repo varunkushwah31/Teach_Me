@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import io.micrometer.core.annotation.Timed;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,7 @@ public class RagChatService {
         this.citationService = citationService;
     }
 
+    @Timed("rag.chat.ask")
     public Flux<String> askQuestionStream(String question, String chatId, Long userId) {
         return Mono.fromCallable(() -> userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found")))
@@ -77,30 +79,11 @@ public class RagChatService {
                     List<Document> similarDocuments = hybridSearchService.hybridSearch(optimizedQuery, currentUser.getId(), chatId, 8);
                     List<Document> reRankedDocuments = reRankingService.reRankChunks(optimizedQuery, similarDocuments, 4);
 
-                    StringBuilder contextBuilder = new StringBuilder();
-                    for (int i = 0; i < reRankedDocuments.size(); i++) {
-                        Document doc = reRankedDocuments.get(i);
-                        contextBuilder.append("[").append(i + 1).append("] ").append(doc.getText()).append("\n\n");
-                    }
-
-                    String context = contextBuilder.toString();
+                    String context = buildContextText(reRankedDocuments);
                     String systemInstruction = SYSTEM_INSTRUCTION_TEMPLATE + context;
                     StringBuilder aiResponseBuffer = new StringBuilder();
 
-                    // Extract the document ID from the metadata of the first retrieved chunk to associate the Chat session with the Document.
-                    com.TeachMe.TeachMe.entity.Document documentAssoc = null;
-                    if (!reRankedDocuments.isEmpty()) {
-                        Object dbDocIdObj = reRankedDocuments.get(0).getMetadata().get("dbDocumentId");
-                        if (dbDocIdObj != null) {
-                            try {
-                                Long docId = Long.valueOf(dbDocIdObj.toString());
-                                documentAssoc = documentRepository.findById(docId).orElse(null);
-                            } catch (Exception e) {
-                                log.warn("Failed to parse dbDocumentId from chunk metadata", e);
-                            }
-                        }
-                    }
-                    final com.TeachMe.TeachMe.entity.Document finalDocAssoc = documentAssoc;
+                    com.TeachMe.TeachMe.entity.Document documentAssoc = extractDocumentAssociation(reRankedDocuments);
 
                     return mainChatClient.prompt()
                             .system(systemInstruction)
@@ -120,7 +103,7 @@ public class RagChatService {
                                                 .answer(aiResponseBuffer.toString())
                                                 .context(context)
                                                 .user(currentUser)
-                                                .document(finalDocAssoc)
+                                                .document(documentAssoc)
                                                 .build();
                                         Chat savedChat = chatRepository.save(chatRecord);
                                         citationService.extractAndSaveCitations(savedChat, aiResponseBuffer.toString(), reRankedDocuments);
@@ -131,6 +114,32 @@ public class RagChatService {
                                 }
                             });
                 });
+    }
+
+    private String buildContextText(List<Document> documents) {
+        StringBuilder contextBuilder = new StringBuilder();
+        for (int i = 0; i < documents.size(); i++) {
+            Document doc = documents.get(i);
+            contextBuilder.append("[").append(i + 1).append("] ").append(doc.getText()).append("\n\n");
+        }
+        return contextBuilder.toString();
+    }
+
+    private com.TeachMe.TeachMe.entity.Document extractDocumentAssociation(List<Document> documents) {
+        if (documents == null || documents.isEmpty()) {
+            return null;
+        }
+        Object dbDocIdObj = documents.get(0).getMetadata().get("dbDocumentId");
+        if (dbDocIdObj == null) {
+            return null;
+        }
+        try {
+            Long docId = Long.valueOf(dbDocIdObj.toString());
+            return documentRepository.findById(docId).orElse(null);
+        } catch (Exception e) {
+            log.warn("Failed to parse dbDocumentId from chunk metadata", e);
+            return null;
+        }
     }
 
     private String optimizeSearchQuery(String originalQuestion, String chatId) {

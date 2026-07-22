@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
+        private static final String BEARER_JWT_SCHEME = "bearer-jwt";
+
         @Bean
         public OpenAPI customOpenAPI() {
                 return new OpenAPI()
@@ -18,10 +20,10 @@ public class OpenApiConfig {
                                                 .title("TeachMe RAG Engine API")
                                                 .version("1.0.0")
                                                 .description("Interactive API documentation for the TeachMe AI-powered local learning platform."))
-                                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
+                                .addSecurityItem(new SecurityRequirement().addList(BEARER_JWT_SCHEME))
                                 .components(new Components()
-                                                .addSecuritySchemes("bearer-jwt", new SecurityScheme()
-                                                                .name("bearer-jwt")
+                                                .addSecuritySchemes(BEARER_JWT_SCHEME, new SecurityScheme()
+                                                                .name(BEARER_JWT_SCHEME)
                                                                 .type(SecurityScheme.Type.HTTP)
                                                                 .scheme("bearer")
                                                                 .bearerFormat("JWT")

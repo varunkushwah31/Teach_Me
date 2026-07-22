@@ -30,6 +30,8 @@ import java.util.Map;
 @Tag(name = "Quizzes", description = "Endpoints for generating, taking, and submitting document-based learning quizzes.")
 public class QuizController {
 
+    public static final String ACCESS_DENIED = "Access denied";
+
     private final QuizGenerationService quizGenerationService;
     private final UserRepository userRepository;
     private final AuthService authService;
@@ -53,7 +55,7 @@ public class QuizController {
     @GetMapping("/{quizId}")
     @Operation(summary = "Get quiz details", description = "Retrieves quiz details including questions and options, ensuring user ownership.")
     @ApiResponse(responseCode = "200", description = "Quiz retrieved successfully")
-    @ApiResponse(responseCode = "403", description = "Access denied: Quiz not owned by user")
+    @ApiResponse(responseCode = "403", description = ACCESS_DENIED + ": Quiz not owned by user")
     @ApiResponse(responseCode = "404", description = "Quiz not found")
     public ResponseEntity<QuizDTO> getQuiz(@PathVariable Long quizId) {
         try {
@@ -62,7 +64,7 @@ public class QuizController {
             return ResponseEntity.ok(quiz);
         } catch (Exception e) {
             log.error("Failed to fetch quiz ID: {}", quizId, e);
-            if (e.getMessage() != null && e.getMessage().contains("Access denied")) {
+            if (e.getMessage() != null && e.getMessage().contains(ACCESS_DENIED)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -73,7 +75,7 @@ public class QuizController {
     @Operation(summary = "Submit quiz answers", description = "Grades the submitted quiz answers and returns detailed score and feedback.")
     @ApiResponse(responseCode = "200", description = "Quiz graded successfully")
     @ApiResponse(responseCode = "400", description = "Invalid request or answers list")
-    @ApiResponse(responseCode = "403", description = "Access denied: Quiz not owned by user")
+    @ApiResponse(responseCode = "403", description = ACCESS_DENIED + ": Quiz not owned by user")
     public ResponseEntity<QuizResponseDTO> submitQuiz(
             @PathVariable Long quizId,
             @RequestBody Map<String, Object> response) {
@@ -133,7 +135,7 @@ public class QuizController {
 
         } catch (Exception e) {
             log.error("Failed to submit and grade quiz ID: {}", quizId, e);
-            if (e.getMessage() != null && e.getMessage().contains("Access denied")) {
+            if (e.getMessage() != null && e.getMessage().contains(ACCESS_DENIED)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -143,14 +145,14 @@ public class QuizController {
     @GetMapping("/document/{documentId}")
     @Operation(summary = "Get document quizzes", description = "Retrieves all quizzes generated for a specific document, validating user ownership.")
     @ApiResponse(responseCode = "200", description = "Quizzes retrieved successfully")
-    @ApiResponse(responseCode = "403", description = "Access denied: Document not owned by user")
+    @ApiResponse(responseCode = "403", description = ACCESS_DENIED + ": Document not owned by user")
     public ResponseEntity<List<QuizDTO>> getQuizzesForDocument(@PathVariable Long documentId) {
         try {
             Long userId = authService.getAuthenticatedUserId();
             return ResponseEntity.ok(quizGenerationService.getAllQuizzesForDocument(documentId, userId));
         } catch (Exception e) {
             log.error("Failed to fetch quizzes for document ID: {}", documentId, e);
-            if (e.getMessage() != null && e.getMessage().contains("Access denied")) {
+            if (e.getMessage() != null && e.getMessage().contains(ACCESS_DENIED)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

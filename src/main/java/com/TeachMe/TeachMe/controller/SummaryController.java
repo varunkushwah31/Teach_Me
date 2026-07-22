@@ -23,6 +23,8 @@ import java.util.Map;
 @Tag(name = "Document Summarization", description = "Endpoints for generating and fetching Map-Reduce executive summaries for documents.")
 public class SummaryController {
 
+    private static final String DOCUMENT_NOT_FOUND = "Document not found";
+
     private final DocumentSummarizationService summaryService;
     private final DocumentRepository documentRepository;
     private final AuthService authService;
@@ -31,12 +33,12 @@ public class SummaryController {
     @Operation(summary = "Generate document summary", description = "Triggers an asynchronous map-reduce summarization job for the specified document.")
     @ApiResponse(responseCode = "202", description = "Summary generation accepted and started in background")
     @ApiResponse(responseCode = "403", description = "Access denied: Document not owned by user")
-    @ApiResponse(responseCode = "404", description = "Document not found")
+    @ApiResponse(responseCode = "404", description = DOCUMENT_NOT_FOUND)
     public ResponseEntity<Map<String, String>> generateSummary(@PathVariable Long documentId) {
         try {
             Long userId = authService.getAuthenticatedUserId();
             Document doc = documentRepository.findById(documentId)
-                    .orElseThrow(() -> new RuntimeException("Document not found"));
+                    .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
 
             if (!doc.getUser().getId().equals(userId)) {
                 log.warn("User {} attempted to generate summary for document {} they do not own", userId, documentId);
@@ -51,7 +53,7 @@ public class SummaryController {
 
         } catch (Exception e) {
             log.error("Failed to start summary generation for document ID: {}", documentId, e);
-            if (e.getMessage() != null && e.getMessage().contains("Document not found")) {
+            if (e.getMessage() != null && e.getMessage().contains(DOCUMENT_NOT_FOUND)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -68,7 +70,7 @@ public class SummaryController {
         try {
             Long userId = authService.getAuthenticatedUserId();
             Document doc = documentRepository.findById(documentId)
-                    .orElseThrow(() -> new RuntimeException("Document not found"));
+                    .orElseThrow(() -> new RuntimeException(DOCUMENT_NOT_FOUND));
 
             if (!doc.getUser().getId().equals(userId)) {
                 log.warn("User {} attempted to fetch summary for document {} they do not own", userId, documentId);
@@ -80,7 +82,7 @@ public class SummaryController {
 
         } catch (Exception e) {
             log.error("Failed to fetch summary for document ID: {}", documentId, e);
-            if (e.getMessage() != null && e.getMessage().contains("Document not found")) {
+            if (e.getMessage() != null && e.getMessage().contains(DOCUMENT_NOT_FOUND)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

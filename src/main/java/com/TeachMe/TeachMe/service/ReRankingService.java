@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import org.jspecify.annotations.NonNull;
+import io.micrometer.core.annotation.Timed;
 
 @Slf4j
 @Service
@@ -67,11 +71,12 @@ public class ReRankingService {
         return batchReRank(queries, 4);
     }
 
+    @Timed("rag.search.rerank")
     public Map<String, List<Document>> batchReRank(
             Map<String, List<Document>> queryChunksMap, int topK) {
         return queryChunksMap.entrySet().stream()
                 .collect(Collectors.toMap(
-                        e -> e.getKey(),
-                        e -> reRankChunks(e.getKey(), e.getValue(), topK)));
+                        (@NonNull Entry<String, List<Document>> e) -> e.getKey(),
+                        (@NonNull Entry<String, List<Document>> e) -> reRankChunks(e.getKey(), e.getValue(), topK)));
     }
 }

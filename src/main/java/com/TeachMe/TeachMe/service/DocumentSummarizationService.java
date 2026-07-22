@@ -14,6 +14,10 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import io.micrometer.core.annotation.Timed;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +44,7 @@ public class DocumentSummarizationService {
 
     @CacheEvict(value = "documentSummaries", key = "#documentId")
     @Async("taskExecutor")
+    @Timed("rag.summary.generate")
     public void generateSummaryAsync(Long documentId) {
         log.info("Starting async summary generation for document ID: {}", documentId);
 
@@ -105,26 +110,31 @@ public class DocumentSummarizationService {
                 Chunk:
                 """;
 
-        return chunks.parallelStream()
-                .map(chunk -> {
-                    try {
-                        String summary = chatClient.prompt()
-                                .user(mapPrompt + chunk.getText())
-                                .call()
-                                .content();
-                        // Safe null check before stripping
-                        return summary != null ? summary.strip() : "";
-                    } catch (Exception e) {
-                        log.warn("Error summarizing chunk", e);
-                        String text = chunk.getText();
-                        String fallback;
-                        if (text != null && text.length() > 200) {
-                            fallback = text.substring(0, 200);
-                        } else fallback = Objects.requireNonNullElse(text, "");
-                        return fallback;
-                    }
-                })
-                .toList(); // Using modern Java 16+ .toList()
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<CompletableFuture<String>> futures = chunks.stream()
+                    .map(chunk -> CompletableFuture.supplyAsync(() -> {
+                        try {
+                            String summary = chatClient.prompt()
+                                    .user(mapPrompt + chunk.getText())
+                                    .call()
+                                    .content();
+                            return summary != null ? summary.strip() : "";
+                        } catch (Exception e) {
+                            log.warn("Error summarizing chunk", e);
+                            String text = chunk.getText();
+                            String fallback;
+                            if (text != null && text.length() > 200) {
+                                fallback = text.substring(0, 200);
+                            } else fallback = Objects.requireNonNullElse(text, "");
+                            return fallback;
+                        }
+                    }, executor))
+                    .toList();
+
+            return futures.stream()
+                    .map(CompletableFuture::join)
+                    .toList();
+        }
     }
 
     //  Removed unused parameter

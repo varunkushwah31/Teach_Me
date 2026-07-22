@@ -66,10 +66,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Register user", description = "Registers a new user account and returns the authenticated JWT and refresh token.")
+    @Operation(summary = "Register a new user", description = "Creates a new user account and returns access and refresh tokens.")
     @ApiResponse(responseCode = "200", description = "Successful registration")
     @ApiResponse(responseCode = "409", description = "User already exists")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> request) {
         try {
             String email = request.get(EMAIL);
             String rawPassword = request.get(PASSWORD);
@@ -110,7 +110,7 @@ public class AuthController {
     @Operation(summary = "Refresh JWT", description = "Trades an active refresh token for a newly rotated access token and new refresh token.")
     @ApiResponse(responseCode = "200", description = "Successful rotation")
     @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
-    public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> refresh(@RequestBody Map<String, String> request) {
         String tokenStr = request.get(REFRESH_TOKEN);
         if (tokenStr == null || tokenStr.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of(MESSAGE, "Refresh token is missing"));
@@ -141,7 +141,7 @@ public class AuthController {
     @PostMapping("/logout")
     @Operation(summary = "Log out user", description = "Revokes and deletes the user's active refresh tokens.")
     @ApiResponse(responseCode = "200", description = "Logged out successfully")
-    public ResponseEntity<?> logout(@RequestBody(required = false) Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> logout(@RequestBody(required = false) Map<String, String> request) {
         try {
             if (request != null && request.containsKey(REFRESH_TOKEN)) {
                 String tokenStr = request.get(REFRESH_TOKEN);

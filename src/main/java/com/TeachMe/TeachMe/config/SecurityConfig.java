@@ -30,7 +30,7 @@ public class SecurityConfig {
 
     @Bean
     @SuppressWarnings("java:S4502") // Suppress SonarQube CSRF warning: Safe because we use stateless JWTs, not cookies.
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())

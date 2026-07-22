@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.NonNull;
+import org.springframework.security.authentication.BadCredentialsException;
 
 @Service
 @RequiredArgsConstructor
@@ -46,13 +48,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     @Transactional
-    public RefreshToken verifyExpiration(RefreshToken token) {
+    public @NonNull RefreshToken verifyExpiration(@NonNull RefreshToken token) {
         if (token.getExpiryDate().isBefore(Instant.now())) {
             refreshTokenRepository.delete(token);
-            throw new RuntimeException("Refresh token was expired. Please sign in again.");
+            throw new BadCredentialsException("Refresh token was expired. Please sign in again.");
         }
         if (token.isRevoked()) {
-            throw new RuntimeException("Refresh token is revoked.");
+            throw new BadCredentialsException("Refresh token is revoked.");
         }
         return token;
     }

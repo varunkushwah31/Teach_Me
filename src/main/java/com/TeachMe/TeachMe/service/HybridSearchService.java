@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -41,6 +42,7 @@ public class HybridSearchService {
                 .register(meterRegistry);
     }
 
+    @Timed("rag.search.hybrid")
     public List<Document> hybridSearch(String query, Long userId, String chatId, int topK) {
         log.info("Hybrid search: query='{}' topK={}", query, topK);
 
@@ -130,9 +132,7 @@ public class HybridSearchService {
             Document doc = fullTextResults.get(rank);
             String docId = doc.getId();
             rrfScores.merge(docId, 1.0 / (k + rank + 1), (v1, v2) -> v1 + v2);
-            if (!documentMap.containsKey(docId)) {
-                documentMap.put(docId, doc);
-            }
+            documentMap.putIfAbsent(docId, doc);
         }
 
         return rrfScores.entrySet().stream()

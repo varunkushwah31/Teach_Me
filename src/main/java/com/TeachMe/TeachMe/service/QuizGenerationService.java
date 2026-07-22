@@ -10,6 +10,8 @@ import com.TeachMe.TeachMe.exception.FileProcessingException;
 import com.TeachMe.TeachMe.repository.DocumentRepository;
 import com.TeachMe.TeachMe.repository.QuizRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.document.Document;
@@ -46,6 +48,7 @@ public class QuizGenerationService {
     }
 
     @Transactional
+    @Timed("rag.quiz.generate")
     public QuizDTO generateQuiz(Long documentId, User currentUser) {
         log.info("Generating quiz for document ID: {}", documentId);
 
@@ -67,7 +70,7 @@ public class QuizGenerationService {
                 documentChunks.size(), documentId);
 
         String combinedContext = documentChunks.stream()
-                .map(Document::getText)
+                .map((@NonNull Document docCh) -> docCh.getText())
                 .collect(Collectors.joining("\n\n---\n\n"));
 
         String systemPrompt = "You are an expert educational assessment designer. "
@@ -151,7 +154,7 @@ public class QuizGenerationService {
 
     private QuizDTO mapQuizToDTO(Quiz quiz) {
         List<QuizQuestionDTO> questionDTOs = quiz.getQuestions().stream()
-                .sorted(Comparator.comparingInt(QuizQuestion::getQuestionOrder))
+                .sorted(Comparator.comparingInt((@NonNull QuizQuestion q) -> q.getQuestionOrder()))
                 .map(q -> QuizQuestionDTO.builder()
                         .id(q.getId())
                         .questionText(q.getQuestionText())

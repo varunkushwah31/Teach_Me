@@ -22,8 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.when;
 
 import org.springframework.test.context.ActiveProfiles;
-
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.junit.jupiter.api.BeforeEach;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Bandwidth;
+import java.time.Duration;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @ActiveProfiles("test")
 @WebMvcTest(DocumentController.class)
@@ -53,6 +57,23 @@ class DocumentControllerTest {
 
     @MockitoBean
     private AuthService authService;
+
+    @MockitoBean
+    private com.TeachMe.TeachMe.security.RateLimitingService rateLimitingService;
+
+    @MockitoBean
+    private com.TeachMe.TeachMe.security.JwtService jwtService;
+
+    @MockitoBean
+    private org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+
+    @BeforeEach
+    void setUp() {
+        Bucket bucket = Bucket.builder()
+                .addLimit(Bandwidth.builder().capacity(100).refillGreedy(100, Duration.ofMinutes(1)).build())
+                .build();
+        when(rateLimitingService.resolveBucket(anyString())).thenReturn(bucket);
+    }
 
     @Test
     void shouldAcceptPdfUploadSuccessfully() throws Exception {
