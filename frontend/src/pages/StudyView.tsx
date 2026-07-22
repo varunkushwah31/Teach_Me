@@ -104,9 +104,9 @@ export const StudyView: React.FC = () => {
 
               {/* Main Flashcard Container (3D Flip) */}
               <div className="w-full max-w-2xl flashcard-container min-h-[280px] mb-2 z-10">
-                <div
+                <button
                   onClick={() => setShowAnswer(!showAnswer)}
-                  className={`flashcard-inner cursor-pointer ${showAnswer ? 'flashcard-flipped' : ''}`}
+                  className={`flashcard-inner cursor-pointer w-full block text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#F97316]/50 rounded-2xl ${showAnswer ? 'flashcard-flipped' : ''}`}
                 >
                   {/* Front Side */}
                   <div className="flashcard-front bg-[#0D0D17]/80 border border-white/5 shadow-2xl flex flex-col justify-between p-6">
@@ -146,7 +146,7 @@ export const StudyView: React.FC = () => {
                       Evaluate recall difficulty below
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Bottom Control Evaluation Bar (SM-2 Spaced Repetition) */}
@@ -219,7 +219,7 @@ export const StudyView: React.FC = () => {
                       const isSelected = selectedAnswers[qIdx] === optIdx;
                       return (
                         <button
-                          key={optIdx}
+                          key={`${q.id}-opt-${optIdx}`}
                           onClick={() => selectOption(qIdx, optIdx)}
                           className={`text-left p-3.5 rounded-xl text-xs transition-all border focus-visible:ring-2 focus-visible:ring-[#F97316] cursor-pointer ${
                             isSelected
@@ -228,7 +228,7 @@ export const StudyView: React.FC = () => {
                           }`}
                         >
                           <span className="font-mono text-[#F97316] mr-2">
-                            {String.fromCharCode(65 + optIdx)}.
+                            {String.fromCodePoint(65 + optIdx)}.
                           </span>
                           {opt}
                         </button>
@@ -274,7 +274,7 @@ export const StudyView: React.FC = () => {
 
               <div className="space-y-3 z-10 relative">
                 {quizResult.feedback?.map((fb: any, idx: number) => (
-                  <div key={idx} className="p-4 rounded-xl bg-[#06060A]/80 border border-white/5 text-xs space-y-1.5">
+                  <div key={`feedback-${idx}-${fb.questionText.slice(0, 10)}`} className="p-4 rounded-xl bg-[#06060A]/80 border border-white/5 text-xs space-y-1.5">
                     <p className="font-semibold text-white flex items-center gap-2">
                       {fb.isCorrect ? (
                         <Check className="w-4 h-4 text-[#06B6D4]" />

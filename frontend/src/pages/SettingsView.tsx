@@ -92,8 +92,9 @@ export const SettingsView: React.FC = () => {
 
               <div className="space-y-3.5 text-xs">
                 <div>
-                  <label className="block text-[#94A3B8] font-semibold mb-1">Full Name</label>
+                  <label htmlFor="full-name-input" className="block text-[#94A3B8] font-semibold mb-1">Full Name</label>
                   <input
+                    id="full-name-input"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -102,8 +103,9 @@ export const SettingsView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[#94A3B8] font-semibold mb-1">Email Address</label>
+                  <label htmlFor="email-settings-input" className="block text-[#94A3B8] font-semibold mb-1">Email Address</label>
                   <input
+                    id="email-settings-input"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -112,8 +114,9 @@ export const SettingsView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[#94A3B8] font-semibold mb-1">Academic Institution</label>
+                  <label htmlFor="institution-settings-input" className="block text-[#94A3B8] font-semibold mb-1">Academic Institution</label>
                   <input
+                    id="institution-settings-input"
                     type="text"
                     value={institution}
                     onChange={(e) => setInstitution(e.target.value)}
@@ -138,11 +141,12 @@ export const SettingsView: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5">
-                  <div>
-                    <p className="font-semibold text-white">Verbose Technical Mode</p>
-                    <p className="text-[#94A3B8] text-[11px] mt-0.5">Show vector chunk IDs & distance scores in chat</p>
-                  </div>
+                  <label htmlFor="verbose-mode-checkbox" className="cursor-pointer">
+                    <span className="block font-semibold text-white">Verbose Technical Mode</span>
+                    <span className="block text-[#94A3B8] text-[11px] mt-0.5 font-normal">Show vector chunk IDs & distance scores in chat</span>
+                  </label>
                   <input
+                    id="verbose-mode-checkbox"
                     type="checkbox"
                     checked={verboseMode}
                     onChange={(e) => setVerboseMode(e.target.checked)}
@@ -151,7 +155,7 @@ export const SettingsView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[#94A3B8] mb-2.5 font-semibold">Information Density</label>
+                  <p className="block text-[#94A3B8] mb-2.5 font-semibold">Information Density</p>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => setDensity('comfortable')}

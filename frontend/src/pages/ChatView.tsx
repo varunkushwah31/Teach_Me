@@ -242,9 +242,9 @@ export const ChatView: React.FC = () => {
           </h2>
           <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 scrollbar-thin">
             {citations.map((c) => (
-              <div
+              <button
                 key={c.id}
-                className="p-3.5 rounded-xl bg-white/5 border border-white/5 hover:border-[#06B6D4]/30 hover:bg-white/10 transition-all cursor-pointer group"
+                className="p-3.5 rounded-xl bg-white/5 border border-white/5 hover:border-[#06B6D4]/30 hover:bg-white/10 transition-all cursor-pointer group text-left w-full block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#06B6D4]/50"
                 onClick={() => {
                   setFlashcardModal({
                     open: true,
@@ -264,7 +264,7 @@ export const ChatView: React.FC = () => {
                 <div className="mt-2 text-[10px] text-[#F97316] font-mono flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <BookmarkPlus className="w-3 h-3" /> Convert to Flashcard
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </aside>

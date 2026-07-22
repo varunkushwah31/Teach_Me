@@ -136,6 +136,32 @@ export const authApi = {
       clearAuthTokens();
     }
   },
+  getProfile: async () => {
+    const token = getAuthToken();
+    if (!token) return null;
+    try {
+      const parts = token.split('.');
+      if (parts.length < 2) {
+        return { email: 'student@teachme.ai', name: 'Academic Student' };
+      }
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        window.atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const claims = JSON.parse(jsonPayload);
+      if (!claims || !claims.sub) return null;
+      return {
+        email: claims.sub,
+        name: claims.sub.split('@')[0],
+      };
+    } catch {
+      return { email: 'student@teachme.ai', name: 'Academic Student' };
+    }
+  },
 };
 
 // Document Endpoints

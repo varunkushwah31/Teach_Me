@@ -74,16 +74,22 @@ export const LandingView: React.FC = () => {
 
     window.addEventListener('resize', handleResize);
 
+    const secureRandom = () => {
+      const arr = new Uint32Array(1);
+      window.crypto.getRandomValues(arr);
+      return arr[0] / 4294967296;
+    };
+
     const colors = ['#fde047', '#3b82f6', '#10b981', '#a855f7', '#ef4444', '#f97316', '#06b6d4'];
     const numLines = 50;
 
     const createLine = (randomX = false) => ({
-      x: randomX ? Math.random() * -width : -200,
-      length: Math.random() * 120 + 40,
-      speed: Math.random() * 3.5 + 2,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      thickness: Math.random() > 0.7 ? 5 : 2.5,
-      offsetY: (Math.random() - 0.5) * 160,
+      x: randomX ? secureRandom() * -width : -200,
+      length: secureRandom() * 120 + 40,
+      speed: secureRandom() * 3.5 + 2,
+      color: colors[Math.floor(secureRandom() * colors.length)],
+      thickness: secureRandom() > 0.7 ? 5 : 2.5,
+      offsetY: (secureRandom() - 0.5) * 160,
     });
 
     const lines = Array.from({ length: numLines }, () => createLine(true));
@@ -354,7 +360,7 @@ export const LandingView: React.FC = () => {
                 <div className="flex-grow flex flex-col justify-between h-full">
                   <div className="space-y-3.5 overflow-y-auto max-h-[200px] pr-1">
                     {sandboxMessages.map((msg, idx) => (
-                      <div key={idx} className={`space-y-1.5 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
+                      <div key={`sandbox-msg-${idx}-${msg.text.slice(0, 10)}`} className={`space-y-1.5 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
                         <div className="flex items-center gap-1.5 text-[9px] text-[#94A3B8]">
                           <span className="font-semibold uppercase">{msg.sender === 'user' ? 'Student' : 'Tutor AI'}</span>
                         </div>
@@ -423,7 +429,7 @@ export const LandingView: React.FC = () => {
                         const isSelected = selectedQuizOpt === idx;
                         return (
                           <button
-                            key={idx}
+                            key={`sandbox-opt-${opt.slice(0, 15)}`}
                             onClick={() => {
                               if (quizScore === null) setSelectedQuizOpt(idx);
                             }}
@@ -433,7 +439,7 @@ export const LandingView: React.FC = () => {
                                 : 'bg-white/5 border-white/5 text-[#94A3B8] hover:bg-white/10'
                             }`}
                           >
-                            <span className="font-mono text-[#F97316] mr-1.5">{String.fromCharCode(65 + idx)}.</span>
+                            <span className="font-mono text-[#F97316] mr-1.5">{String.fromCodePoint(65 + idx)}.</span>
                             {opt}
                           </button>
                         );

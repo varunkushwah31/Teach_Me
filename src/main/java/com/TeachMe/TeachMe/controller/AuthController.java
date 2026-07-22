@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(AuthController.AUTH_PATH)
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Endpoints for user registration and JWT-based login authentication.")
 public class AuthController {
@@ -37,6 +37,7 @@ public class AuthController {
     private static final String TOKEN = "token";
     private static final String REFRESH_TOKEN = "refreshToken";
     private static final String MESSAGE = "message";
+    public static final String AUTH_PATH = "/api/auth";
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
     private final UserRepository userRepository;
@@ -46,6 +47,9 @@ public class AuthController {
 
     @Value("${application.security.jwt.refresh-token-expiration:604800000}")
     private long refreshExpiration;
+
+    @Value("${application.security.cookie.secure:false}")
+    private boolean secureCookie;
 
     @PostMapping("/login")
     @Operation(summary = "Authenticate user", description = "Verifies user credentials and returns an access JWT and a refresh token.")
@@ -67,8 +71,8 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken.getToken())
                 .httpOnly(true)
-                .secure(false)
-                .path("/api/auth")
+                .secure(secureCookie)
+                .path(AUTH_PATH)
                 .maxAge(refreshExpiration / 1000)
                 .sameSite("Lax")
                 .build();
@@ -109,8 +113,8 @@ public class AuthController {
 
             ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken.getToken())
                     .httpOnly(true)
-                    .secure(false)
-                    .path("/api/auth")
+                    .secure(secureCookie)
+                    .path(AUTH_PATH)
                     .maxAge(refreshExpiration / 1000)
                     .sameSite("Lax")
                     .build();
@@ -139,7 +143,7 @@ public class AuthController {
         try {
             return refreshTokenService.findByToken(tokenStr)
                     .map(refreshTokenService::verifyExpiration)
-                    .map(RefreshToken::getUser)
+                    .map(t -> t.getUser())
                     .map(user -> {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
                         String accessToken = jwtService.generateToken(userDetails);
@@ -147,8 +151,8 @@ public class AuthController {
 
                         ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, rotatedRefreshToken.getToken())
                                 .httpOnly(true)
-                                .secure(false)
-                                .path("/api/auth")
+                                .secure(secureCookie)
+                                .path(AUTH_PATH)
                                 .maxAge(refreshExpiration / 1000)
                                 .sameSite("Lax")
                                 .build();
@@ -189,8 +193,8 @@ public class AuthController {
 
             ResponseCookie clearCookie = ResponseCookie.from(REFRESH_TOKEN, "")
                     .httpOnly(true)
-                    .secure(false)
-                    .path("/api/auth")
+                    .secure(secureCookie)
+                    .path(AUTH_PATH)
                     .maxAge(0)
                     .sameSite("Lax")
                     .build();

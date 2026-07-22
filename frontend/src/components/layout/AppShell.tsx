@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileText,
@@ -13,7 +13,7 @@ import {
 import { TopNav } from './TopNav';
 
 interface AppShellProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   user?: { email: string; name: string };
   onLogout?: () => void;
 }
@@ -121,7 +121,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#06060A]">
         <TopNav />
         <main className="flex-1 overflow-y-auto p-6">
-          {children}
+          {children || <Outlet />}
         </main>
       </div>
     </div>
