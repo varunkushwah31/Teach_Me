@@ -9,16 +9,16 @@ export interface CardProps
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = "default", ...props }, ref) => {
     const variantStyles = {
-      default: "bg-[#1A1A1A] hover:border-[#3F3F46]",
-      highlight: "bg-[#27272A]/70 hover:bg-[#27272A]",
-      glass: "glass-panel hover:border-orange-500/30",
+      default: "premium-card",
+      highlight: "premium-card border-orange-500/20 shadow-[0_0_40px_rgba(249,115,22,0.08)]",
+      glass: "glass-panel rounded-[1.25rem] hover:border-orange-500/30",
     }
 
     return (
       <div
         ref={ref}
         className={cn(
-          "rounded-xl border border-[#27272A] text-white shadow-sm transition-all duration-200 p-6",
+          "p-6 text-white shadow-sm",
           variantStyles[variant],
           className
         )}

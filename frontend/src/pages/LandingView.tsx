@@ -118,19 +118,23 @@ export const LandingView: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-[#0F0F0F] text-white min-h-screen flex flex-col font-sans overflow-x-hidden selection:bg-[#F97316]/30 relative">
+    <div className="bg-[#06060A] text-[#F8FAFC] min-h-screen flex flex-col font-sans overflow-x-hidden selection:bg-[#F97316]/30 relative">
+      {/* Glow Effects in Background */}
+      <div className="glow-ambient-orange top-[15%] left-[20%]" />
+      <div className="glow-ambient-cyan top-[60%] right-[10%]" />
+
       {/* Top Navigation */}
       <nav className="flex items-center justify-between px-8 py-6 z-30 relative max-w-7xl mx-auto w-full">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[#F97316] flex items-center justify-center orange-glow">
-            <Sparkles className="w-4 h-4 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F97316] to-[#D946EF] flex items-center justify-center orange-glow">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <span className="text-sm font-bold tracking-tight text-white uppercase">
-            TeachMe <span className="text-[#F97316]">AI</span>
+          <span className="font-heading text-sm font-bold tracking-widest text-white uppercase">
+            TeachMe <span className="gradient-text-orange font-extrabold">AI</span>
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-8 text-xs font-medium text-[#A1A1AA] tracking-wider uppercase font-mono">
+        <div className="hidden md:flex items-center gap-8 text-[11px] font-semibold text-[#94A3B8] tracking-widest uppercase font-mono">
           <a href="#features" className="hover:text-white transition-colors">Features</a>
           <a href="#rag" className="hover:text-white transition-colors">RAG Engine</a>
           <a href="#sm2" className="hover:text-white transition-colors">Spaced Repetition</a>
@@ -138,10 +142,10 @@ export const LandingView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative p-[1px] rounded-lg bg-gradient-to-r from-[#F97316] via-[#06B6D4] to-[#F97316] hidden sm:block">
+          <div className="relative p-[1px] rounded-xl bg-gradient-to-r from-[#F97316] via-[#06B6D4] to-[#D946EF] hidden sm:block">
             <button
               onClick={() => navigate('/dashboard')}
-              className="px-5 py-2 bg-[#0F0F0F] text-xs font-medium uppercase tracking-wider hover:bg-[#1A1A1A] transition-colors rounded-[7px] text-white"
+              className="px-5 py-2 bg-[#06060A] text-xs font-semibold uppercase tracking-wider hover:bg-white/5 transition-colors rounded-[11px] text-white cursor-pointer"
             >
               Launch Dashboard
             </button>
@@ -149,7 +153,7 @@ export const LandingView: React.FC = () => {
 
           <button
             onClick={() => navigate('/login')}
-            className="px-5 py-2.5 bg-[#F97316] text-white text-xs font-medium uppercase tracking-wider rounded-lg hover:bg-[#EA580C] transition-colors orange-glow"
+            className="px-5 py-2.5 bg-gradient-to-r from-[#F97316] to-[#D946EF] text-white text-xs font-semibold uppercase tracking-wider rounded-xl hover:opacity-90 transition-all orange-glow cursor-pointer"
           >
             Sign In
           </button>
@@ -163,15 +167,15 @@ export const LandingView: React.FC = () => {
           <canvas ref={canvasRef} className="w-full h-full" />
 
           {/* Central Document Graphic */}
-          <div className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 w-64 h-80 bg-[#1A1A1A] rounded-2xl shadow-2xl z-10 border border-[#27272A] flex flex-col p-6 glass-panel orange-glow">
+          <div className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 w-64 h-80 bg-[#0D0D17]/80 rounded-2xl shadow-2xl z-10 border border-white/5 flex flex-col p-6 glass-panel orange-glow">
             <div className="flex items-center gap-2 mb-4">
               <FileText className="w-5 h-5 text-[#F97316]" />
               <span className="text-xs font-mono font-bold text-white truncate">Quantum_Physics.pdf</span>
             </div>
             <div className="w-20 h-2 bg-[#F97316]/50 rounded-sm mb-3" />
             <div className="w-32 h-2 bg-[#06B6D4]/50 rounded-sm mb-3" />
-            <div className="w-24 h-2 bg-[#A1A1AA]/30 rounded-sm mb-3" />
-            <div className="w-40 h-2 bg-[#A1A1AA]/20 rounded-sm mb-3" />
+            <div className="w-24 h-2 bg-[#94A3B8]/30 rounded-sm mb-3" />
+            <div className="w-40 h-2 bg-[#94A3B8]/20 rounded-sm mb-3" />
             <div className="mt-auto w-full h-1 bg-gradient-to-r from-[#F97316] to-[#06B6D4] rounded-full" />
           </div>
 
@@ -195,7 +199,7 @@ export const LandingView: React.FC = () => {
           </div>
 
           <div
-            className="absolute z-20 w-16 h-16 bg-[#A855F7] rounded-xl shadow-lg flex items-end p-2 transform -translate-y-1/2"
+            className="absolute z-20 w-16 h-16 bg-[#D946EF] rounded-xl shadow-lg flex items-end p-2 transform -translate-y-1/2"
             style={{ left: 'calc(50% + 160px)', top: 'calc(42% + 85px)' }}
           >
             <span className="bg-white text-black text-[10px] font-mono px-1 rounded font-bold uppercase">
@@ -206,23 +210,23 @@ export const LandingView: React.FC = () => {
 
         {/* Headline */}
         <div className="z-20 relative max-w-3xl mt-auto pt-72">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F97316]/10 border border-[#F97316]/30 text-[#F97316] text-xs font-mono mb-4">
-            <Cpu className="w-3.5 h-3.5" />
-            <span>Local RAG Vector Ingestion + Map-Reduce Engine</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white text-xs font-mono mb-4">
+            <Cpu className="w-3.5 h-3.5 text-[#06B6D4]" />
+            <span>Local RAG Ingestion + Map-Reduce Engine</span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-white">
-            Unlock structured academic intelligence <span className="text-[#F97316]">from any source.</span>
+            Unlock structured academic intelligence <span className="gradient-text-orange font-extrabold">from any source.</span>
           </h1>
 
-          <p className="mt-4 text-sm text-[#A1A1AA] max-w-xl leading-relaxed">
+          <p className="mt-4 text-sm text-[#94A3B8] max-w-xl leading-relaxed">
             Upload PDFs, lecture slides, and notes. Stream AI responses with verified page citations, auto-generate 5-question quizzes, and master concepts using SM-2 spaced repetition.
           </p>
 
           <div className="mt-6 flex items-center gap-4">
             <button
               onClick={() => navigate('/dashboard')}
-              className="px-6 py-3 bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-all orange-glow flex items-center gap-2"
+              className="px-6 py-3.5 bg-gradient-to-r from-[#F97316] to-[#D946EF] hover:opacity-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all orange-glow flex items-center gap-2 cursor-pointer"
             >
               <span>Explore Demo Dashboard</span>
               <ArrowRight className="w-4 h-4" />
@@ -230,7 +234,7 @@ export const LandingView: React.FC = () => {
 
             <button
               onClick={() => navigate('/documents')}
-              className="px-6 py-3 bg-[#1A1A1A] hover:bg-[#27272A] border border-[#27272A] text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-all"
+              className="px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer"
             >
               Upload PDF Notes
             </button>
@@ -239,42 +243,42 @@ export const LandingView: React.FC = () => {
       </main>
 
       {/* Feature Showcase Grid Section */}
-      <section id="features" className="bg-[#1A1A1A]/80 border-t border-[#27272A] py-16 px-6 relative z-20">
+      <section id="features" className="bg-[#0D0D17]/40 backdrop-blur-xl border-t border-white/5 py-20 px-6 relative z-20">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-2xl font-bold text-white tracking-tight">Enterprise Academic AI Stack</h2>
-            <p className="text-xs text-[#A1A1AA] mt-1 font-mono">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold text-white tracking-tight">Enterprise Academic AI Stack</h2>
+            <p className="text-xs text-[#94A3B8] mt-2 font-mono">
               Powered by Spring AI, pgvector RRF Hybrid Search, Map-Reduce Summaries, and SM-2 Spaced Repetition.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#0F0F0F] border border-[#27272A] rounded-2xl p-6 hover:border-[#F97316]/40 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-[#F97316]/10 text-[#F97316] flex items-center justify-center mb-4">
+            <div className="premium-card p-6">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#06B6D4] to-[#3B82F6] text-white flex items-center justify-center mb-6 shadow-sm">
                 <MessageSquare className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-2">RRF Hybrid Search Chat</h3>
-              <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              <h3 className="text-sm font-bold text-white mb-3">RRF Hybrid Search Chat</h3>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Combines pgvector similarity with PostgreSQL full-text search for exact keyword precision and semantic comprehension.
               </p>
             </div>
 
-            <div className="bg-[#0F0F0F] border border-[#27272A] rounded-2xl p-6 hover:border-[#06B6D4]/40 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-[#06B6D4]/10 text-[#06B6D4] flex items-center justify-center mb-4">
+            <div className="premium-card p-6">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center mb-6 shadow-sm">
                 <BookOpen className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-2">Map-Reduce Summaries</h3>
-              <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              <h3 className="text-sm font-bold text-white mb-3">Map-Reduce Summaries</h3>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Automatically triggers 1-page executive summaries across 50+ vector chunks in parallel for 100+ page textbooks.
               </p>
             </div>
 
-            <div className="bg-[#0F0F0F] border border-[#27272A] rounded-2xl p-6 hover:border-[#F97316]/40 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-[#F97316]/10 text-[#F97316] flex items-center justify-center mb-4">
+            <div className="premium-card p-6">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D946EF] to-purple-600 text-white flex items-center justify-center mb-6 shadow-sm">
                 <Layers className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-2">SM-2 Spaced Repetition</h3>
-              <p className="text-xs text-[#A1A1AA] leading-relaxed">
+              <h3 className="text-sm font-bold text-white mb-3">SM-2 Spaced Repetition</h3>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Highlight AI streaming responses to save flashcards. Evaluate recall quality (`Again`, `Hard`, `Good`, `Easy`) with custom ease factors.
               </p>
             </div>
@@ -283,7 +287,7 @@ export const LandingView: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#27272A] py-6 px-8 text-center text-xs font-mono text-[#A1A1AA] z-20">
+      <footer className="border-t border-white/5 py-8 px-8 text-center text-xs font-mono text-[#94A3B8] z-20 bg-[#06060A]/80">
         <p>TeachMe AI Academic Assistant • Powered by Spring Boot, pgvector, React & Tailwind CSS</p>
       </footer>
     </div>

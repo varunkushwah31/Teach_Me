@@ -9,9 +9,11 @@ const API_BASE = 'http://localhost:8080/api';
 export const getAuthToken = () => localStorage.getItem('teachme_token');
 export const getRefreshToken = () => localStorage.getItem('teachme_refresh_token');
 
-export const setAuthTokens = (token: string, refreshToken: string) => {
+export const setAuthTokens = (token: string, refreshToken?: string) => {
   localStorage.setItem('teachme_token', token);
-  localStorage.setItem('teachme_refresh_token', refreshToken);
+  if (refreshToken) {
+    localStorage.setItem('teachme_refresh_token', refreshToken);
+  }
 };
 
 export const clearAuthTokens = () => {
@@ -20,13 +22,9 @@ export const clearAuthTokens = () => {
 };
 
 async function tryTokenRefresh(url: string, options: RequestInit, headers: Headers): Promise<any> {
-  const refToken = getRefreshToken();
-  if (!refToken) throw new Error("No refresh token available");
-
   const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken: refToken }),
+    credentials: 'include',
   });
   
   if (!refreshRes.ok) {
@@ -35,10 +33,11 @@ async function tryTokenRefresh(url: string, options: RequestInit, headers: Heade
   }
 
   const data = await refreshRes.json();
-  setAuthTokens(data.token, data.refreshToken);
+  setAuthTokens(data.token);
   headers.set('Authorization', `Bearer ${data.token}`);
 
-  const retryRes = await fetch(`${API_BASE}${url}`, { ...options, headers });
+  const retryOptions = { ...options, credentials: 'include' as const };
+  const retryRes = await fetch(`${API_BASE}${url}`, { ...retryOptions, headers });
   if (!retryRes.ok) {
     const errorText = await retryRes.text();
     throw new Error(`API Error [${retryRes.status}]: ${errorText || retryRes.statusText}`);
@@ -67,10 +66,11 @@ async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<an
   try {
     const response = await fetch(`${API_BASE}${url}`, {
       ...options,
+      credentials: 'include',
       headers,
     });
 
-    if (response.status === 401 && getRefreshToken()) {
+    if (response.status === 401) {
       try {
         return await tryTokenRefresh(url, options, headers);
       } catch {
@@ -126,11 +126,9 @@ export const authApi = {
     }
   },
   logout: async () => {
-    const refToken = getRefreshToken();
     try {
       await fetchWithAuth('/auth/logout', {
         method: 'POST',
-        body: JSON.stringify({ refreshToken: refToken }),
       });
     } catch {
       // Ignore errors on logout

@@ -12,6 +12,8 @@ import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 import java.util.*;
 
@@ -40,6 +42,17 @@ public class HybridSearchService {
         this.fullTextFallbackCounter = Counter.builder("rag.fulltext.fallback.total")
                 .description("Number of times full-text search fell back to vector-only search")
                 .register(meterRegistry);
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void ensureHnswIndex() {
+        try {
+            log.info("Ensuring HNSW index idx_vector_store_hnsw exists on vector_store...");
+            jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS idx_vector_store_hnsw ON vector_store USING hnsw (embedding vector_cosine_ops)");
+            log.info("HNSW index checked/created successfully.");
+        } catch (Exception e) {
+            log.warn("Could not ensure HNSW index creation: {}", e.getMessage());
+        }
     }
 
     @Timed("rag.search.hybrid")

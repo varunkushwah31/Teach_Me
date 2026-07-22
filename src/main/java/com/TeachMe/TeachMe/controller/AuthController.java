@@ -19,6 +19,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Map;
 
@@ -41,6 +44,9 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
 
+    @Value("${application.security.jwt.refresh-token-expiration:604800000}")
+    private long refreshExpiration;
+
     @PostMapping("/login")
     @Operation(summary = "Authenticate user", description = "Verifies user credentials and returns an access JWT and a refresh token.")
     @ApiResponse(responseCode = "200", description = "Successful authentication")
@@ -59,10 +65,17 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        return ResponseEntity.ok(Map.of(
-                TOKEN, jwtToken,
-                REFRESH_TOKEN, refreshToken.getToken()
-        ));
+        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken.getToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/api/auth")
+                .maxAge(refreshExpiration / 1000)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(Map.of(TOKEN, jwtToken));
     }
 
     @PostMapping("/register")
@@ -94,10 +107,17 @@ public class AuthController {
             String jwtToken = jwtService.generateToken(userDetails);
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser.getId());
 
-            return ResponseEntity.ok(Map.of(
-                    TOKEN, jwtToken,
-                    REFRESH_TOKEN, refreshToken.getToken()
-            ));
+            ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, refreshToken.getToken())
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/api/auth")
+                    .maxAge(refreshExpiration / 1000)
+                    .sameSite("Lax")
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(Map.of(TOKEN, jwtToken));
 
         } catch (Exception e) {
             log.error("Registration failed: {}", e.getMessage());
@@ -110,8 +130,8 @@ public class AuthController {
     @Operation(summary = "Refresh JWT", description = "Trades an active refresh token for a newly rotated access token and new refresh token.")
     @ApiResponse(responseCode = "200", description = "Successful rotation")
     @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
-    public ResponseEntity<Map<String, String>> refresh(@RequestBody Map<String, String> request) {
-        String tokenStr = request.get(REFRESH_TOKEN);
+    public ResponseEntity<Map<String, String>> refresh(
+            @CookieValue(name = REFRESH_TOKEN, required = false) String tokenStr) {
         if (tokenStr == null || tokenStr.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of(MESSAGE, "Refresh token is missing"));
         }
@@ -124,10 +144,18 @@ public class AuthController {
                         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
                         String accessToken = jwtService.generateToken(userDetails);
                         RefreshToken rotatedRefreshToken = refreshTokenService.createRefreshToken(user.getId());
-                        return ResponseEntity.ok(Map.of(
-                                TOKEN, accessToken,
-                                REFRESH_TOKEN, rotatedRefreshToken.getToken()
-                        ));
+
+                        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN, rotatedRefreshToken.getToken())
+                                .httpOnly(true)
+                                .secure(false)
+                                .path("/api/auth")
+                                .maxAge(refreshExpiration / 1000)
+                                .sameSite("Lax")
+                                .build();
+
+                        return ResponseEntity.ok()
+                                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                                .body(Map.of(TOKEN, accessToken));
                     })
                     .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                             .body(Map.of(MESSAGE, "Refresh token not found in database")));
@@ -141,11 +169,15 @@ public class AuthController {
     @PostMapping("/logout")
     @Operation(summary = "Log out user", description = "Revokes and deletes the user's active refresh tokens.")
     @ApiResponse(responseCode = "200", description = "Logged out successfully")
-    public ResponseEntity<Map<String, String>> logout(@RequestBody(required = false) Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> logout(
+            @CookieValue(name = REFRESH_TOKEN, required = false) String tokenStr,
+            @RequestBody(required = false) Map<String, String> request) {
         try {
-            if (request != null && request.containsKey(REFRESH_TOKEN)) {
-                String tokenStr = request.get(REFRESH_TOKEN);
-                refreshTokenService.findByToken(tokenStr).ifPresent(token ->
+            String fallbackToken = (request != null) ? request.get(REFRESH_TOKEN) : null;
+            String tokenToUse = (tokenStr != null && !tokenStr.isBlank()) ? tokenStr : fallbackToken;
+
+            if (tokenToUse != null && !tokenToUse.isBlank()) {
+                refreshTokenService.findByToken(tokenToUse).ifPresent(token ->
                     refreshTokenService.deleteByUserId(token.getUser().getId())
                 );
             } else {
@@ -154,7 +186,18 @@ public class AuthController {
                     userRepository.findByEmail(auth.getName()).ifPresent(user -> refreshTokenService.deleteByUserId(user.getId()));
                 }
             }
-            return ResponseEntity.ok(Map.of(MESSAGE, "Logged out successfully"));
+
+            ResponseCookie clearCookie = ResponseCookie.from(REFRESH_TOKEN, "")
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/api/auth")
+                    .maxAge(0)
+                    .sameSite("Lax")
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
+                    .body(Map.of(MESSAGE, "Logged out successfully"));
         } catch (Exception e) {
             log.error("Logout failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

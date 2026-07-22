@@ -51,27 +51,28 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen w-screen bg-[#0F0F0F] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#F97316]/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen w-screen bg-[#06060A] flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      {/* Ambient background glows */}
+      <div className="glow-ambient-orange top-[20%] left-[20%]" />
+      <div className="glow-ambient-cyan bottom-[20%] right-[20%]" />
 
       {/* Centered Auth Card */}
-      <div className="w-full max-w-md bg-[#1A1A1A] border border-[#27272A] rounded-2xl p-8 shadow-2xl relative z-10">
+      <div className="w-full max-w-md glass-panel rounded-2xl p-8 shadow-2xl relative z-10">
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-[#F97316] flex items-center justify-center orange-glow mb-3">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F97316] to-[#D946EF] flex items-center justify-center orange-glow mb-3">
             <Sparkles className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            TeachMe <span className="text-[#F97316]">AI</span>
+          <h1 className="text-2xl font-bold text-white tracking-tight font-heading">
+            TeachMe <span className="gradient-text-orange font-extrabold">AI</span>
           </h1>
-          <p className="text-xs text-[#A1A1AA] font-mono mt-1">
+          <p className="text-xs text-[#94A3B8] font-mono mt-1 text-center">
             {isRegister ? 'Create your Academic Student Account' : 'Sign in to access document analysis'}
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] text-xs text-center font-mono">
+          <div className="mb-4 p-3 rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] text-xs text-center font-mono">
             {error}
           </div>
         )}
@@ -80,9 +81,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           {isRegister && (
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="first-name-input" className="block text-xs font-medium text-[#A1A1AA] mb-1">First Name</label>
+                <label htmlFor="first-name-input" className="block text-xs font-semibold text-[#94A3B8] mb-1">First Name</label>
                 <div className="relative">
-                  <UserIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" />
+                  <UserIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
                   <input
                     id="first-name-input"
                     type="text"
@@ -90,12 +91,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Jane"
-                    className="w-full bg-[#0F0F0F] border border-[#27272A] rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-[#A1A1AA] focus:outline-none focus:border-[#F97316]"
+                    className="w-full glass-input rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-[#94A3B8] focus:outline-none"
                   />
                 </div>
               </div>
               <div>
-                <label htmlFor="last-name-input" className="block text-xs font-medium text-[#A1A1AA] mb-1">Last Name</label>
+                <label htmlFor="last-name-input" className="block text-xs font-semibold text-[#94A3B8] mb-1">Last Name</label>
                 <input
                   id="last-name-input"
                   type="text"
@@ -103,16 +104,16 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Doe"
-                  className="w-full bg-[#0F0F0F] border border-[#27272A] rounded-lg px-3 py-2 text-xs text-white placeholder-[#A1A1AA] focus:outline-none focus:border-[#F97316]"
+                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-white placeholder-[#94A3B8] focus:outline-none"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label htmlFor="email-input" className="block text-xs font-medium text-[#A1A1AA] mb-1">Email Address</label>
+            <label htmlFor="email-input" className="block text-xs font-semibold text-[#94A3B8] mb-1">Email Address</label>
             <div className="relative">
-              <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" />
+              <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
               <input
                 id="email-input"
                 type="email"
@@ -120,15 +121,15 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="student@university.edu"
-                className="w-full bg-[#0F0F0F] border border-[#27272A] rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-[#A1A1AA] focus:outline-none focus:border-[#F97316]"
+                className="w-full glass-input rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-[#94A3B8] focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="password-input" className="block text-xs font-medium text-[#A1A1AA] mb-1">Password</label>
+            <label htmlFor="password-input" className="block text-xs font-semibold text-[#94A3B8] mb-1">Password</label>
             <div className="relative">
-              <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" />
+              <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
               <input
                 id="password-input"
                 type="password"
@@ -136,7 +137,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-[#0F0F0F] border border-[#27272A] rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-[#A1A1AA] focus:outline-none focus:border-[#F97316]"
+                className="w-full glass-input rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-[#94A3B8] focus:outline-none"
               />
             </div>
           </div>
@@ -144,7 +145,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all orange-glow text-sm mt-6"
+            className="w-full bg-gradient-to-r from-[#F97316] to-[#D946EF] hover:opacity-95 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all orange-glow text-xs uppercase tracking-wider mt-6 cursor-pointer"
           >
             <span>{getSubmitButtonText()}</span>
             <ArrowRight className="w-4 h-4" />
@@ -154,9 +155,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         {/* Separators */}
         <div className="relative my-6 text-center">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#27272A]" />
+            <div className="w-full border-t border-white/5" />
           </div>
-          <span className="relative bg-[#1A1A1A] px-3 text-[10px] text-[#A1A1AA] font-mono tracking-wider">
+          <span className="relative bg-[#0D0D17] px-3 text-[10px] text-[#94A3B8] font-mono tracking-wider">
             OR CONTINUE WITH
           </span>
         </div>
@@ -165,26 +166,26 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         <div className="grid grid-cols-2 gap-3 mb-6">
           <button
             onClick={handleGuestLogin}
-            className="w-full bg-[#0F0F0F] border border-[#27272A] hover:bg-[#27272A] text-xs text-[#A1A1AA] hover:text-white font-medium py-2 rounded-lg transition-colors"
+            className="w-full bg-white/5 border border-white/5 hover:bg-white/10 text-xs text-[#94A3B8] hover:text-white font-semibold py-2.5 rounded-xl transition-all cursor-pointer"
           >
             Google Workspace
           </button>
           <button
             onClick={handleGuestLogin}
-            className="w-full bg-[#0F0F0F] border border-[#27272A] hover:bg-[#27272A] text-xs text-[#A1A1AA] hover:text-white font-medium py-2 rounded-lg transition-colors"
+            className="w-full bg-white/5 border border-white/5 hover:bg-white/10 text-xs text-[#94A3B8] hover:text-white font-semibold py-2.5 rounded-xl transition-all cursor-pointer"
           >
             Institution SSO
           </button>
         </div>
 
         {/* Switch mode link */}
-        <div className="text-center text-xs text-[#A1A1AA]">
+        <div className="text-center text-xs text-[#94A3B8]">
           {isRegister ? (
             <>
               Already have an account?{' '}
               <button
                 onClick={() => setIsRegister(false)}
-                className="text-[#F97316] hover:underline font-medium"
+                className="text-[#F97316] hover:underline font-bold"
               >
                 Sign In
               </button>
@@ -194,7 +195,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               Don't have an account?{' '}
               <button
                 onClick={() => setIsRegister(true)}
-                className="text-[#F97316] hover:underline font-medium"
+                className="text-[#F97316] hover:underline font-bold"
               >
                 Register
               </button>

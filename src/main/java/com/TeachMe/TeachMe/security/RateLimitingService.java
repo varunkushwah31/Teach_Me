@@ -28,12 +28,7 @@ public class RateLimitingService {
             .build();
 
     public Bucket resolveBucket(String key) {
-        Bucket existing = cache.getIfPresent(key);
-        if (existing != null) return existing;
-
-        Bucket newBucket = newBucket();
-        cache.put(key, newBucket);
-        return newBucket;
+        return cache.get(key, k -> newBucket());
     }
 
     private Bucket newBucket() {

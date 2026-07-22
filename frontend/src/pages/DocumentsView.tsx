@@ -111,12 +111,14 @@ export const DocumentsView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto font-sans relative">
       {/* Title Header */}
-      <div className="flex justify-between items-start pb-2 border-b border-[#27272A]">
+      <div className="flex justify-between items-start pb-4 border-b border-white/5">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Document Library</h1>
-          <p className="text-xs text-[#A1A1AA]">Upload course notes, textbooks & papers for pgvector RAG indexing.</p>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight font-heading">
+            Document <span className="gradient-text-orange font-extrabold">Library</span>
+          </h1>
+          <p className="text-xs text-[#94A3B8] font-mono mt-1">Upload course notes, textbooks & papers for pgvector RAG indexing.</p>
         </div>
       </div>
 
@@ -132,10 +134,10 @@ export const DocumentsView: React.FC = () => {
           setDragActive(false);
           handleFileUpload(e.dataTransfer.files);
         }}
-        className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-200 cursor-pointer ${
+        className={`scanning-grid border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 cursor-pointer ${
           dragActive
             ? 'border-[#F97316] bg-[#F97316]/10 scale-[1.01]'
-            : 'border-[#27272A] bg-[#1A1A1A] hover:border-[#3F3F46]'
+            : 'border-white/10 bg-[#0D0D17]/50 hover:border-orange-500/30'
         }`}
       >
         <input
@@ -146,16 +148,16 @@ export const DocumentsView: React.FC = () => {
           onChange={(e) => handleFileUpload(e.target.files)}
         />
         <label htmlFor="file-upload-input" className="cursor-pointer flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full bg-[#27272A] flex items-center justify-center text-[#F97316] mb-3 orange-glow">
+          <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#F97316] mb-4 orange-glow">
             {uploading ? <RefreshCw className="w-6 h-6 animate-spin" /> : <Upload className="w-6 h-6" />}
           </div>
-          <h3 className="text-sm font-semibold text-white mb-1">
+          <h3 className="text-sm font-bold text-white mb-2 font-heading">
             {uploading ? 'Ingesting & Vectorizing Document...' : 'Drag and drop your academic files here'}
           </h3>
-          <p className="text-xs text-[#A1A1AA] mb-3">
+          <p className="text-xs text-[#94A3B8] mb-4 max-w-md font-sans">
             Supports PDF, DOCX, TXT files up to 50MB. Automatic Map-Reduce triggers on 50+ chunks.
           </p>
-          <span className="bg-[#F97316] text-white text-xs px-4 py-2 rounded-lg font-medium hover:bg-[#EA580C] transition-colors orange-glow">
+          <span className="bg-gradient-to-r from-[#F97316] to-[#D946EF] text-white text-xs px-5 py-2.5 rounded-xl font-bold uppercase tracking-wider hover:opacity-95 transition-colors orange-glow cursor-pointer">
             Browse Computer Files
           </span>
         </label>
@@ -163,7 +165,7 @@ export const DocumentsView: React.FC = () => {
 
       {/* Recent Files Section */}
       <div>
-        <h2 className="text-sm font-semibold text-white mb-4">Ingested Academic Documents ({documents.length})</h2>
+        <h2 className="text-sm font-bold text-white mb-4 tracking-wide uppercase font-heading">Ingested Academic Documents ({documents.length})</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {documents.map((doc) => {
@@ -174,14 +176,14 @@ export const DocumentsView: React.FC = () => {
               <Card
                 key={doc.id}
                 variant="default"
-                className={`relative flex flex-col justify-between ${
+                className={`relative flex flex-col justify-between group ${
                   isFailed ? 'border-[#EF4444]/40 bg-[#EF4444]/5' : ''
                 }`}
               >
                 <div>
                   {/* File Header */}
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="p-2 rounded-lg bg-[#27272A] text-[#F97316]">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="p-2.5 rounded-xl bg-white/5 text-[#F97316] border border-white/5">
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
@@ -191,10 +193,10 @@ export const DocumentsView: React.FC = () => {
                     </div>
                   </div>
 
-                  <h3 className="font-semibold text-sm text-white truncate mb-1" title={doc.originalFilename}>
+                  <h3 className="font-bold text-sm text-white truncate mb-1" title={doc.originalFilename}>
                     {doc.originalFilename}
                   </h3>
-                  <div className="flex items-center gap-3 text-[11px] text-[#A1A1AA] font-mono mb-4">
+                  <div className="flex items-center gap-3 text-[11px] text-[#94A3B8] font-mono mb-4">
                     <span>{(doc.fileSize / 1024 / 1024).toFixed(2)} MB</span>
                     <span>•</span>
                     <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
@@ -202,11 +204,11 @@ export const DocumentsView: React.FC = () => {
                 </div>
 
                 {/* Action Row */}
-                <div className="pt-3 border-t border-[#27272A] flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
                   {isFailed ? (
                     <button
                       onClick={() => handleFileUpload(null)}
-                      className="w-full bg-[#EF4444]/10 hover:bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/30 py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all"
+                      className="w-full bg-[#EF4444]/10 hover:bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/30 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       <span>Retry Upload</span>
@@ -216,7 +218,7 @@ export const DocumentsView: React.FC = () => {
                       <button
                         onClick={() => navigate('/chat')}
                         disabled={isProcessing}
-                        className="flex-1 bg-[#27272A] hover:bg-[#3F3F46] text-white py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all disabled:opacity-50"
+                        className="flex-1 bg-white/5 border border-white/5 hover:bg-white/10 text-white py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
                       >
                         <MessageSquare className="w-3.5 h-3.5 text-[#06B6D4]" />
                         <span>Chat</span>
@@ -225,7 +227,7 @@ export const DocumentsView: React.FC = () => {
                       <button
                         onClick={() => handleFetchSummary(doc)}
                         disabled={isProcessing}
-                        className="flex-1 bg-[#27272A] hover:bg-[#3F3F46] text-white py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all disabled:opacity-50"
+                        className="flex-1 bg-white/5 border border-white/5 hover:bg-white/10 text-white py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
                       >
                         <BookOpen className="w-3.5 h-3.5 text-[#F97316]" />
                         <span>Summary</span>
@@ -234,7 +236,7 @@ export const DocumentsView: React.FC = () => {
                       <button
                         onClick={() => handleGenerateQuiz(doc.id)}
                         disabled={isProcessing}
-                        className="flex-1 bg-[#F97316]/10 hover:bg-[#F97316]/20 text-[#F97316] border border-[#F97316]/30 py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all disabled:opacity-50"
+                        className="flex-1 bg-gradient-to-r from-[#F97316]/10 to-[#D946EF]/10 hover:from-[#F97316]/20 hover:to-[#D946EF]/20 text-[#F97316] border border-[#F97316]/20 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Quiz</span>
@@ -250,45 +252,47 @@ export const DocumentsView: React.FC = () => {
 
       {/* Executive Summary Modal */}
       {summaryModal.open && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1A1A1A] border border-[#27272A] rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl">
-            <div className="p-5 border-b border-[#27272A] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-[#F97316]/10 text-[#F97316]">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="glass-panel rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl relative overflow-hidden">
+            <div className="glow-ambient-orange top-[0px] left-[0px]" />
+            
+            <div className="p-5 border-b border-white/5 flex items-center justify-between z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-[#F97316]/15 to-[#D946EF]/10 text-[#F97316] border border-orange-500/10">
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Map-Reduce Executive Summary</h3>
-                  <p className="text-[11px] text-[#A1A1AA] font-mono truncate max-w-md">{summaryModal.title}</p>
+                  <h3 className="text-sm font-bold text-white font-heading">Map-Reduce Executive Summary</h3>
+                  <p className="text-[10px] text-[#94A3B8] font-mono truncate max-w-md mt-0.5">{summaryModal.title}</p>
                 </div>
               </div>
               <button
                 onClick={() => setSummaryModal({ open: false, title: '', content: '', loading: false })}
-                className="text-[#A1A1AA] hover:text-white p-1 rounded-lg hover:bg-[#27272A]"
+                className="text-[#94A3B8] hover:text-white p-1.5 rounded-xl hover:bg-white/5 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto font-sans text-xs leading-relaxed text-[#A1A1AA] space-y-4">
+            <div className="p-6 overflow-y-auto font-sans text-xs leading-relaxed text-[#94A3B8] space-y-4 z-10">
               {summaryModal.loading ? (
                 <div className="flex items-center justify-center py-12 text-[#F97316] font-mono gap-2">
                   <RefreshCw className="w-5 h-5 animate-spin" />
                   <span>Processing Map-Reduce vector chunks...</span>
                 </div>
               ) : (
-                <div className="prose prose-invert prose-xs text-[#FFFFFF] bg-[#0F0F0F] p-4 rounded-xl border border-[#27272A]">
-                  <p className="text-xs text-[#A1A1AA] leading-relaxed whitespace-pre-line">
+                <div className="prose prose-invert prose-xs text-[#F8FAFC] bg-[#06060A]/85 p-5 rounded-2xl border border-white/5">
+                  <p className="text-xs text-[#94A3B8] leading-relaxed whitespace-pre-line font-sans">
                     {summaryModal.content}
                   </p>
                 </div>
               )}
             </div>
 
-            <div className="p-4 border-t border-[#27272A] flex justify-end gap-3">
+            <div className="p-4 border-t border-white/5 flex justify-end gap-3 z-10">
               <button
                 onClick={() => setSummaryModal({ open: false, title: '', content: '', loading: false })}
-                className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-xs px-4 py-2 rounded-lg font-medium"
+                className="bg-white/5 hover:bg-white/10 text-white text-xs px-5 py-2.5 rounded-xl font-bold cursor-pointer border border-white/5"
               >
                 Close Summary
               </button>
