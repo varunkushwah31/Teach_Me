@@ -38,7 +38,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
           {/* Header Logo */}
           <div className="flex items-center gap-3 px-2 py-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F97316]/10 to-[#D946EF]/5 border border-white/5 flex items-center justify-center orange-glow transition-transform hover:scale-105 duration-300">
-              <Sparkles className="w-5 h-5 animate-pulse" style={{ stroke: 'url(#orange-grad)' }} />
+              <Sparkles className="w-5 h-5 animate-pulse text-[#F97316]" />
             </div>
             <div>
               <h1 className="font-heading font-bold text-lg tracking-tight text-white leading-none">
@@ -74,7 +74,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
                     }`
                   }
                 >
-                  <Icon className="w-4 h-4 transition-transform group-hover:scale-110 duration-200" style={{ stroke: isActive ? 'url(#orange-grad)' : '#94A3B8' }} />
+                  <Icon className={`w-4 h-4 transition-transform group-hover:scale-110 duration-200 ${isActive ? 'text-[#F97316]' : 'text-[#94A3B8] group-hover:text-white'}`} />
                   <span>{item.name}</span>
                 </NavLink>
               );
