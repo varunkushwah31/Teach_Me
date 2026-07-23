@@ -21,7 +21,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({ onLoginSuccess }) =>
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreed) {
       setError('Please accept the terms and privacy policy to continue.');

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Search, Bell, Share2, Download, Check, Cpu } from 'lucide-react';
+import { Search, Bell, Share2, Download, Check, Cpu, Settings2 } from 'lucide-react';
 import { NotificationsDrawer } from '../drawers/NotificationsDrawer';
 import { GlobalSearchCommand } from '../search/GlobalSearchCommand';
 import { UserProfileModal } from '../modals/UserProfileModal';
+import { OllamaConnectionModal } from '../modals/OllamaConnectionModal';
 
 interface TopNavProps {
   user?: { email: string; name: string };
@@ -13,11 +14,13 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
   const [selectedModel, setSelectedModel] = useState('deepseek-r1:8b');
+  const [baseUrl, setBaseUrl] = useState('http://localhost:11434');
 
   // Drawer / Modal states
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showOllamaModal, setShowOllamaModal] = useState(false);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -49,22 +52,23 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
 
       {/* Contextual Action Tools, Model Switcher, Notifications & Profile */}
       <div className="flex items-center gap-3">
-        {/* Dynamic Model Switcher Dropdown */}
-        <div className="flex items-center gap-2 bg-[#1A1A1A] border border-[#27272A] px-3 py-1.5 rounded-xl">
+        {/* Dynamic Ollama Connection & Model Switcher Button */}
+        <button
+          type="button"
+          onClick={() => setShowOllamaModal(true)}
+          className="flex items-center gap-2 bg-[#1A1A1A] hover:bg-[#27272A] border border-[#06B6D4]/40 px-3 py-1.5 rounded-xl cursor-pointer transition-all cyan-glow"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]"></span>
+          </span>
           <Cpu className="w-3.5 h-3.5 text-[#06B6D4]" />
-          <span className="text-[11px] text-[#A1A1AA] font-mono">Model:</span>
-          <select
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            className="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer"
-          >
-            <option value="deepseek-r1:8b" className="bg-[#1A1A1A] text-white">DeepSeek-R1 (8B)</option>
-            <option value="qwen2.5:7b" className="bg-[#1A1A1A] text-white">Qwen 2.5 (7B)</option>
-            <option value="llama3.1:8b" className="bg-[#1A1A1A] text-white">Llama 3.1 (8B)</option>
-          </select>
-        </div>
+          <span className="text-xs font-semibold text-white font-mono">{selectedModel}</span>
+          <Settings2 className="w-3.5 h-3.5 text-[#A1A1AA] hover:text-white" />
+        </button>
 
         <button
+          type="button"
           onClick={handleExportAnki}
           aria-label="Export Flashcard Deck for Anki"
           className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#27272A] bg-[#1A1A1A] text-xs font-medium text-[#A1A1AA] hover:text-white hover:border-[#F97316]/50 transition-all cursor-pointer"
@@ -74,6 +78,7 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
         </button>
 
         <button
+          type="button"
           onClick={handleShare}
           aria-label="Share workspace link"
           className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#27272A] bg-[#1A1A1A] text-xs font-medium text-[#A1A1AA] hover:text-white transition-all cursor-pointer"
@@ -86,6 +91,7 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
 
         {/* Notifications Trigger */}
         <button
+          type="button"
           onClick={() => setShowNotifications(!showNotifications)}
           aria-label="View notifications"
           className="relative p-2 rounded-xl text-[#A1A1AA] hover:text-white hover:bg-[#27272A] transition-colors cursor-pointer"
@@ -96,6 +102,7 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
 
         {/* User Avatar Header Trigger */}
         <button
+          type="button"
           onClick={() => setShowProfileModal(true)}
           className="w-8 h-8 rounded-full bg-gradient-to-br from-[#06B6D4] to-[#3B82F6] flex items-center justify-center font-bold text-xs text-white cyan-glow hover:scale-105 transition-transform cursor-pointer ml-1"
         >
@@ -116,6 +123,19 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
       {/* User Profile Modal */}
       {showProfileModal && (
         <UserProfileModal user={user} onClose={() => setShowProfileModal(false)} onLogout={onLogout} />
+      )}
+
+      {/* Ollama Connection & Model Manager Modal */}
+      {showOllamaModal && (
+        <OllamaConnectionModal
+          activeModel={selectedModel}
+          activeBaseUrl={baseUrl}
+          onClose={() => setShowOllamaModal(false)}
+          onSelectModel={(model, url) => {
+            setSelectedModel(model);
+            setBaseUrl(url);
+          }}
+        />
       )}
     </header>
   );

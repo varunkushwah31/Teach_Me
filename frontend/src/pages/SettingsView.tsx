@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { User, Sliders, Cpu, Save, Check, ShieldCheck, LogOut, Laptop } from 'lucide-react';
+import { User, Sliders, Cpu, Save, Check, ShieldCheck, LogOut, Laptop, Server, Wifi, RefreshCw, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 import { authApi } from '../lib/apiClient';
 
 export const SettingsView: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'algorithm' | 'security'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'ollama' | 'algorithm' | 'security'>('profile');
   const [saved, setSaved] = useState(false);
 
   // Form states
@@ -18,6 +18,13 @@ export const SettingsView: React.FC = () => {
   const [vectorK, setVectorK] = useState(60);
   const [easeFactor, setEaseFactor] = useState(2.5);
 
+  // Ollama states
+  const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434');
+  const [ollamaStatus, setOllamaStatus] = useState<any>(null);
+  const [testingOllama, setTestingOllama] = useState(false);
+  const [ollamaModels, setOllamaModels] = useState<any[]>([]);
+  const [selectedOllamaModel, setSelectedOllamaModel] = useState('deepseek-r1:8b');
+
   // Active Sessions state
   const [sessions, setSessions] = useState<{ id: number; expiryDate: string; revoked: boolean; currentDevice?: boolean }[]>([]);
 
@@ -25,7 +32,38 @@ export const SettingsView: React.FC = () => {
     authApi.getSessions().then((res) => {
       if (Array.isArray(res)) setSessions(res);
     });
+    handleTestOllama();
   }, []);
+
+  const handleTestOllama = async () => {
+    setTestingOllama(true);
+    try {
+      const res = await fetch('http://localhost:8081/api/ollama/test-connection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('teachme_jwt_token') || ''}`,
+        },
+        body: JSON.stringify({ baseUrl: ollamaUrl }),
+      });
+      const data = await res.json();
+      setOllamaStatus(data);
+
+      if (data.status === 'ONLINE') {
+        const modelsRes = await fetch(`http://localhost:8081/api/ollama/models?baseUrl=${encodeURIComponent(ollamaUrl)}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('teachme_jwt_token') || ''}`,
+          },
+        });
+        const modelsData = await modelsRes.json();
+        if (Array.isArray(modelsData)) setOllamaModels(modelsData);
+      }
+    } catch (err) {
+      setOllamaStatus({ status: 'OFFLINE', message: 'Could not connect to backend endpoint.' });
+    } finally {
+      setTestingOllama(false);
+    }
+  };
 
   const handleRevokeSession = async (id: number) => {
     await authApi.revokeSession(id);
@@ -53,7 +91,7 @@ export const SettingsView: React.FC = () => {
         <h1 className="text-3xl font-extrabold text-white tracking-tight font-heading">
           System <span className="gradient-text-orange font-extrabold">Settings</span>
         </h1>
-        <p className="text-xs text-[#94A3B8] font-mono mt-1">Manage profile, active security sessions, and RAG vector store parameters.</p>
+        <p className="text-xs text-[#94A3B8] font-mono mt-1">Manage profile, custom Ollama LLMs, active security sessions, and RAG parameters.</p>
       </div>
 
       {/* Split-Pane Layout */}
@@ -70,6 +108,18 @@ export const SettingsView: React.FC = () => {
           >
             <User className="w-4 h-4 text-[#F97316]" />
             <span>Profile Settings</span>
+          </Tabs.Trigger>
+
+          <Tabs.Trigger
+            value="ollama"
+            className={`w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer text-left focus:outline-none ${
+              activeTab === 'ollama'
+                ? 'bg-gradient-to-r from-[#06B6D4]/10 to-[#3B82F6]/5 text-white border-l-4 border-[#06B6D4] shadow-[inset_0_0_15px_rgba(6,182,212,0.05)] font-bold'
+                : 'text-[#94A3B8] hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <Cpu className="w-4 h-4 text-[#06B6D4]" />
+            <span>Ollama AI Models</span>
           </Tabs.Trigger>
 
           <Tabs.Trigger
@@ -150,6 +200,81 @@ export const SettingsView: React.FC = () => {
             </div>
           </Tabs.Content>
 
+          {/* OLLAMA LLM TAB */}
+          <Tabs.Content value="ollama" className="focus:outline-none space-y-5">
+            <div>
+              <h2 className="text-sm font-bold text-white tracking-wide uppercase font-heading flex items-center gap-2">
+                <span>Ollama AI Model & Endpoint Connection</span>
+                <Badge variant="cyan">Local & Private LLM</Badge>
+              </h2>
+              <p className="text-[11px] text-[#94A3B8] font-mono mt-1">Connect the TeachMe assistant directly to your local or GPU server Ollama instance.</p>
+            </div>
+
+            <div className="space-y-3 font-mono text-xs">
+              <label htmlFor="settings-ollama-url" className="block text-white font-semibold">Ollama Server Base Endpoint</label>
+              <div className="flex gap-2">
+                <div className="relative flex-grow">
+                  <Server className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                  <input
+                    id="settings-ollama-url"
+                    type="text"
+                    value={ollamaUrl}
+                    onChange={(e) => setOllamaUrl(e.target.value)}
+                    placeholder="http://localhost:11434"
+                    className="w-full bg-[#06060A]/80 border border-white/5 rounded-xl pl-9 pr-3 py-2.5 text-white focus:outline-none focus:border-[#06B6D4]"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleTestOllama}
+                  disabled={testingOllama}
+                  className="px-4 py-2.5 bg-[#27272A] hover:bg-[#3F3F46] text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+                >
+                  {testingOllama ? <RefreshCw className="w-4 h-4 animate-spin text-[#06B6D4]" /> : <Wifi className="w-4 h-4 text-[#06B6D4]" />}
+                  <span>Test Endpoint</span>
+                </button>
+              </div>
+            </div>
+
+            {ollamaStatus && (
+              <div className={`p-3.5 rounded-xl border flex items-center justify-between text-xs font-mono ${ollamaStatus.status === 'ONLINE' ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' : 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'}`}>
+                <div className="flex items-center gap-2">
+                  {ollamaStatus.status === 'ONLINE' ? <CheckCircle2 className="w-4 h-4 text-[#10B981]" /> : <AlertTriangle className="w-4 h-4 text-[#EF4444]" />}
+                  <span>{ollamaStatus.status === 'ONLINE' ? `Ollama Server Online (${ollamaStatus.latencyMs}ms latency | Version: ${ollamaStatus.version})` : ollamaStatus.message}</span>
+                </div>
+                <Badge variant={ollamaStatus.status === 'ONLINE' ? 'cyan' : 'outline'}>{ollamaStatus.status}</Badge>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <p className="text-xs font-mono font-semibold text-white uppercase">Select Study AI Model</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {ollamaModels.map((m) => {
+                  const isSel = selectedOllamaModel === m.name;
+                  return (
+                    <button
+                      key={m.name}
+                      type="button"
+                      onClick={() => setSelectedOllamaModel(m.name)}
+                      className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                        isSel ? 'bg-gradient-to-r from-[#06B6D4]/15 to-[#3B82F6]/10 border-[#06B6D4] text-white cyan-glow font-bold' : 'bg-[#06060A]/80 border-white/5 text-[#94A3B8] hover:border-white/20 hover:text-white'
+                      }`}
+                    >
+                      <div>
+                        <p className="text-xs font-semibold text-white flex items-center gap-1.5">
+                          <Sparkles className={`w-3.5 h-3.5 ${isSel ? 'text-[#06B6D4]' : 'text-[#94A3B8]'}`} />
+                          {m.name}
+                        </p>
+                        <p className="text-[10px] font-mono text-[#94A3B8] mt-0.5">Size: {m.sizeGb || 4.8} GB</p>
+                      </div>
+                      {isSel && <CheckCircle2 className="w-4 h-4 text-[#06B6D4]" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </Tabs.Content>
+
           <Tabs.Content value="preferences" className="focus:outline-none space-y-4">
             <h2 className="text-sm font-bold text-white mb-4 tracking-wide uppercase font-heading">Interface & Workspace Preferences</h2>
 
@@ -172,6 +297,7 @@ export const SettingsView: React.FC = () => {
                 <p className="text-white font-semibold">Card Density</p>
                 <div className="grid grid-cols-2 gap-3 font-sans">
                   <button
+                    type="button"
                     onClick={() => setDensity('comfortable')}
                     className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       density === 'comfortable'
@@ -183,6 +309,7 @@ export const SettingsView: React.FC = () => {
                     <p className="text-[10px] text-[#94A3B8] mt-1 font-normal font-sans">Standard padding and margins</p>
                   </button>
                   <button
+                    type="button"
                     onClick={() => setDensity('compact')}
                     className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       density === 'compact'
@@ -254,6 +381,7 @@ export const SettingsView: React.FC = () => {
               </div>
               {sessions.length > 0 && (
                 <button
+                  type="button"
                   onClick={handleRevokeAll}
                   className="bg-red-500/10 hover:bg-red-500/20 text-[#EF4444] border border-[#EF4444]/30 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all"
                 >
@@ -289,6 +417,7 @@ export const SettingsView: React.FC = () => {
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => handleRevokeSession(sess.id)}
                       className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-[#EF4444] border border-white/5 text-xs font-medium text-[#94A3B8] transition-all cursor-pointer"
                     >
@@ -302,6 +431,7 @@ export const SettingsView: React.FC = () => {
 
           <div className="pt-6 border-t border-white/5 flex justify-end">
             <button
+              type="button"
               onClick={handleSave}
               className="bg-gradient-to-r from-[#F97316] to-[#D946EF] hover:opacity-95 text-white text-xs px-5 py-2.5 rounded-xl font-bold orange-glow flex items-center gap-1.5 cursor-pointer"
             >

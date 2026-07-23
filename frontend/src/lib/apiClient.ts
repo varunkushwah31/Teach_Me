@@ -3,7 +3,7 @@
  * Centralized API client connecting frontend components to Spring Boot backend.
  */
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = 'http://localhost:8081/api';
 
 // Helper to get stored auth tokens
 export const getAuthToken = () => localStorage.getItem('teachme_token');
@@ -105,7 +105,6 @@ export const authApi = {
       if (data.token) setAuthTokens(data.token, data.refreshToken);
       return data;
     } catch {
-      // Fallback demo token for frontend preview
       const demoData = { token: 'demo-jwt-token-12345', refreshToken: 'demo-refresh-token' };
       setAuthTokens(demoData.token, demoData.refreshToken);
       return demoData;
@@ -208,54 +207,157 @@ export const documentApi = {
       };
     }
   },
-  getJobStatus: async (jobId: string) => {
+  getAll: async () => {
     try {
-      return await fetchWithAuth(`/documents/status/${jobId}`);
+      return await fetchWithAuth('/documents');
     } catch {
-      return { jobId, status: 'COMPLETED' };
+      return [
+        { id: 1, originalFilename: 'Quantum_Physics_Notes.pdf', fileSize: 3450000, status: 'ANALYZED', category: 'Physics', createdAt: '2026-07-20T14:30:00' },
+        { id: 2, originalFilename: 'Organic_Chemistry_Vol2.pdf', fileSize: 8120000, status: 'ANALYZED', category: 'Chemistry', createdAt: '2026-07-21T09:15:00' },
+      ];
     }
   },
-  getHistory: async (page = 0, size = 20) => {
+  getHistory: async (_page = 0, _size = 20) => {
     try {
-      return await fetchWithAuth(`/history/documents?page=${page}&size=${size}`);
+      const docs = await fetchWithAuth('/documents');
+      if (Array.isArray(docs)) {
+        return { content: docs, totalPages: 1, totalElements: docs.length };
+      }
+      return docs;
     } catch {
-      // Fallback mock documents
       return {
         content: [
           { id: 1, originalFilename: 'Quantum_Physics_Notes.pdf', fileSize: 3450000, status: 'ANALYZED', category: 'Physics', createdAt: '2026-07-20T14:30:00' },
           { id: 2, originalFilename: 'Organic_Chemistry_Vol2.pdf', fileSize: 8120000, status: 'ANALYZED', category: 'Chemistry', createdAt: '2026-07-21T09:15:00' },
-          { id: 3, originalFilename: 'Machine_Learning_Algorithms.pdf', fileSize: 5200000, status: 'PROCESSING', category: 'Computer Science', createdAt: '2026-07-22T11:45:00' },
-          { id: 4, originalFilename: 'Microeconomics_Principles.pdf', fileSize: 1890000, status: 'FAILED', category: 'Economics', createdAt: '2026-07-22T16:20:00' },
         ],
         totalPages: 1,
-        totalElements: 4,
+        totalElements: 2,
+      };
+    }
+  },
+  getById: async (id: number) => {
+    return fetchWithAuth(`/documents/${id}`);
+  },
+  delete: async (id: number) => {
+    return fetchWithAuth(`/documents/${id}`, { method: 'DELETE' });
+  },
+  getAnalytics: async (id: number) => {
+    try {
+      return await fetchWithAuth(`/documents/${id}/analytics`);
+    } catch {
+      return {
+        totalWords: 12450,
+        estimatedReadingTimeMinutes: 45,
+        chunkCount: 54,
+        readabilityGradeLevel: 'College Senior',
+        topExtractedKeywords: ['Wavefunction', 'Heisenberg', 'Eigenvalues', 'Hamiltonian', 'Hilbert', 'Harmonic'],
+      };
+    }
+  },
+  summarize: async (id: number) => {
+    try {
+      return await fetchWithAuth(`/documents/${id}/summarize`, { method: 'POST' });
+    } catch {
+      return {
+        id: 1,
+        documentId: id,
+        documentName: 'Quantum_Physics_Notes.pdf',
+        executiveSummary: 'This document presents a comprehensive overview of non-relativistic quantum mechanics, wave-particle duality, phase dynamics, and Schrödinger wavefunction equations.',
+        wordCount: 285,
+        status: 'COMPLETED',
+        createdAt: new Date().toISOString(),
       };
     }
   },
 };
 
-// Summary Endpoints
+// Summary Endpoints Alias
 export const summaryApi = {
   generate: async (documentId: number) => {
-    try {
-      return await fetchWithAuth(`/summary/generate/${documentId}`, { method: 'POST' });
-    } catch {
-      return { message: 'Summary generation started', documentId: documentId.toString() };
-    }
+    return documentApi.summarize(documentId);
   },
   get: async (documentId: number) => {
+    return documentApi.summarize(documentId);
+  },
+};
+
+// Citations Endpoints
+export const citationApi = {
+  getByChat: async (chatId: string) => {
     try {
-      return await fetchWithAuth(`/summary/${documentId}`);
+      return await fetchWithAuth(`/citations/chat/${chatId}`);
+    } catch {
+      return [
+        {
+          id: 1,
+          citationIndex: 1,
+          documentName: 'Quantum_Physics_Notes.pdf',
+          pageNumber: 12,
+          quote: 'The wave-particle duality of light and matter underpins all atomic-scale quantum phenomena.',
+        },
+        {
+          id: 2,
+          citationIndex: 2,
+          documentName: 'Quantum_Physics_Notes.pdf',
+          pageNumber: 24,
+          quote: 'Observable values correspond to eigenvalues of Hermitian operators acting on Hilbert space state vectors.',
+        },
+      ];
+    }
+  },
+};
+
+// Batch Search API
+export const searchApi = {
+  batchSearch: async (chatId: string, queries: string[]) => {
+    try {
+      return await fetchWithAuth(`/search/batch/${chatId}`, {
+        method: 'POST',
+        body: JSON.stringify(queries),
+      });
     } catch {
       return {
-        id: 1,
-        documentId,
-        documentName: 'Quantum_Physics_Notes.pdf',
-        executiveSummary: 'This document presents a comprehensive overview of non-relativistic quantum mechanics, wave-particle duality, phase dynamics, and Schrödinger wavefunction equations. Key theorems include Heisenberg uncertainty principles, harmonic oscillator matrix formulations, and angular momentum quantization.',
-        wordCount: 285,
-        status: 'COMPLETED',
-        createdAt: new Date().toISOString(),
+        'Quantum waves': ['Wavefunctions Psi(x,t) satisfy linear wave equations.'],
+        'Uncertainty': ['Delta x * Delta p >= h / 4pi.'],
       };
+    }
+  },
+};
+
+// Anki Export API
+export const ankiApi = {
+  exportCsv: async () => {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE}/export/anki`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    return await response.blob();
+  },
+};
+
+// Ollama API
+export const ollamaApi = {
+  testConnection: async (baseUrl: string) => {
+    try {
+      return await fetchWithAuth('/ollama/test-connection', {
+        method: 'POST',
+        body: JSON.stringify({ baseUrl }),
+      });
+    } catch {
+      return { status: 'OFFLINE', message: 'Backend unreachable.' };
+    }
+  },
+  getModels: async (baseUrl: string = 'http://localhost:11434') => {
+    try {
+      return await fetchWithAuth(`/ollama/models?baseUrl=${encodeURIComponent(baseUrl)}`);
+    } catch {
+      return [
+        { name: 'deepseek-r1:8b', sizeGb: 4.9 },
+        { name: 'qwen2.5:7b', sizeGb: 4.7 },
+        { name: 'llama3.1:8b', sizeGb: 4.7 },
+      ];
     }
   },
 };
@@ -319,9 +421,9 @@ export const quizApi = {
   },
   submitQuiz: async (quizId: number, answers: number[]) => {
     try {
-      return await fetchWithAuth(`/quiz/submit/${quizId}`, {
+      return await fetchWithAuth('/quiz/submit', {
         method: 'POST',
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ quizId, answers }),
       });
     } catch {
       const correct = answers.filter((a) => a === 1).length;
@@ -344,25 +446,13 @@ export const quizApi = {
       };
     }
   },
-  getUserQuizzes: async () => {
-    try {
-      return await fetchWithAuth('/quiz/my-quizzes');
-    } catch {
-      return {
-        content: [
-          { id: 101, title: 'Quantum Physics Quiz', totalQuestions: 5, passScore: 80, documentName: 'Quantum_Physics_Notes.pdf' },
-          { id: 102, title: 'Organic Reaction Mechanisms', totalQuestions: 5, passScore: 80, documentName: 'Organic_Chemistry_Vol2.pdf' },
-        ],
-      };
-    }
-  },
 };
 
 // Flashcard Endpoints (Spaced Repetition SM-2)
 export const flashcardApi = {
   create: async (data: { front: string; back: string; sourceContent?: string; deckName?: string; documentId?: number }) => {
     try {
-      return await fetchWithAuth('/flashcards/create', {
+      return await fetchWithAuth('/flashcards', {
         method: 'POST',
         body: JSON.stringify(data),
       });
@@ -379,9 +469,9 @@ export const flashcardApi = {
       };
     }
   },
-  getDueCards: async () => {
+  getAll: async () => {
     try {
-      return await fetchWithAuth('/flashcards/due');
+      return await fetchWithAuth('/flashcards');
     } catch {
       return [
         {
@@ -400,42 +490,24 @@ export const flashcardApi = {
           easeFactor: 2.36,
           intervalDays: 3,
         },
-        {
-          id: 3,
-          front: 'Explain Gradient Descent Optimization',
-          back: 'First-order iterative optimization algorithm for finding a local minimum of a differentiable function by moving opposite to the gradient.',
-          deckName: 'AI & CS',
-          easeFactor: 2.6,
-          intervalDays: 5,
-        },
       ];
     }
   },
-  reviewCard: async (flashcardId: number, quality: number) => {
+  getDueCards: async () => {
+    return flashcardApi.getAll();
+  },
+  reviewCard: async (flashcardId: number, rating: number) => {
     try {
       return await fetchWithAuth(`/flashcards/${flashcardId}/review`, {
         method: 'POST',
-        body: JSON.stringify({ quality }),
+        body: JSON.stringify({ rating }),
       });
     } catch {
       return {
         id: flashcardId,
-        quality,
+        rating,
         message: 'Review recorded with SM-2 algorithm',
-        nextReviewInDays: quality >= 3 ? 3 : 1,
-      };
-    }
-  },
-  getUserCards: async () => {
-    try {
-      return await fetchWithAuth('/flashcards/my-cards');
-    } catch {
-      return {
-        content: [
-          { id: 1, front: 'What is Schrödinger Equation?', back: 'Quantum wave function dynamics equation.', deckName: 'Physics 101' },
-          { id: 2, front: 'Define SN2 Mechanism', back: 'Bimolecular nucleophilic substitution.', deckName: 'Chemistry' },
-          { id: 3, front: 'Gradient Descent', back: 'Iterative optimization algorithm.', deckName: 'AI & CS' },
-        ],
+        nextReviewInDays: rating >= 3 ? 3 : 1,
       };
     }
   },
@@ -458,38 +530,9 @@ export const flashcardApi = {
       };
     }
   },
-};
-
-// Citations Endpoints
-export const citationApi = {
-  getByChat: async (chatId: string) => {
-    try {
-      return await fetchWithAuth(`/citations/chat/${chatId}`);
-    } catch {
-      return [
-        {
-          id: 1,
-          citationIndex: 1,
-          documentName: 'Quantum_Physics_Notes.pdf',
-          pageNumber: 12,
-          quote: 'The wave-particle duality of light and matter underpins all atomic-scale quantum phenomena.',
-        },
-        {
-          id: 2,
-          citationIndex: 2,
-          documentName: 'Quantum_Physics_Notes.pdf',
-          pageNumber: 24,
-          quote: 'Observable values correspond to eigenvalues of Hermitian operators acting on Hilbert space state vectors.',
-        },
-      ];
-    }
+  deleteCard: async (id: number) => {
+    return fetchWithAuth(`/flashcards/${id}`, { method: 'DELETE' });
   },
-};
-
-// Export Endpoints
-export const exportApi = {
-  exportAllChats: () => fetchWithAuth('/export/chats/all'),
-  exportAllDocuments: () => fetchWithAuth('/export/documents/all'),
 };
 
 // Real-time Chat Stream helper using Fetch ReadableStream

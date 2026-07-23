@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Send, Paperclip, BookmarkPlus, Quote, Check, Bot, User, Filter } from 'lucide-react';
+import { Send, Paperclip, BookmarkPlus, Quote, Check, Bot, User, Filter, Layers } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { streamChatResponse, citationApi, flashcardApi, documentApi } from '../lib/apiClient';
 import { Badge } from '@/components/ui/badge';
+import { BatchSearchModal } from '../components/modals/BatchSearchModal';
 
 interface CitationItem {
   id: number;
@@ -33,6 +34,7 @@ const toggleDocSelection = (docId: number, prev: number[]): number[] => {
 const DocFilterButton = ({ doc, isChecked, onClick }: { doc: { id: number; originalFilename: string }; isChecked: boolean; onClick: () => void }) => (
   <button
     key={doc.id}
+    type="button"
     onClick={onClick}
     className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold tracking-wide transition-all shrink-0 flex items-center gap-1.5 cursor-pointer border ${
       isChecked
@@ -86,6 +88,7 @@ const MessageBubble = ({ msg, isStreaming, onSaveFlashcard }: { msg: Message; is
           <span>{msg.timestamp}</span>
           {!isUser && msg.text && (
             <button
+              type="button"
               onClick={onSaveFlashcard}
               className="opacity-0 group-hover:opacity-100 transition-opacity text-[#F97316] hover:underline flex items-center gap-1 ml-2 cursor-pointer"
             >
@@ -101,6 +104,7 @@ const MessageBubble = ({ msg, isStreaming, onSaveFlashcard }: { msg: Message; is
 const CitationItem = ({ citation, onClick }: { citation: CitationItem; onClick: () => void }) => (
   <button
     key={citation.id}
+    type="button"
     className="p-3.5 rounded-xl bg-white/5 border border-white/5 hover:border-[#06B6D4]/30 hover:bg-white/10 transition-all cursor-pointer group text-left w-full block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#06B6D4]/50"
     onClick={onClick}
   >
@@ -131,6 +135,7 @@ export const ChatView: React.FC = () => {
   const [citations, setCitations] = useState<CitationItem[]>([]);
   const [availableDocs, setAvailableDocs] = useState<{ id: number; originalFilename: string }[]>([]);
   const [selectedDocIds, setSelectedDocIds] = useState<number[]>([]);
+  const [showBatchModal, setShowBatchModal] = useState(false);
   const selectedDocId = 'default-session';
 
   // Flashcard save modal state
@@ -239,6 +244,15 @@ export const ChatView: React.FC = () => {
               Ask questions with verified citations from your vector store.
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setShowBatchModal(true)}
+            className="px-3.5 py-1.5 bg-[#06B6D4]/10 border border-[#06B6D4]/30 hover:bg-[#06B6D4]/20 text-[#06B6D4] text-xs font-semibold rounded-xl flex items-center gap-1.5 cursor-pointer cyan-glow transition-all"
+          >
+            <Layers className="w-4 h-4" />
+            <span>Batch Multi-Query Search</span>
+          </button>
         </div>
 
         {/* Document Scope Filter Bar */}
@@ -248,6 +262,7 @@ export const ChatView: React.FC = () => {
               <Filter className="w-3.5 h-3.5 text-[#F97316]" /> Target Scope:
             </span>
             <button
+              type="button"
               onClick={() => setSelectedDocIds([])}
               className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold tracking-wide transition-all shrink-0 cursor-pointer ${
                 selectedDocIds.length === 0
@@ -296,6 +311,7 @@ export const ChatView: React.FC = () => {
         {/* Floating Bottom Input Box */}
         <div className="sticky bottom-0 glass-panel p-2.5 rounded-2xl border border-white/5 shadow-2xl flex items-center gap-2 z-10">
           <button
+            type="button"
             className="p-2 rounded-xl text-[#94A3B8] hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
             title="Attach Document Reference"
           >
@@ -312,6 +328,7 @@ export const ChatView: React.FC = () => {
           />
 
           <button
+            type="button"
             onClick={handleSend}
             disabled={!inputQuery.trim() || isStreaming}
             className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#F97316] to-[#D946EF] hover:opacity-95 text-white flex items-center justify-center transition-all orange-glow disabled:opacity-40 cursor-pointer"
@@ -411,12 +428,14 @@ export const ChatView: React.FC = () => {
             <div className="flex items-center justify-end gap-2.5 pt-2 z-10">
               <Dialog.Close asChild>
                 <button
+                  type="button"
                   className="bg-white/5 border border-white/5 hover:bg-white/10 text-white text-xs px-4 py-2 rounded-xl font-bold transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
               </Dialog.Close>
               <button
+                type="button"
                 onClick={handleSaveFlashcard}
                 className="bg-gradient-to-r from-[#F97316] to-[#D946EF] text-white text-xs px-5 py-2.5 rounded-xl font-bold orange-glow flex items-center gap-1.5 cursor-pointer"
               >
@@ -432,6 +451,11 @@ export const ChatView: React.FC = () => {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+
+      {/* Batch Search Modal */}
+      {showBatchModal && (
+        <BatchSearchModal chatId={selectedDocId} onClose={() => setShowBatchModal(false)} />
+      )}
     </div>
   );
 };
