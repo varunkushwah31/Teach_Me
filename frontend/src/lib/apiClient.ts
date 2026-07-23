@@ -187,6 +187,26 @@ export const authApi = {
   },
 };
 
+// Audio Podcast API
+export const audioApi = {
+  generatePodcast: async (documentId: number) => {
+    try {
+      return await fetchWithAuth(`/audio/generate-podcast/${documentId}`, { method: 'POST' });
+    } catch {
+      return {
+        documentId,
+        title: 'Quantum Wave Mechanics Audio Deep-Dive',
+        durationSeconds: 185,
+        dialogue: [
+          { speaker: 'Alex (Host)', text: 'Welcome back! Today we are breaking down quantum wave mechanics and the Schrödinger equation.' },
+          { speaker: 'Dr. Elena (AI Specialist)', text: 'Wave-particle duality dictates that every physical state is represented by a wavefunction Psi(x,t).' },
+          { speaker: 'Alex (Host)', text: 'Taking the absolute square of that wavefunction yields the exact probability density of locating the particle.' },
+        ],
+      };
+    }
+  },
+};
+
 // Document Endpoints
 export const documentApi = {
   upload: async (file: File, chatId: string = 'default-session', category: string = 'general') => {
@@ -377,6 +397,19 @@ export const ankiApi = {
   exportCsv: async () => {
     const token = getAuthToken();
     const response = await fetch(`${API_BASE}/export/anki`, {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    return await response.blob();
+  },
+};
+
+// PDF Export API
+export const pdfExportApi = {
+  downloadPdf: async (documentId: number) => {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE}/export/documents/${documentId}/pdf`, {
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },

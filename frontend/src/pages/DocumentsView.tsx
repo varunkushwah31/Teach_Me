@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles, BarChart3, Search, Trash2, Network, Calendar } from 'lucide-react';
-import { documentApi, summaryApi, quizApi } from '../lib/apiClient';
+import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles, BarChart3, Search, Trash2, Network, Calendar, Mic, Download } from 'lucide-react';
+import { documentApi, summaryApi, quizApi, pdfExportApi } from '../lib/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { DocumentAnalyticsModal } from '../components/modals/DocumentAnalyticsModal';
 import { KnowledgeGraphModal } from '../components/modals/KnowledgeGraphModal';
 import { StudyRoadmapModal } from '../components/modals/StudyRoadmapModal';
+import { AudioPodcastPlayerModal } from '../components/modals/AudioPodcastPlayerModal';
 
 interface DocumentItem {
   id: number;
@@ -40,26 +41,11 @@ export const DocumentsView: React.FC = () => {
     loading: false,
   });
 
-  // Analytics modal state
-  const [analyticsModal, setAnalyticsModal] = useState<{ open: boolean; docId: number; docName: string }>({
-    open: false,
-    docId: 0,
-    docName: '',
-  });
-
-  // Knowledge Graph modal state
-  const [kgModal, setKgModal] = useState<{ open: boolean; docId: number; docName: string }>({
-    open: false,
-    docId: 0,
-    docName: '',
-  });
-
-  // Study Roadmap modal state
-  const [roadmapModal, setRoadmapModal] = useState<{ open: boolean; docId: number; docName: string }>({
-    open: false,
-    docId: 0,
-    docName: '',
-  });
+  // Modals state
+  const [analyticsModal, setAnalyticsModal] = useState<{ open: boolean; docId: number; docName: string }>({ open: false, docId: 0, docName: '' });
+  const [kgModal, setKgModal] = useState<{ open: boolean; docId: number; docName: string }>({ open: false, docId: 0, docName: '' });
+  const [roadmapModal, setRoadmapModal] = useState<{ open: boolean; docId: number; docName: string }>({ open: false, docId: 0, docName: '' });
+  const [audioModal, setAudioModal] = useState<{ open: boolean; docId: number; docName: string }>({ open: false, docId: 0, docName: '' });
 
   const loadDocuments = async () => {
     try {
@@ -113,6 +99,19 @@ export const DocumentsView: React.FC = () => {
       setDocuments((prev) => prev.filter((d) => d.id !== id));
     } catch (err) {
       setDocuments((prev) => prev.filter((d) => d.id !== id));
+    }
+  };
+
+  const handleDownloadPdf = async (docId: number, filename: string) => {
+    try {
+      const blob = await pdfExportApi.downloadPdf(docId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}_Summary.pdf`;
+      a.click();
+    } catch (err) {
+      console.error('PDF download error', err);
     }
   };
 
@@ -266,6 +265,24 @@ export const DocumentsView: React.FC = () => {
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
+                        onClick={() => setAudioModal({ open: true, docId: doc.id, docName: doc.originalFilename })}
+                        title="Listen to 2-Speaker AI Podcast"
+                        aria-label="Listen to AI Podcast"
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#D946EF] transition-colors"
+                      >
+                        <Mic className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadPdf(doc.id, doc.originalFilename)}
+                        title="Download Summary as PDF"
+                        aria-label="Download Summary PDF"
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#F97316] transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setKgModal({ open: true, docId: doc.id, docName: doc.originalFilename })}
                         title="View Concept Knowledge Graph"
                         aria-label="View Concept Knowledge Graph"
@@ -366,6 +383,15 @@ export const DocumentsView: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Audio Podcast Player Modal */}
+      {audioModal.open && (
+        <AudioPodcastPlayerModal
+          documentId={audioModal.docId}
+          documentName={audioModal.docName}
+          onClose={() => setAudioModal({ open: false, docId: 0, docName: '' })}
+        />
+      )}
 
       {/* Knowledge Graph Modal */}
       {kgModal.open && (

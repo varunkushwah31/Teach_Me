@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { User, Sliders, Cpu, Save, Check, ShieldCheck, LogOut, Laptop, Server, Wifi, RefreshCw, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
+import { User, Sliders, Cpu, Save, Check, ShieldCheck, LogOut, Laptop, Server, Wifi, RefreshCw, CheckCircle2, AlertTriangle, Sparkles, Activity } from 'lucide-react';
 import { authApi } from '../lib/apiClient';
+import { RagObservabilityCard } from '../components/ui/RagObservabilityCard';
 
 export const SettingsView: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'ollama' | 'algorithm' | 'security'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'preferences' | 'ollama' | 'persona' | 'observability' | 'security'>('profile');
   const [saved, setSaved] = useState(false);
 
   // Form states
@@ -17,6 +18,9 @@ export const SettingsView: React.FC = () => {
   const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable');
   const [vectorK, setVectorK] = useState(60);
   const [easeFactor, setEaseFactor] = useState(2.5);
+
+  // Persona state
+  const [persona, setPersona] = useState<'socratic' | 'eli5' | 'phd'>('socratic');
 
   // Ollama states
   const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434');
@@ -91,7 +95,7 @@ export const SettingsView: React.FC = () => {
         <h1 className="text-3xl font-extrabold text-white tracking-tight font-heading">
           System <span className="gradient-text-orange font-extrabold">Settings</span>
         </h1>
-        <p className="text-xs text-[#94A3B8] font-mono mt-1">Manage profile, custom Ollama LLMs, active security sessions, and RAG parameters.</p>
+        <p className="text-xs text-[#94A3B8] font-mono mt-1">Manage profile, AI personas, Ollama endpoints, Actuator metrics, and RAG tuning.</p>
       </div>
 
       {/* Split-Pane Layout */}
@@ -111,6 +115,18 @@ export const SettingsView: React.FC = () => {
           </Tabs.Trigger>
 
           <Tabs.Trigger
+            value="persona"
+            className={`w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer text-left focus:outline-none ${
+              activeTab === 'persona'
+                ? 'bg-gradient-to-r from-[#F97316]/10 to-[#D946EF]/5 text-white border-l-4 border-[#F97316] shadow-[inset_0_0_15px_rgba(249,115,22,0.05)] font-bold'
+                : 'text-[#94A3B8] hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-[#F97316]" />
+            <span>AI Persona Mode</span>
+          </Tabs.Trigger>
+
+          <Tabs.Trigger
             value="ollama"
             className={`w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer text-left focus:outline-none ${
               activeTab === 'ollama'
@@ -123,6 +139,18 @@ export const SettingsView: React.FC = () => {
           </Tabs.Trigger>
 
           <Tabs.Trigger
+            value="observability"
+            className={`w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer text-left focus:outline-none ${
+              activeTab === 'observability'
+                ? 'bg-gradient-to-r from-[#06B6D4]/10 to-[#3B82F6]/5 text-white border-l-4 border-[#06B6D4] shadow-[inset_0_0_15px_rgba(6,182,212,0.05)] font-bold'
+                : 'text-[#94A3B8] hover:bg-white/5 hover:text-white'
+            }`}
+          >
+            <Activity className="w-4 h-4 text-[#06B6D4]" />
+            <span>RAG Telemetry</span>
+          </Tabs.Trigger>
+
+          <Tabs.Trigger
             value="preferences"
             className={`w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer text-left focus:outline-none ${
               activeTab === 'preferences'
@@ -132,18 +160,6 @@ export const SettingsView: React.FC = () => {
           >
             <Sliders className="w-4 h-4 text-[#06B6D4]" />
             <span>App Preferences</span>
-          </Tabs.Trigger>
-
-          <Tabs.Trigger
-            value="algorithm"
-            className={`w-full flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all cursor-pointer text-left focus:outline-none ${
-              activeTab === 'algorithm'
-                ? 'bg-gradient-to-r from-[#F97316]/10 to-[#D946EF]/5 text-white border-l-4 border-[#F97316] shadow-[inset_0_0_15px_rgba(249,115,22,0.05)] font-bold'
-                : 'text-[#94A3B8] hover:bg-white/5 hover:text-white'
-            }`}
-          >
-            <Cpu className="w-4 h-4 text-[#D946EF]" />
-            <span>RAG & SM-2 Tuning</span>
           </Tabs.Trigger>
 
           <Tabs.Trigger
@@ -197,6 +213,73 @@ export const SettingsView: React.FC = () => {
                   className="w-full bg-[#06060A]/80 border border-white/5 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-[#F97316]"
                 />
               </div>
+            </div>
+          </Tabs.Content>
+
+          {/* AI PERSONA TAB */}
+          <Tabs.Content value="persona" className="focus:outline-none space-y-5">
+            <div>
+              <h2 className="text-sm font-bold text-white tracking-wide uppercase font-heading flex items-center gap-2">
+                <span>AI Tutor Persona & Teaching Mode</span>
+                <Badge variant="orange">Dynamic Prompt Tuning</Badge>
+              </h2>
+              <p className="text-[11px] text-[#94A3B8] font-mono mt-1">Select how TeachMe AI structures explanation responses and academic guidance.</p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 font-mono text-xs">
+              <button
+                type="button"
+                onClick={() => setPersona('socratic')}
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                  persona === 'socratic'
+                    ? 'border-[#F97316] bg-[#F97316]/10 text-white orange-glow font-bold'
+                    : 'border-white/5 bg-[#06060A]/80 text-[#94A3B8] hover:border-white/20 hover:text-white'
+                }`}
+              >
+                <p className="text-xs font-bold text-white flex items-center justify-between">
+                  <span>🏛 Socratic Interviewer Mode</span>
+                  {persona === 'socratic' && <CheckCircle2 className="w-4 h-4 text-[#F97316]" />}
+                </p>
+                <p className="text-[11px] text-[#94A3B8] font-sans mt-1">
+                  Guides you to answers by asking probing academic questions and challenging assumptions.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPersona('eli5')}
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                  persona === 'eli5'
+                    ? 'border-[#06B6D4] bg-[#06B6D4]/10 text-white cyan-glow font-bold'
+                    : 'border-white/5 bg-[#06060A]/80 text-[#94A3B8] hover:border-white/20 hover:text-white'
+                }`}
+              >
+                <p className="text-xs font-bold text-white flex items-center justify-between">
+                  <span>💡 ELI5 (Explain Like I'm 5) Mode</span>
+                  {persona === 'eli5' && <CheckCircle2 className="w-4 h-4 text-[#06B6D4]" />}
+                </p>
+                <p className="text-[11px] text-[#94A3B8] font-sans mt-1">
+                  Simplifies complex equations and physics proofs into intuitive real-world analogies.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPersona('phd')}
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                  persona === 'phd'
+                    ? 'border-[#D946EF] bg-[#D946EF]/10 text-white font-bold'
+                    : 'border-white/5 bg-[#06060A]/80 text-[#94A3B8] hover:border-white/20 hover:text-white'
+                }`}
+              >
+                <p className="text-xs font-bold text-white flex items-center justify-between">
+                  <span>🎓 Ph.D. Exam & Rigor Mode</span>
+                  {persona === 'phd' && <CheckCircle2 className="w-4 h-4 text-[#D946EF]" />}
+                </p>
+                <p className="text-[11px] text-[#94A3B8] font-sans mt-1">
+                  Rigorous mathematical derivations, formal proof steps, and graduate-level academic citations.
+                </p>
+              </button>
             </div>
           </Tabs.Content>
 
@@ -275,6 +358,11 @@ export const SettingsView: React.FC = () => {
             </div>
           </Tabs.Content>
 
+          {/* RAG TELEMETRY OBSERVABILITY TAB */}
+          <Tabs.Content value="observability" className="focus:outline-none space-y-4">
+            <RagObservabilityCard />
+          </Tabs.Content>
+
           <Tabs.Content value="preferences" className="focus:outline-none space-y-4">
             <h2 className="text-sm font-bold text-white mb-4 tracking-wide uppercase font-heading">Interface & Workspace Preferences</h2>
 
@@ -321,49 +409,6 @@ export const SettingsView: React.FC = () => {
                     <p className="text-[10px] text-[#94A3B8] mt-1 font-normal font-sans">High document density mode</p>
                   </button>
                 </div>
-              </div>
-            </div>
-          </Tabs.Content>
-
-          <Tabs.Content value="algorithm" className="focus:outline-none space-y-4">
-            <h2 className="text-sm font-bold text-white mb-4 tracking-wide uppercase font-heading">Algorithm & Hyperparameter Config</h2>
-
-            <div className="space-y-4 text-xs font-mono">
-              <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-3">
-                <div className="flex justify-between font-semibold">
-                  <span className="text-white">RRF Constant (k):</span>
-                  <span className="text-[#06B6D4]">{vectorK}</span>
-                </div>
-                <input
-                  type="range"
-                  min={10}
-                  max={100}
-                  value={vectorK}
-                  onChange={(e) => setVectorK(Number(e.target.value))}
-                  className="w-full accent-[#06B6D4] cursor-pointer"
-                />
-                <p className="text-[10px] text-[#94A3B8] font-sans">
-                  Reciprocal Rank Fusion constant balancing vector similarity vs pgvector tsvector full-text search.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-3">
-                <div className="flex justify-between font-semibold">
-                  <span className="text-white">Base Ease Factor (EF):</span>
-                  <span className="text-[#F97316]">{easeFactor}</span>
-                </div>
-                <input
-                  type="range"
-                  min={1.3}
-                  max={3.5}
-                  step={0.1}
-                  value={easeFactor}
-                  onChange={(e) => setEaseFactor(Number(e.target.value))}
-                  className="w-full accent-[#F97316] cursor-pointer"
-                />
-                <p className="text-[10px] text-[#94A3B8] font-sans">
-                  Initial multiplier for SM-2 spaced repetition review scheduling algorithm.
-                </p>
               </div>
             </div>
           </Tabs.Content>
