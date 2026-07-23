@@ -5,6 +5,7 @@ import com.TeachMe.TeachMe.entity.Flashcard;
 import com.TeachMe.TeachMe.entity.User;
 import com.TeachMe.TeachMe.repository.DocumentRepository;
 import com.TeachMe.TeachMe.repository.FlashcardRepository;
+import com.TeachMe.TeachMe.service.impl.FlashcardServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +29,11 @@ class FlashcardServiceTest {
     @Mock
     private DocumentRepository documentRepository;
 
+    @Mock
+    private com.TeachMe.TeachMe.repository.FlashcardReviewLogRepository reviewLogRepository;
+
     @InjectMocks
-    private FlashcardService flashcardService;
+    private FlashcardServiceImpl flashcardService;
 
     private User testUser;
     private Flashcard testCard;
@@ -86,12 +90,10 @@ class FlashcardServiceTest {
         when(flashcardRepository.findById(100L)).thenReturn(Optional.of(testCard));
         when(flashcardRepository.save(any(Flashcard.class))).thenAnswer(i -> i.getArgument(0));
 
-        // First successful review (quality = 5)
         FlashcardDTO result1 = flashcardService.reviewFlashcard(100L, 5);
         assertEquals(1, result1.getRepetitionCount());
         assertEquals(1, result1.getIntervalDays());
 
-        // Second successful review (quality = 5)
         FlashcardDTO result2 = flashcardService.reviewFlashcard(100L, 5);
         assertEquals(2, result2.getRepetitionCount());
         assertEquals(3, result2.getIntervalDays());

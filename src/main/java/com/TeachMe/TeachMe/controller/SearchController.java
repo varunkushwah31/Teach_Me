@@ -6,14 +6,12 @@ import com.TeachMe.TeachMe.service.ReRankingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
-import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,7 +52,7 @@ public class SearchController {
                             query -> hybridSearchService.hybridSearch(query, userId, chatId, 8)
                     ));
 
-            // 2. ✅ Actively consumes the processMultipleQueries / batchReRank method
+            // 2. Actively consumes the processMultipleQueries / batchReRank method
             Map<String, List<Document>> reRankedResults = reRankingService.processMultipleQueries(searchResults);
 
             // 3. Map the complex Document objects to simple text chunks for the frontend

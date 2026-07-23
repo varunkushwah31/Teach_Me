@@ -1,5 +1,6 @@
 package com.TeachMe.TeachMe.service;
 
+import com.TeachMe.TeachMe.service.impl.HybridSearchServiceImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class HybridSearchServiceTest {
     @BeforeEach
     void setUp() {
         meterRegistry = new SimpleMeterRegistry();
-        hybridSearchService = new HybridSearchService(vectorStore, jdbcTemplate, meterRegistry);
+        hybridSearchService = new HybridSearchServiceImpl(vectorStore, jdbcTemplate, meterRegistry);
     }
 
     @Test
@@ -60,7 +61,6 @@ class HybridSearchServiceTest {
         Document doc1 = new Document("doc-1", "Vector match text", Map.of("userId", 1L));
         when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.of(doc1));
 
-        // Simulate DB query failure for full-text search leg
         doThrow(new RuntimeException("SQL syntax error or tsvector missing"))
                 .when(jdbcTemplate).queryForList(anyString(), eq("query"), eq("1"), eq("chat-1"), eq(5));
 
@@ -69,7 +69,6 @@ class HybridSearchServiceTest {
         assertEquals(1, results.size());
         assertEquals("doc-1", results.get(0).getId());
 
-        // Counter should have incremented
         assertEquals(1.0, meterRegistry.get("rag.fulltext.fallback.total").counter().count());
     }
 }

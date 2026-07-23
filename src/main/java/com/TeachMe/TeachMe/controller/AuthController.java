@@ -80,7 +80,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(Map.of(TOKEN, jwtToken));
+                .body(Map.of(TOKEN, jwtToken, REFRESH_TOKEN, refreshToken.getToken()));
     }
 
     @PostMapping("/register")
@@ -97,7 +97,6 @@ public class AuthController {
                         .body(Map.of(MESSAGE, "User already exists"));
             }
 
-            // Create your JPA Entity
             User newUser = User.builder()
                     .email(email)
                     .password(passwordEncoder.encode(rawPassword))
@@ -105,7 +104,6 @@ public class AuthController {
                     .lastName(request.getOrDefault("lastName", "User"))
                     .build();
 
-            // Save directly to PostgreSQL
             User savedUser = userRepository.save(newUser);
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
@@ -122,7 +120,7 @@ public class AuthController {
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(Map.of(TOKEN, jwtToken));
+                    .body(Map.of(TOKEN, jwtToken, REFRESH_TOKEN, refreshToken.getToken()));
 
         } catch (Exception e) {
             log.error("Registration failed: {}", e.getMessage());
@@ -136,7 +134,11 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "Successful rotation")
     @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
     public ResponseEntity<Map<String, String>> refresh(
-            @CookieValue(name = REFRESH_TOKEN, required = false) String tokenStr) {
+            @CookieValue(name = REFRESH_TOKEN, required = false) String cookieToken,
+            @RequestBody(required = false) Map<String, String> request) {
+        String bodyToken = (request != null) ? request.get(REFRESH_TOKEN) : null;
+        String tokenStr = (cookieToken != null && !cookieToken.isBlank()) ? cookieToken : bodyToken;
+
         if (tokenStr == null || tokenStr.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of(MESSAGE, "Refresh token is missing"));
         }
@@ -158,7 +160,7 @@ public class AuthController {
 
                         return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                                .body(Map.of(TOKEN, accessToken));
+                                .body(Map.of(TOKEN, accessToken, REFRESH_TOKEN, rotated.getToken()));
                     })
                     .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                             .body(Map.of(MESSAGE, "Refresh token not found in database")));

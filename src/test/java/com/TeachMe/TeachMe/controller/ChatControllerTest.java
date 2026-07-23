@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import reactor.core.publisher.Flux;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bandwidth;
 import java.time.Duration;
-import static org.mockito.ArgumentMatchers.anyString;
 
 @ActiveProfiles("test")
 @WebMvcTest(ChatController.class)
@@ -68,7 +68,6 @@ class ChatControllerTest {
     @Test
     @WithMockUser(username = "test@teachme.com")
     void shouldStreamChatResponseSuccessfully() throws Exception {
-        // Arrange
         String question = "What is AI?";
         String chatId = "session-123";
         Long mockUserId = 42L;
@@ -77,7 +76,7 @@ class ChatControllerTest {
 
         Flux<String> mockStream = Flux.just("Artificial ", "Intelligence ", "is ", "cool.");
 
-        when(ragChatService.askQuestionStream(question, chatId, mockUserId))
+        when(ragChatService.askQuestionStream(eq(question), eq(chatId), eq(mockUserId), anyList()))
                 .thenReturn(mockStream);
 
         String jsonPayload = """
@@ -87,7 +86,6 @@ class ChatControllerTest {
                 }
                 """;
 
-        // Act & Assert (Part 1: Verify the async processing handles text event streams cleanly)
         MvcResult mvcResult = mockMvc.perform(post("/api/chat/ask/stream")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonPayload)
@@ -95,7 +93,6 @@ class ChatControllerTest {
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
-        // Act & Assert (Part 2: Verify the dispatched reactive stream chunks)
         mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM))

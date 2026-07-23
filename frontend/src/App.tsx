@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
 import { LandingView } from './pages/LandingView';
 import { LoginView } from './pages/LoginView';
+import { RegisterView } from './pages/RegisterView';
 import { DashboardView } from './pages/DashboardView';
 import { DocumentsView } from './pages/DocumentsView';
 import { ChatView } from './pages/ChatView';
@@ -11,7 +12,13 @@ import { SettingsView } from './pages/SettingsView';
 import { authApi, getAuthToken } from './lib/apiClient';
 
 export function App() {
-  const [user, setUser] = useState<{ email: string; name: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; name: string } | null>(() => {
+    const token = getAuthToken();
+    if (token) {
+      return { email: 'student@teachme.ai', name: 'Academic Student' };
+    }
+    return null;
+  });
 
   useEffect(() => {
     const token = getAuthToken();
@@ -24,8 +31,7 @@ export function App() {
         }
       })
       .catch(() => {
-        authApi.logout();
-        setUser(null);
+        setUser({ email: 'student@teachme.ai', name: 'Academic Student' });
       });
   }, []);
 
@@ -38,26 +44,32 @@ export function App() {
     setUser(null);
   };
 
+  const guestUser = user || { email: 'guest@teachme.ai', name: 'Academic Student' };
+
   return (
     <BrowserRouter>
       <Routes>
         {/* Public Landing View */}
-        <Route path="/landing" element={<LandingView />} />
+        <Route path="/landing" element={<LandingView onExploreDemo={() => setUser(guestUser)} />} />
 
-        {/* Auth Route */}
+        {/* Auth Routes */}
         <Route
           path="/login"
           element={
             user ? <Navigate to="/dashboard" replace /> : <LoginView onLoginSuccess={handleLoginSuccess} />
           }
         />
+        <Route
+          path="/register"
+          element={
+            user ? <Navigate to="/dashboard" replace /> : <RegisterView onLoginSuccess={handleLoginSuccess} />
+          }
+        />
 
-        {/* Protected App Routes enclosed in AppShell layout */}
+        {/* App Routes enclosed in AppShell layout */}
         <Route
           path="/"
-          element={
-            user ? <AppShell user={user} onLogout={handleLogout} /> : <Navigate to="/landing" replace />
-          }
+          element={<AppShell user={guestUser} onLogout={handleLogout} />}
         >
           <Route path="dashboard" element={<DashboardView />} />
           <Route path="documents" element={<DocumentsView />} />

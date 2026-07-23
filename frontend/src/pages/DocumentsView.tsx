@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles } from 'lucide-react';
+import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles, BarChart3 } from 'lucide-react';
 import { documentApi, summaryApi, quizApi } from '../lib/apiClient';
 import { useNavigate } from 'react-router-dom';
+import { DocumentAnalyticsModal } from '../components/modals/DocumentAnalyticsModal';
 
 interface DocumentItem {
   id: number;
@@ -33,6 +34,13 @@ export const DocumentsView: React.FC = () => {
     loading: false,
   });
 
+  // Analytics modal state
+  const [analyticsModal, setAnalyticsModal] = useState<{ open: boolean; docId: number; docName: string }>({
+    open: false,
+    docId: 0,
+    docName: '',
+  });
+
   const loadDocuments = async () => {
     try {
       const data = await documentApi.getHistory();
@@ -57,7 +65,6 @@ export const DocumentsView: React.FC = () => {
 
     try {
       const result = await documentApi.upload(file);
-      // Add optimistic document to list
       const newDoc: DocumentItem = {
         id: Date.now(),
         originalFilename: file.name,
@@ -68,7 +75,6 @@ export const DocumentsView: React.FC = () => {
       };
       setDocuments((prev) => [newDoc, ...prev]);
 
-      // Poll status if jobId returned
       if (result.jobId) {
         setTimeout(() => {
           setDocuments((prev) => updateDocumentStatus(prev, newDoc.id, 'ANALYZED'));
@@ -186,7 +192,15 @@ export const DocumentsView: React.FC = () => {
                     <div className="p-2.5 rounded-xl bg-white/5 text-[#F97316] border border-white/5">
                       <FileText className="w-5 h-5" />
                     </div>
-                    <div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setAnalyticsModal({ open: true, docId: doc.id, docName: doc.originalFilename })}
+                        title="View Document Analytics & Readability"
+                        aria-label="View Document Analytics"
+                        className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-[#06B6D4] transition-colors"
+                      >
+                        <BarChart3 className="w-4 h-4" />
+                      </button>
                       {doc.status === 'ANALYZED' && <Badge variant="cyan">Analyzed</Badge>}
                       {doc.status === 'PROCESSING' && <Badge variant="orange">Processing</Badge>}
                       {doc.status === 'FAILED' && <Badge variant="danger">Failed</Badge>}
@@ -250,6 +264,15 @@ export const DocumentsView: React.FC = () => {
         </div>
       </div>
 
+      {/* Analytics Modal */}
+      {analyticsModal.open && (
+        <DocumentAnalyticsModal
+          documentId={analyticsModal.docId}
+          documentName={analyticsModal.docName}
+          onClose={() => setAnalyticsModal({ open: false, docId: 0, docName: '' })}
+        />
+      )}
+
       {/* Executive Summary Modal */}
       {summaryModal.open && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -268,6 +291,7 @@ export const DocumentsView: React.FC = () => {
               </div>
               <button
                 onClick={() => setSummaryModal({ open: false, title: '', content: '', loading: false })}
+                aria-label="Close Summary Modal"
                 className="text-[#94A3B8] hover:text-white p-1.5 rounded-xl hover:bg-white/5 cursor-pointer"
               >
                 <X className="w-5 h-5" />

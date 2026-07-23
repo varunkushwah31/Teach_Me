@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink, useNavigate, useLocation, Outlet } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, useNavigate, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileText,
@@ -11,6 +11,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { TopNav } from './TopNav';
+import { NewAnalysisModal } from '../modals/NewAnalysisModal';
+import { UserProfileModal } from '../modals/UserProfileModal';
 
 interface AppShellProps {
   children?: React.ReactNode;
@@ -20,7 +22,9 @@ interface AppShellProps {
 
 export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) => {
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -35,10 +39,14 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
       {/* Left Sidebar - Fixed ~260px */}
       <aside className="w-[260px] flex-shrink-0 bg-[#0D0D17]/85 backdrop-blur-xl border-r border-white/5 flex flex-col justify-between p-4 z-20">
         <div>
-          {/* Header Logo */}
-          <div className="flex items-center gap-3 px-2 py-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F97316]/10 to-[#D946EF]/5 border border-white/5 flex items-center justify-center orange-glow transition-transform hover:scale-105 duration-300">
-              <Sparkles className="w-5 h-5 animate-pulse text-[#F97316]" />
+          {/* Header Logo Button */}
+          <button
+            type="button"
+            onClick={() => navigate('/landing')}
+            className="flex items-center gap-3 px-2 py-3 mb-6 w-full text-left cursor-pointer group focus:outline-none focus:ring-1 focus:ring-[#F97316]/50 rounded-xl"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F97316] via-[#06B6D4] to-[#D946EF] flex items-center justify-center orange-glow transition-transform group-hover:scale-105 duration-300">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="font-heading font-bold text-lg tracking-tight text-white leading-none">
@@ -46,11 +54,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
               </h1>
               <p className="text-[10px] text-[#94A3B8] font-mono mt-1 uppercase tracking-widest">Academic Agent</p>
             </div>
-          </div>
+          </button>
 
           {/* Primary Action Button */}
           <button
-            onClick={() => navigate('/documents')}
+            type="button"
+            onClick={() => setShowAnalysisModal(true)}
             className="w-full bg-gradient-to-r from-[#F97316] to-[#D946EF] hover:opacity-95 text-white font-semibold px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 orange-glow mb-6 text-xs uppercase tracking-wider cursor-pointer"
           >
             <Plus className="w-4 h-4" />
@@ -61,7 +70,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
           <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
               return (
                 <NavLink
                   key={item.path}
@@ -74,8 +82,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
                     }`
                   }
                 >
-                  <Icon className={`w-4 h-4 transition-transform group-hover:scale-110 duration-200 ${isActive ? 'text-[#F97316]' : 'text-[#94A3B8] group-hover:text-white'}`} />
-                  <span>{item.name}</span>
+                  {({ isActive }) => (
+                    <>
+                      <Icon className={`w-4 h-4 transition-transform group-hover:scale-110 duration-200 ${isActive ? 'text-[#F97316]' : 'text-[#94A3B8] group-hover:text-white'}`} />
+                      <span>{item.name}</span>
+                    </>
+                  )}
                 </NavLink>
               );
             })}
@@ -93,37 +105,55 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
             <span className="text-[#94A3B8]">RAG Engine - <span className="text-[#06B6D4] font-bold">Online</span></span>
           </div>
 
-          {/* User Profile Snippet */}
-          <div className="flex items-center justify-between bg-white/5 border border-white/5 rounded-xl p-3">
+          {/* User Profile Snippet Button */}
+          <button
+            type="button"
+            onClick={() => setShowProfileModal(true)}
+            className="flex items-center justify-between w-full bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl p-3 cursor-pointer transition-colors text-left focus:outline-none focus:ring-1 focus:ring-[#06B6D4]"
+          >
             <div className="flex items-center gap-2.5 overflow-hidden">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#06B6D4] to-[#3B82F6] flex items-center justify-center font-bold text-xs text-white shadow-sm">
                 {user?.name ? user.name.slice(0, 2).toUpperCase() : 'US'}
               </div>
               <div className="truncate">
-                <p className="text-xs font-semibold text-white truncate">{user?.name || 'Student User'}</p>
+                <p className="text-xs font-semibold text-white truncate">{user?.name || 'Academic Student'}</p>
                 <p className="text-[9px] text-[#94A3B8] font-mono truncate">{user?.email || 'student@teachme.ai'}</p>
               </div>
             </div>
             {onLogout && (
               <button
-                onClick={onLogout}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLogout();
+                }}
                 title="Log Out"
                 className="text-[#94A3B8] hover:text-[#EF4444] p-1.5 rounded-lg hover:bg-white/5 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             )}
-          </div>
+          </button>
         </div>
       </aside>
 
       {/* Main Fluid Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#06060A]">
-        <TopNav />
+        <TopNav user={user} onLogout={onLogout} />
         <main className="flex-1 overflow-y-auto p-6">
           {children || <Outlet />}
         </main>
       </div>
+
+      {/* New Analysis Modal */}
+      {showAnalysisModal && (
+        <NewAnalysisModal onClose={() => setShowAnalysisModal(false)} onSuccess={() => navigate('/documents')} />
+      )}
+
+      {/* User Profile Modal */}
+      {showProfileModal && (
+        <UserProfileModal user={user} onClose={() => setShowProfileModal(false)} onLogout={onLogout} />
+      )}
     </div>
   );
 };

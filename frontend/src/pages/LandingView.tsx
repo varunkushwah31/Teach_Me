@@ -1,8 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, BookOpen, Layers, MessageSquare, Cpu, FileText, CheckCircle2 } from 'lucide-react';
+import { BrainCircuit, Sparkles, ArrowRight, BookOpen, Layers, Cpu, FileText, CheckCircle2, Zap } from 'lucide-react';
 
-export const LandingView: React.FC = () => {
+interface Props {
+  onExploreDemo?: () => void;
+}
+
+export const LandingView: React.FC<Props> = ({ onExploreDemo }) => {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -16,6 +20,11 @@ export const LandingView: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedQuizOpt, setSelectedQuizOpt] = useState<number | null>(null);
   const [quizScore, setQuizScore] = useState<number | null>(null);
+
+  const handleLaunchDashboard = (targetPath: string = '/dashboard') => {
+    if (onExploreDemo) onExploreDemo();
+    navigate(targetPath);
+  };
 
   const handleSandboxSend = () => {
     if (!sandboxInput.trim()) return;
@@ -174,14 +183,24 @@ export const LandingView: React.FC = () => {
 
       {/* Top Navigation */}
       <nav className="flex items-center justify-between px-8 py-6 z-30 relative max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F97316] to-[#D946EF] flex items-center justify-center orange-glow">
-            <Sparkles className="w-5 h-5 text-white" />
+        {/* Shadcn Styled Brand Logo Button */}
+        <button
+          type="button"
+          onClick={() => handleLaunchDashboard('/dashboard')}
+          className="flex items-center gap-3 group cursor-pointer text-left focus:outline-none focus:ring-1 focus:ring-[#F97316] rounded-xl p-1"
+        >
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#F97316] via-[#06B6D4] to-[#D946EF] p-[1.5px] shadow-lg orange-glow group-hover:scale-105 transition-transform duration-300">
+            <div className="w-full h-full bg-[#06060A] rounded-[14px] flex items-center justify-center">
+              <BrainCircuit className="w-6 h-6 text-[#F97316] group-hover:text-[#06B6D4] transition-colors" />
+            </div>
           </div>
-          <span className="font-heading text-sm font-bold tracking-widest text-white uppercase">
-            TeachMe <span className="gradient-text-orange font-extrabold">AI</span>
-          </span>
-        </div>
+          <div>
+            <span className="font-heading text-base font-extrabold tracking-tight text-white uppercase block leading-none">
+              TeachMe <span className="gradient-text-orange font-extrabold">AI</span>
+            </span>
+            <span className="text-[9px] text-[#06B6D4] font-mono tracking-widest uppercase">Academic Agent</span>
+          </div>
+        </button>
 
         <div className="hidden md:flex items-center gap-8 text-[11px] font-semibold text-[#94A3B8] tracking-widest uppercase font-mono">
           <a href="#features" className="hover:text-white transition-colors">Features</a>
@@ -191,16 +210,16 @@ export const LandingView: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="relative p-[1px] rounded-xl bg-gradient-to-r from-[#F97316] via-[#06B6D4] to-[#D946EF] hidden sm:block">
             <button
-              onClick={() => navigate('/dashboard')}
-              className="px-5 py-2 bg-[#06060A] text-xs font-semibold uppercase tracking-wider hover:bg-white/5 transition-colors rounded-[11px] text-white cursor-pointer"
+              onClick={() => handleLaunchDashboard('/dashboard')}
+              className="px-5 py-2.5 bg-[#06060A] text-xs font-bold uppercase tracking-wider hover:bg-white/5 transition-colors rounded-[11px] text-white cursor-pointer"
             >
               Launch Dashboard
             </button>
           </div>
 
           <button
-            onClick={() => navigate('/login')}
-            className="px-5 py-2.5 bg-gradient-to-r from-[#F97316] to-[#D946EF] text-white text-xs font-semibold uppercase tracking-wider rounded-xl hover:opacity-90 transition-all orange-glow cursor-pointer"
+            onClick={() => handleLaunchDashboard('/login')}
+            className="px-5 py-2.5 bg-gradient-to-r from-[#F97316] to-[#D946EF] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:opacity-90 transition-all orange-glow cursor-pointer"
           >
             Sign In
           </button>
@@ -257,7 +276,7 @@ export const LandingView: React.FC = () => {
 
         {/* Headline */}
         <div className="z-20 relative max-w-3xl mt-auto pt-72">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white text-xs font-mono mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-white text-xs font-mono mb-4">
             <Cpu className="w-3.5 h-3.5 text-[#06B6D4]" />
             <span>Local RAG Ingestion + Map-Reduce Engine</span>
           </div>
@@ -272,7 +291,7 @@ export const LandingView: React.FC = () => {
 
           <div className="mt-6 flex items-center gap-4">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => handleLaunchDashboard('/dashboard')}
               className="px-6 py-3.5 bg-gradient-to-r from-[#F97316] to-[#D946EF] hover:opacity-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all orange-glow flex items-center gap-2 cursor-pointer"
             >
               <span>Explore Demo Dashboard</span>
@@ -280,7 +299,7 @@ export const LandingView: React.FC = () => {
             </button>
 
             <button
-              onClick={() => navigate('/documents')}
+              onClick={() => handleLaunchDashboard('/documents')}
               className="px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer"
             >
               Upload PDF Notes
@@ -387,7 +406,7 @@ export const LandingView: React.FC = () => {
                       onChange={(e) => setSandboxInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSandboxSend()}
                       placeholder="Ask: 'Explain quantum waves'..."
-                      className="flex-grow bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-white text-[11px] focus:outline-none focus:border-[#F97316]"
+                      className="flex-grow bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-[#F8FAFC] text-[11px] focus:outline-none focus:border-[#F97316]"
                     />
                     <button
                       onClick={handleSandboxSend}
@@ -491,7 +510,7 @@ export const LandingView: React.FC = () => {
         </div>
       </section>
 
-      {/* Feature Showcase Grid Section */}
+      {/* Feature Showcase Grid Section with Shadcn Styled Badges */}
       <section id="features" className="bg-[#0D0D17]/40 backdrop-blur-xl border-t border-white/5 py-20 px-6 relative z-20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
@@ -502,31 +521,43 @@ export const LandingView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="premium-card p-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#06B6D4] to-[#3B82F6] text-white flex items-center justify-center mb-6 shadow-sm">
-                <MessageSquare className="w-5 h-5" />
+            {/* Feature 1 */}
+            <div className="premium-card p-6 border border-white/5 rounded-2xl bg-[#0D0D17]/70 hover:border-[#06B6D4]/40 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#06B6D4]/20 to-[#3B82F6]/20 border border-[#06B6D4]/30 text-[#06B6D4] flex items-center justify-center mb-6 cyan-glow">
+                <BrainCircuit className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-3 font-heading">RRF Hybrid Search Chat</h3>
+              <h3 className="text-sm font-bold text-white mb-3 font-heading flex items-center gap-2">
+                <span>RRF Hybrid Search Chat</span>
+                <Zap className="w-3.5 h-3.5 text-[#06B6D4]" />
+              </h3>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Combines pgvector similarity with PostgreSQL full-text search for exact keyword precision and semantic comprehension.
               </p>
             </div>
 
-            <div className="premium-card p-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] text-white flex items-center justify-center mb-6 shadow-sm">
-                <BookOpen className="w-5 h-5" />
+            {/* Feature 2 */}
+            <div className="premium-card p-6 border border-white/5 rounded-2xl bg-[#0D0D17]/70 hover:border-[#F97316]/40 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F97316]/20 to-[#EA580C]/20 border border-[#F97316]/30 text-[#F97316] flex items-center justify-center mb-6 orange-glow">
+                <BookOpen className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-3 font-heading">Map-Reduce Summaries</h3>
+              <h3 className="text-sm font-bold text-white mb-3 font-heading flex items-center gap-2">
+                <span>Map-Reduce Summaries</span>
+                <Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+              </h3>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Automatically triggers 1-page executive summaries across 50+ vector chunks in parallel for 100+ page textbooks.
               </p>
             </div>
 
-            <div className="premium-card p-6">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D946EF] to-purple-600 text-white flex items-center justify-center mb-6 shadow-sm">
-                <Layers className="w-5 h-5" />
+            {/* Feature 3 */}
+            <div className="premium-card p-6 border border-white/5 rounded-2xl bg-[#0D0D17]/70 hover:border-[#D946EF]/40 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D946EF]/20 to-purple-600/20 border border-[#D946EF]/30 text-[#D946EF] flex items-center justify-center mb-6">
+                <Layers className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-white mb-3 font-heading">SM-2 Spaced Repetition</h3>
+              <h3 className="text-sm font-bold text-white mb-3 font-heading flex items-center gap-2">
+                <span>SM-2 Spaced Repetition</span>
+                <Zap className="w-3.5 h-3.5 text-[#D946EF]" />
+              </h3>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Highlight AI streaming responses to save flashcards. Evaluate recall quality (`Again`, `Hard`, `Good`, `Easy`) with custom ease factors.
               </p>
