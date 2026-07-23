@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, Outlet } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  FileText,
-  MessageSquare,
-  Layers,
-  Settings as SettingsIcon,
-  Plus,
-  LogOut,
-  Sparkles,
-} from 'lucide-react';
+import { LogOut, Plus } from 'lucide-react';
+import { SvgSparklesIcon, SvgDocumentIcon, SvgChatIcon, SvgCpuIcon, SvgAwardIcon } from '../ui/SvgIcon';
 import { TopNav } from './TopNav';
 import { NewAnalysisModal } from '../modals/NewAnalysisModal';
 import { UserProfileModal } from '../modals/UserProfileModal';
@@ -27,11 +19,11 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Document Library', path: '/documents', icon: FileText },
-    { name: 'AI Tutor Chat', path: '/chat', icon: MessageSquare },
-    { name: 'Study Mode', path: '/study', icon: Layers },
-    { name: 'Settings', path: '/settings', icon: SettingsIcon },
+    { name: 'Dashboard', path: '/dashboard', icon: SvgSparklesIcon },
+    { name: 'Document Library', path: '/documents', icon: SvgDocumentIcon },
+    { name: 'AI Tutor Chat', path: '/chat', icon: SvgChatIcon },
+    { name: 'Study Mode', path: '/study', icon: SvgAwardIcon },
+    { name: 'Settings', path: '/settings', icon: SvgCpuIcon },
   ];
 
   return (
@@ -46,7 +38,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user, onLogout }) 
             className="flex items-center gap-3 px-2 py-3 mb-6 w-full text-left cursor-pointer group focus:outline-none focus:ring-1 focus:ring-[#F97316]/50 rounded-xl"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F97316] via-[#06B6D4] to-[#D946EF] flex items-center justify-center orange-glow transition-transform group-hover:scale-105 duration-300">
-              <Sparkles className="w-5 h-5 text-white" />
+              <SvgSparklesIcon className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="font-heading font-bold text-lg tracking-tight text-white leading-none">

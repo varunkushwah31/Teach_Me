@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AreaChartComponent } from '../components/ui/AreaChartComponent';
 import { RadarChartComponent } from '../components/ui/RadarChartComponent';
-import { FileText, Award, Clock, ArrowUpRight, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { FileText, Award, Clock, ArrowUpRight, MessageSquare, CheckCircle2, Cpu, Sparkles, Layers, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { flashcardApi } from '../lib/apiClient';
 
@@ -28,8 +28,67 @@ export const DashboardView: React.FC = () => {
           <p className="text-xs text-[#94A3B8] font-mono mt-1">Real-time RAG ingestion analytics & study performance overview.</p>
         </div>
         <div className="flex gap-2">
-          <Badge variant="cyan">+12 Document Chunks Vectorized Today</Badge>
+          <Badge variant="cyan">🟢 Local Ollama Vector Engine Active</Badge>
         </div>
+      </div>
+
+      {/* Quick Launch Action Toolbar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <button
+          type="button"
+          onClick={() => navigate('/documents')}
+          className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#F97316]/40 hover:bg-[#F97316]/10 text-white flex items-center gap-3 transition-all cursor-pointer group"
+        >
+          <div className="p-2 rounded-xl bg-[#F97316]/15 text-[#F97316] group-hover:scale-110 transition-transform">
+            <Upload className="w-4 h-4" />
+          </div>
+          <div className="text-left truncate">
+            <p className="text-xs font-bold text-white truncate">Upload PDF</p>
+            <p className="text-[10px] text-[#94A3B8] font-mono truncate">Vector Ingestion</p>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/chat')}
+          className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#06B6D4]/40 hover:bg-[#06B6D4]/10 text-white flex items-center gap-3 transition-all cursor-pointer group"
+        >
+          <div className="p-2 rounded-xl bg-[#06B6D4]/15 text-[#06B6D4] group-hover:scale-110 transition-transform">
+            <MessageSquare className="w-4 h-4" />
+          </div>
+          <div className="text-left truncate">
+            <p className="text-xs font-bold text-white truncate">RAG AI Chat</p>
+            <p className="text-[10px] text-[#94A3B8] font-mono truncate">Verified Footnotes</p>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/study')}
+          className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#D946EF]/40 hover:bg-[#D946EF]/10 text-white flex items-center gap-3 transition-all cursor-pointer group"
+        >
+          <div className="p-2 rounded-xl bg-[#D946EF]/15 text-[#D946EF] group-hover:scale-110 transition-transform">
+            <Layers className="w-4 h-4" />
+          </div>
+          <div className="text-left truncate">
+            <p className="text-xs font-bold text-white truncate">SM-2 Flashcards</p>
+            <p className="text-[10px] text-[#94A3B8] font-mono truncate">Spaced Review</p>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/settings')}
+          className="p-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#06B6D4]/40 hover:bg-[#06B6D4]/10 text-white flex items-center gap-3 transition-all cursor-pointer group"
+        >
+          <div className="p-2 rounded-xl bg-[#06B6D4]/15 text-[#06B6D4] group-hover:scale-110 transition-transform">
+            <Cpu className="w-4 h-4" />
+          </div>
+          <div className="text-left truncate">
+            <p className="text-xs font-bold text-white truncate">Ollama Models</p>
+            <p className="text-[10px] text-[#94A3B8] font-mono truncate">Custom Endpoint</p>
+          </div>
+        </button>
       </div>
 
       {/* Top Row: Metric Cards */}
@@ -153,6 +212,7 @@ export const DashboardView: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold text-white tracking-wide uppercase font-heading">Top Analyzed Documents</h2>
             <button
+              type="button"
               onClick={() => navigate('/documents')}
               className="text-xs text-[#F97316] hover:underline flex items-center gap-1 font-mono uppercase tracking-wider font-semibold cursor-pointer"
             >
@@ -176,7 +236,7 @@ export const DashboardView: React.FC = () => {
                   <td className="py-3 text-[#94A3B8]">Physics</td>
                   <td className="py-3"><Badge variant="cyan">Analyzed</Badge></td>
                   <td className="py-3 text-right">
-                    <button onClick={() => navigate('/chat')} className="text-[#F97316] hover:underline font-semibold cursor-pointer">Chat</button>
+                    <button type="button" onClick={() => navigate('/chat')} className="text-[#F97316] hover:underline font-semibold cursor-pointer">Chat</button>
                   </td>
                 </tr>
                 <tr className="hover:bg-white/5 transition-colors">
@@ -184,7 +244,7 @@ export const DashboardView: React.FC = () => {
                   <td className="py-3 text-[#94A3B8]">Chemistry</td>
                   <td className="py-3"><Badge variant="cyan">Analyzed</Badge></td>
                   <td className="py-3 text-right">
-                    <button onClick={() => navigate('/study')} className="text-[#F97316] hover:underline font-semibold cursor-pointer">Quiz</button>
+                    <button type="button" onClick={() => navigate('/study')} className="text-[#F97316] hover:underline font-semibold cursor-pointer">Quiz</button>
                   </td>
                 </tr>
                 <tr className="hover:bg-white/5 transition-colors">

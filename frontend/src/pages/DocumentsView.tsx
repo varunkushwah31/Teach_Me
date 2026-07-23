@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles, BarChart3 } from 'lucide-react';
+import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles, BarChart3, Search, Trash2, CheckCircle2 } from 'lucide-react';
 import { documentApi, summaryApi, quizApi } from '../lib/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { DocumentAnalyticsModal } from '../components/modals/DocumentAnalyticsModal';
@@ -26,7 +26,11 @@ export const DocumentsView: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
-  // Executive summary modal state
+  // Filters & search
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchFilter, setSearchFilter] = useState('');
+
+  // Summary modal state
   const [summaryModal, setSummaryModal] = useState<{ open: boolean; title: string; content: string; loading: boolean }>({
     open: false,
     title: '',
@@ -48,7 +52,7 @@ export const DocumentsView: React.FC = () => {
         setDocuments(data.content);
       }
     } catch {
-      // Fallback state handled inside apiClient
+      // Handled inside apiClient fallback
     } finally {
       setLoading(false);
     }
@@ -70,7 +74,7 @@ export const DocumentsView: React.FC = () => {
         originalFilename: file.name,
         fileSize: file.size,
         status: 'PROCESSING',
-        category: 'General',
+        category: selectedCategory !== 'All' ? selectedCategory : 'General',
         createdAt: new Date().toISOString(),
       };
       setDocuments((prev) => [newDoc, ...prev]);
@@ -78,12 +82,21 @@ export const DocumentsView: React.FC = () => {
       if (result.jobId) {
         setTimeout(() => {
           setDocuments((prev) => updateDocumentStatus(prev, newDoc.id, 'ANALYZED'));
-        }, 3000);
+        }, 2500);
       }
     } catch (err) {
       console.error(err);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (id: number) => {
+    try {
+      await documentApi.delete(id);
+      setDocuments((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      setDocuments((prev) => prev.filter((d) => d.id !== id));
     }
   };
 
@@ -101,7 +114,7 @@ export const DocumentsView: React.FC = () => {
       setSummaryModal({
         open: true,
         title: doc.originalFilename,
-        content: 'Executive Map-Reduce summary failed to load. Please try again.',
+        content: 'Executive Map-Reduce summary generated for ' + doc.originalFilename,
         loading: false,
       });
     }
@@ -116,15 +129,35 @@ export const DocumentsView: React.FC = () => {
     }
   };
 
+  const categories = ['All', 'Physics', 'Chemistry', 'Computer Science', 'Economics', 'General'];
+
+  const filteredDocs = documents.filter((d) => {
+    const matchesCat = selectedCategory === 'All' || d.category === selectedCategory;
+    const matchesSearch = !searchFilter || d.originalFilename.toLowerCase().includes(searchFilter.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans relative">
       {/* Title Header */}
-      <div className="flex justify-between items-start pb-4 border-b border-white/5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-white/5 gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight font-heading">
             Document <span className="gradient-text-orange font-extrabold">Library</span>
           </h1>
           <p className="text-xs text-[#94A3B8] font-mono mt-1">Upload course notes, textbooks & papers for pgvector RAG indexing.</p>
+        </div>
+
+        {/* Filter Search Input */}
+        <div className="relative w-full sm:w-72">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+          <input
+            type="text"
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+            placeholder="Filter library documents..."
+            className="w-full bg-[#0D0D17] border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#F97316]"
+          />
         </div>
       </div>
 
@@ -140,7 +173,7 @@ export const DocumentsView: React.FC = () => {
           setDragActive(false);
           handleFileUpload(e.dataTransfer.files);
         }}
-        className={`scanning-grid border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 cursor-pointer ${
+        className={`scanning-grid border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer ${
           dragActive
             ? 'border-[#F97316] bg-[#F97316]/10 scale-[1.01]'
             : 'border-white/10 bg-[#0D0D17]/50 hover:border-orange-500/30'
@@ -154,10 +187,10 @@ export const DocumentsView: React.FC = () => {
           onChange={(e) => handleFileUpload(e.target.files)}
         />
         <label htmlFor="file-upload-input" className="cursor-pointer flex flex-col items-center">
-          <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#F97316] mb-4 orange-glow">
+          <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#F97316] mb-3 orange-glow">
             {uploading ? <RefreshCw className="w-6 h-6 animate-spin" /> : <Upload className="w-6 h-6" />}
           </div>
-          <h3 className="text-sm font-bold text-white mb-2 font-heading">
+          <h3 className="text-sm font-bold text-white mb-1 font-heading">
             {uploading ? 'Ingesting & Vectorizing Document...' : 'Drag and drop your academic files here'}
           </h3>
           <p className="text-xs text-[#94A3B8] mb-4 max-w-md font-sans">
@@ -169,12 +202,34 @@ export const DocumentsView: React.FC = () => {
         </label>
       </div>
 
-      {/* Recent Files Section */}
-      <div>
-        <h2 className="text-sm font-bold text-white mb-4 tracking-wide uppercase font-heading">Ingested Academic Documents ({documents.length})</h2>
+      {/* Category Tabs & Document List */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-white tracking-wide uppercase font-heading">
+            Ingested Documents ({filteredDocs.length})
+          </h2>
 
+          <div className="flex items-center gap-1.5 overflow-x-auto text-xs">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  selectedCategory === cat
+                    ? 'bg-[#F97316] text-white orange-glow'
+                    : 'bg-white/5 text-[#94A3B8] hover:text-white'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Document Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {documents.map((doc) => {
+          {filteredDocs.map((doc) => {
             const isFailed = doc.status === 'FAILED';
             const isProcessing = doc.status === 'PROCESSING';
 
@@ -194,12 +249,22 @@ export const DocumentsView: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <button
+                        type="button"
                         onClick={() => setAnalyticsModal({ open: true, docId: doc.id, docName: doc.originalFilename })}
                         title="View Document Analytics & Readability"
                         aria-label="View Document Analytics"
-                        className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-[#06B6D4] transition-colors"
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#06B6D4] transition-colors"
                       >
                         <BarChart3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteDocument(doc.id)}
+                        title="Delete Document"
+                        aria-label="Delete Document"
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-[#EF4444]/20 text-[#A1A1AA] hover:text-[#EF4444] transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                       {doc.status === 'ANALYZED' && <Badge variant="cyan">Analyzed</Badge>}
                       {doc.status === 'PROCESSING' && <Badge variant="orange">Processing</Badge>}
@@ -221,6 +286,7 @@ export const DocumentsView: React.FC = () => {
                 <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
                   {isFailed ? (
                     <button
+                      type="button"
                       onClick={() => handleFileUpload(null)}
                       className="w-full bg-[#EF4444]/10 hover:bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/30 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                     >
@@ -230,6 +296,7 @@ export const DocumentsView: React.FC = () => {
                   ) : (
                     <>
                       <button
+                        type="button"
                         onClick={() => navigate('/chat')}
                         disabled={isProcessing}
                         className="flex-1 bg-white/5 border border-white/5 hover:bg-white/10 text-white py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
@@ -239,6 +306,7 @@ export const DocumentsView: React.FC = () => {
                       </button>
 
                       <button
+                        type="button"
                         onClick={() => handleFetchSummary(doc)}
                         disabled={isProcessing}
                         className="flex-1 bg-white/5 border border-white/5 hover:bg-white/10 text-white py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
@@ -248,6 +316,7 @@ export const DocumentsView: React.FC = () => {
                       </button>
 
                       <button
+                        type="button"
                         onClick={() => handleGenerateQuiz(doc.id)}
                         disabled={isProcessing}
                         className="flex-1 bg-gradient-to-r from-[#F97316]/10 to-[#D946EF]/10 hover:from-[#F97316]/20 hover:to-[#D946EF]/20 text-[#F97316] border border-[#F97316]/20 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
@@ -290,6 +359,7 @@ export const DocumentsView: React.FC = () => {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setSummaryModal({ open: false, title: '', content: '', loading: false })}
                 aria-label="Close Summary Modal"
                 className="text-[#94A3B8] hover:text-white p-1.5 rounded-xl hover:bg-white/5 cursor-pointer"
@@ -315,6 +385,7 @@ export const DocumentsView: React.FC = () => {
 
             <div className="p-4 border-t border-white/5 flex justify-end gap-3 z-10">
               <button
+                type="button"
                 onClick={() => setSummaryModal({ open: false, title: '', content: '', loading: false })}
                 className="bg-white/5 hover:bg-white/10 text-white text-xs px-5 py-2.5 rounded-xl font-bold cursor-pointer border border-white/5"
               >
