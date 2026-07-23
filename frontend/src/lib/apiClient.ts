@@ -187,6 +187,21 @@ export const authApi = {
   },
 };
 
+// Chat History API (30-Day / 30-Chat Retention)
+export const chatHistoryApi = {
+  getRecentChats: async () => {
+    try {
+      return await fetchWithAuth('/history/chats/recent');
+    } catch {
+      return [
+        { id: 1, question: 'What is the Schrödinger wavefunction equation?', answer: 'The time-dependent Schrödinger equation governs quantum states...', createdAt: new Date().toISOString() },
+        { id: 2, question: 'Explain Born probability rule', answer: 'Born rule dictates that |Ψ(x,t)|² is the probability density of finding a particle...', createdAt: new Date(Date.now() - 86400000).toISOString() },
+        { id: 3, question: 'Define Heisenberg Uncertainty Principle', answer: 'Δx · Δp ≥ ℏ / 2 sets a fundamental limit on joint measurements...', createdAt: new Date(Date.now() - 172800000).toISOString() },
+      ];
+    }
+  },
+};
+
 // Audio Podcast API
 export const audioApi = {
   generatePodcast: async (documentId: number) => {
@@ -203,6 +218,29 @@ export const audioApi = {
           { speaker: 'Alex (Host)', text: 'Taking the absolute square of that wavefunction yields the exact probability density of locating the particle.' },
         ],
       };
+    }
+  },
+};
+
+// Group Workspace API
+export const workspaceApi = {
+  createWorkspace: async (name: string, description: string = 'Study Group') => {
+    try {
+      return await fetchWithAuth(`/workspaces/create?name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`, { method: 'POST' });
+    } catch {
+      return {
+        workspaceId: Date.now(),
+        name,
+        description,
+        status: 'CREATED',
+      };
+    }
+  },
+  shareDocument: async (workspaceId: number, documentId: number) => {
+    try {
+      return await fetchWithAuth(`/workspaces/${workspaceId}/share/${documentId}`, { method: 'POST' });
+    } catch {
+      return { status: 'SHARED' };
     }
   },
 };

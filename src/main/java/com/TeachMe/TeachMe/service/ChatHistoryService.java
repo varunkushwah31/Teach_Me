@@ -14,6 +14,7 @@ public interface ChatHistoryService {
     PaginatedResponse<ChatHistoryDTO> getHistoryBySession(String sessionId, Long userId, Pageable pageable);
     PaginatedResponse<ChatHistoryDTO> searchHistoryBySession(String sessionId, Long userId, String searchTerm, Pageable pageable);
     List<ChatHistoryDTO> getFullSessionHistory(String sessionId, Long userId);
+    List<ChatHistoryDTO> getRecent30DaysHistoryByUser(Long userId);
     List<ChatHistoryDTO> exportUserChats(Long userId);
     List<ChatHistoryDTO> exportUserChatsSorted(Long userId);
     List<ChatHistoryDTO> getChatsForDocument(Long documentId, Long userId);

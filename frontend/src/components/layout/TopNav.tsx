@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Search, Bell, Share2, Download, Check, Cpu, Settings2 } from 'lucide-react';
+import { Search, Bell, Share2, Download, Check, Cpu, Settings2, Users } from 'lucide-react';
 import { NotificationsDrawer } from '../drawers/NotificationsDrawer';
 import { GlobalSearchCommand } from '../search/GlobalSearchCommand';
 import { UserProfileModal } from '../modals/UserProfileModal';
 import { OllamaConnectionModal } from '../modals/OllamaConnectionModal';
+import { GroupWorkspaceModal } from '../modals/GroupWorkspaceModal';
 
 interface TopNavProps {
   user?: { email: string; name: string };
@@ -21,6 +22,7 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showOllamaModal, setShowOllamaModal] = useState(false);
+  const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -65,6 +67,16 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
           <Cpu className="w-3.5 h-3.5 text-[#06B6D4]" />
           <span className="text-xs font-semibold text-white font-mono">{selectedModel}</span>
           <Settings2 className="w-3.5 h-3.5 text-[#A1A1AA] hover:text-white" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowWorkspaceModal(true)}
+          aria-label="Create Group Study Workspace"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#27272A] bg-[#1A1A1A] text-xs font-medium text-[#A1A1AA] hover:text-white hover:border-[#F97316]/50 transition-all cursor-pointer"
+        >
+          <Users className="w-3.5 h-3.5 text-[#F97316]" />
+          <span>Group Study</span>
         </button>
 
         <button
@@ -123,6 +135,11 @@ export const TopNav: React.FC<TopNavProps> = ({ user, onLogout }) => {
       {/* User Profile Modal */}
       {showProfileModal && (
         <UserProfileModal user={user} onClose={() => setShowProfileModal(false)} onLogout={onLogout} />
+      )}
+
+      {/* Group Workspace Modal */}
+      {showWorkspaceModal && (
+        <GroupWorkspaceModal onClose={() => setShowWorkspaceModal(false)} />
       )}
 
       {/* Ollama Connection & Model Manager Modal */}

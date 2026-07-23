@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -16,6 +17,11 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     List<Chat> findByUserId(Long userId);
 
     List<Chat> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    List<Chat> findTop30ByUserIdOrderByCreatedAtDesc(Long userId);
+
+    @Query("SELECT c FROM Chat c WHERE c.user.id = :userId AND c.createdAt >= :cutoff ORDER BY c.createdAt DESC")
+    List<Chat> findByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(@Param("userId") Long userId, @Param("cutoff") LocalDateTime cutoff);
 
     List<Chat> findBySessionId(String sessionId);
 
@@ -37,7 +43,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     Page<Chat> findBySessionIdOrderByCreatedAtDesc(String sessionId, Pageable pageable);
 
-    Page<Chat> findBySessionIdAndUserIdOrderByCreatedAtDesc(String sessionId, Long userId, Pageable pageable);
+    Page<Chat> findBySessionIdAndUserIdOrderByCreatedAtDesc(String sessionId, Pageable pageable);
 
     @Query("SELECT c FROM Chat c WHERE c.user.id = :userId AND (LOWER(c.question) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(c.answer) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     Page<Chat> searchByUserIdAndTerm(@Param("userId") Long userId, @Param("searchTerm") String searchTerm, Pageable pageable);

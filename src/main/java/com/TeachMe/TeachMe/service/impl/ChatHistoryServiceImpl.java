@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,7 +24,7 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     @Override
     public PaginatedResponse<ChatHistoryDTO> getHistoryByUser(Long userId, Pageable pageable) {
         Page<Chat> chatPage = chatRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
-        return PaginatedResponse.fromPage(chatPage.map(ChatHistoryDTO::fromEntity)); // Assumes fromEntity is added to DTO
+        return PaginatedResponse.fromPage(chatPage.map(ChatHistoryDTO::fromEntity));
     }
 
     @Override
@@ -56,7 +57,6 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
         return PaginatedResponse.fromPage(chatPage.map(ChatHistoryDTO::fromEntity));
     }
 
-    // Consume unpaginated List methods for Session Rebuilding and Data Export
     @Override
     public List<ChatHistoryDTO> getFullSessionHistory(String sessionId, Long userId) {
         return chatRepository.findBySessionIdAndUserId(sessionId, userId).stream()
@@ -64,12 +64,31 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
                 .toList();
     }
 
+    @Override
+    public List<ChatHistoryDTO> getRecent30DaysHistoryByUser(Long userId) {
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(30);
+        List<Chat> recentChats = chatRepository.findByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(userId, cutoff);
+
+        // If fewer than 30 chats in last 30 days, fallback to top 30 overall
+        if (recentChats.size() < 30) {
+            recentChats = chatRepository.findTop30ByUserIdOrderByCreatedAtDesc(userId);
+        } else if (recentChats.size() > 30) {
+            recentChats = recentChats.subList(0, 30);
+        }
+
+        return recentChats.stream()
+                .map(ChatHistoryDTO::fromEntity)
+                .toList();
+    }
+
+    @Override
     public List<ChatHistoryDTO> exportUserChats(Long userId) {
         return chatRepository.findByUserId(userId).stream()
                 .map(ChatHistoryDTO::fromEntity)
                 .toList();
     }
 
+    @Override
     public List<ChatHistoryDTO> exportUserChatsSorted(Long userId) {
         return chatRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(ChatHistoryDTO::fromEntity)
