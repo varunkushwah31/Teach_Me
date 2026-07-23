@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles, BarChart3, Search, Trash2, CheckCircle2 } from 'lucide-react';
+import { Upload, FileText, MessageSquare, BookOpen, RefreshCw, X, Sparkles, BarChart3, Search, Trash2, Network, Calendar } from 'lucide-react';
 import { documentApi, summaryApi, quizApi } from '../lib/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { DocumentAnalyticsModal } from '../components/modals/DocumentAnalyticsModal';
+import { KnowledgeGraphModal } from '../components/modals/KnowledgeGraphModal';
+import { StudyRoadmapModal } from '../components/modals/StudyRoadmapModal';
 
 interface DocumentItem {
   id: number;
@@ -40,6 +42,20 @@ export const DocumentsView: React.FC = () => {
 
   // Analytics modal state
   const [analyticsModal, setAnalyticsModal] = useState<{ open: boolean; docId: number; docName: string }>({
+    open: false,
+    docId: 0,
+    docName: '',
+  });
+
+  // Knowledge Graph modal state
+  const [kgModal, setKgModal] = useState<{ open: boolean; docId: number; docName: string }>({
+    open: false,
+    docId: 0,
+    docName: '',
+  });
+
+  // Study Roadmap modal state
+  const [roadmapModal, setRoadmapModal] = useState<{ open: boolean; docId: number; docName: string }>({
     open: false,
     docId: 0,
     docName: '',
@@ -250,6 +266,24 @@ export const DocumentsView: React.FC = () => {
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
+                        onClick={() => setKgModal({ open: true, docId: doc.id, docName: doc.originalFilename })}
+                        title="View Concept Knowledge Graph"
+                        aria-label="View Concept Knowledge Graph"
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#06B6D4] transition-colors"
+                      >
+                        <Network className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRoadmapModal({ open: true, docId: doc.id, docName: doc.originalFilename })}
+                        title="Generate AI Study Roadmap"
+                        aria-label="Generate AI Study Roadmap"
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#F97316] transition-colors"
+                      >
+                        <Calendar className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setAnalyticsModal({ open: true, docId: doc.id, docName: doc.originalFilename })}
                         title="View Document Analytics & Readability"
                         aria-label="View Document Analytics"
@@ -332,6 +366,24 @@ export const DocumentsView: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Knowledge Graph Modal */}
+      {kgModal.open && (
+        <KnowledgeGraphModal
+          documentId={kgModal.docId}
+          documentName={kgModal.docName}
+          onClose={() => setKgModal({ open: false, docId: 0, docName: '' })}
+        />
+      )}
+
+      {/* Study Roadmap Modal */}
+      {roadmapModal.open && (
+        <StudyRoadmapModal
+          documentId={roadmapModal.docId}
+          documentName={roadmapModal.docName}
+          onClose={() => setRoadmapModal({ open: false, docId: 0, docName: '' })}
+        />
+      )}
 
       {/* Analytics Modal */}
       {analyticsModal.open && (

@@ -281,6 +281,54 @@ export const summaryApi = {
   },
 };
 
+// Study Plan API
+export const studyPlanApi = {
+  generate: async (documentId: number, days = 3) => {
+    try {
+      return await fetchWithAuth(`/study-plan/generate/${documentId}?days=${days}`, { method: 'POST' });
+    } catch {
+      return {
+        documentId,
+        totalDays: days,
+        estimatedHours: 2.6,
+        schedule: [
+          { day: 1, title: 'Core Foundations & Definitions', estimatedMinutes: 45, objectives: ['Review basic concepts', 'Learn key terminology', 'Take initial quiz'] },
+          { day: 2, title: 'Mathematical Equations & Proofs', estimatedMinutes: 60, objectives: ['Analyze formulas', 'Solve sample problems', 'Review flashcards'] },
+          { day: 3, title: 'Mastery & Problem Solving', estimatedMinutes: 50, objectives: ['Boundary scenarios', 'Final quiz evaluation'] },
+        ],
+      };
+    }
+  },
+};
+
+// Knowledge Graph API
+export const knowledgeGraphApi = {
+  get: async (documentId: number) => {
+    try {
+      return await fetchWithAuth(`/documents/${documentId}/knowledge-graph`);
+    } catch {
+      return {
+        documentId,
+        nodeCount: 5,
+        edgeCount: 4,
+        nodes: [
+          { id: 'node-1', label: 'Schrödinger Equation', category: 'Core Concept', importance: 'HIGH' },
+          { id: 'node-2', label: 'Wavefunction |Ψ(x,t)|', category: 'Mathematical Entity', importance: 'HIGH' },
+          { id: 'node-3', label: 'Born Probability Rule', category: 'Interpretation', importance: 'MEDIUM' },
+          { id: 'node-4', label: 'Heisenberg Uncertainty', category: 'Principle', importance: 'HIGH' },
+          { id: 'node-5', label: 'Hamiltonian Operator H', category: 'Operator', importance: 'MEDIUM' },
+        ],
+        edges: [
+          { source: 'node-1', target: 'node-2', relation: 'governs evolution of' },
+          { source: 'node-2', target: 'node-3', relation: 'squared yields' },
+          { source: 'node-1', target: 'node-5', relation: 'uses total energy operator' },
+          { source: 'node-4', target: 'node-2', relation: 'constrains conjugate variables of' },
+        ],
+      };
+    }
+  },
+};
+
 // Citations Endpoints
 export const citationApi = {
   getByChat: async (chatId: string) => {

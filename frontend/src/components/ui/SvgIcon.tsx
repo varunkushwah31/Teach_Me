@@ -1,11 +1,12 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
-interface IconProps extends React.SVGProps<SVGSVGElement> {
+export interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
   size?: number | string;
 }
 
-export const SvgLogoIcon: React.FC<IconProps> = ({ className = 'w-6 h-6', size, ...props }) => (
+export const SvgLogoIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -15,7 +16,7 @@ export const SvgLogoIcon: React.FC<IconProps> = ({ className = 'w-6 h-6', size, 
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-5 w-5 shrink-0 transition-transform', className)}
     {...props}
   >
     <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z" />
@@ -25,7 +26,7 @@ export const SvgLogoIcon: React.FC<IconProps> = ({ className = 'w-6 h-6', size, 
   </svg>
 );
 
-export const SvgDocumentIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgDocumentIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -35,7 +36,7 @@ export const SvgDocumentIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', si
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
@@ -46,7 +47,7 @@ export const SvgDocumentIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', si
   </svg>
 );
 
-export const SvgChatIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgChatIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -56,7 +57,7 @@ export const SvgChatIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, 
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -66,7 +67,7 @@ export const SvgChatIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, 
   </svg>
 );
 
-export const SvgAwardIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgAwardIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -76,7 +77,7 @@ export const SvgAwardIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size,
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <circle cx="12" cy="8" r="6" />
@@ -84,7 +85,7 @@ export const SvgAwardIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size,
   </svg>
 );
 
-export const SvgClockIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgClockIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -94,7 +95,7 @@ export const SvgClockIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size,
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <circle cx="12" cy="12" r="10" />
@@ -102,7 +103,7 @@ export const SvgClockIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size,
   </svg>
 );
 
-export const SvgUploadIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgUploadIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -112,7 +113,7 @@ export const SvgUploadIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -121,7 +122,7 @@ export const SvgUploadIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size
   </svg>
 );
 
-export const SvgSearchIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgSearchIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -131,7 +132,7 @@ export const SvgSearchIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <circle cx="11" cy="11" r="8" />
@@ -139,7 +140,7 @@ export const SvgSearchIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size
   </svg>
 );
 
-export const SvgSparklesIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgSparklesIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -149,7 +150,7 @@ export const SvgSparklesIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', si
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
@@ -160,7 +161,7 @@ export const SvgSparklesIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', si
   </svg>
 );
 
-export const SvgCpuIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgCpuIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -170,7 +171,7 @@ export const SvgCpuIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, .
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <rect width="16" height="16" x="4" y="4" rx="2" />
@@ -186,7 +187,7 @@ export const SvgCpuIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, .
   </svg>
 );
 
-export const SvgUserIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgUserIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -196,7 +197,7 @@ export const SvgUserIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, 
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
@@ -204,7 +205,7 @@ export const SvgUserIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, 
   </svg>
 );
 
-export const SvgCheckIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgCheckIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -214,14 +215,14 @@ export const SvgCheckIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size,
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 
-export const SvgCloseIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size, ...props }) => (
+export const SvgCloseIcon: React.FC<IconProps> = ({ className, size, ...props }) => (
   <svg
     width={size}
     height={size}
@@ -231,7 +232,7 @@ export const SvgCloseIcon: React.FC<IconProps> = ({ className = 'w-5 h-5', size,
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className}
+    className={cn('h-4 w-4 shrink-0 transition-transform', className)}
     {...props}
   >
     <line x1="18" y1="6" x2="6" y2="18" />
