@@ -3,23 +3,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold tracking-wide transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-['Geist_Mono'] font-medium transition-colors focus:outline-none",
   {
     variants: {
       variant: {
         default:
-          "border-[#3F3F46] bg-[#27272A] text-[#A1A1AA] hover:bg-[#3F3F46]",
+          "border-transparent bg-[#a8ff53] text-[#121317]",
         secondary:
-          "border-transparent bg-[#27272A] text-white hover:bg-[#3F3F46]",
+          "border-transparent bg-[#272a2e] text-[#e5e7eb]",
         destructive:
-          "border-[#EF4444]/30 bg-[#EF4444]/10 text-[#EF4444]",
-        danger:
-          "border-[#EF4444]/30 bg-[#EF4444]/10 text-[#EF4444]",
-        outline: "text-white border-[#27272A]",
-        success: "border-[#06B6D4]/30 bg-[#06B6D4]/10 text-[#06B6D4]",
-        cyan: "border-[#06B6D4]/30 bg-[#06B6D4]/10 text-[#06B6D4]",
-        warning: "border-[#F97316]/30 bg-[#F97316]/10 text-[#F97316]",
-        orange: "border-[#F97316]/30 bg-[#F97316]/10 text-[#F97316]",
+          "border-transparent bg-[#f43f5e]/20 text-[#f43f5e] border-[#f43f5e]/30",
+        outline: "text-[#878c99] border-[#272a2e]",
+        lime: "border-[#a8ff53]/30 bg-[#a8ff53]/10 text-[#a8ff53]",
+        violet: "border-[#9c9af2]/30 bg-[#9c9af2]/10 text-[#9c9af2]",
       },
     },
     defaultVariants: {
@@ -32,7 +28,7 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
-function Badge({ className, variant, ...props }: Readonly<BadgeProps>) {
+function Badge({ className, variant, ...props }: BadgeProps) {
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props} />
   )

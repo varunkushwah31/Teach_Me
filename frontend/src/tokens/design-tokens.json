@@ -1,0 +1,129 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "color": {
+    "slate-canvas": {
+      "$value": "#1c1e21",
+      "$type": "color",
+      "$description": "Slate Canvas — Primary page background, hero canvas, card surface base — the workspace floor everything sits on"
+    },
+    "ink-well": {
+      "$value": "#121317",
+      "$type": "color",
+      "$description": "Ink Well — Deepest surface — code block backgrounds, terminal panes, inset containers that need to feel recessed below the canvas"
+    },
+    "graphite-hairline": {
+      "$value": "#3b3e45",
+      "$type": "color",
+      "$description": "Graphite Hairline — Subtle borders, divider lines, card edges — barely visible separators that let density carry the visual structure"
+    },
+    "steel-border": {
+      "$value": "#272a2e",
+      "$type": "color",
+      "$description": "Steel Border — Slightly darker hairline for nested containers and secondary borders where Graphite feels too bright"
+    },
+    "ash-text": {
+      "$value": "#b5b8c0",
+      "$type": "color",
+      "$description": "Ash Text — Tertiary text, captions, muted helper copy — text that should be readable but not competing with headlines"
+    },
+    "fog-text": {
+      "$value": "#878c99",
+      "$type": "color",
+      "$description": "Fog Text — Secondary body text, metadata, icon strokes — the most-used neutral text color, reading as a soft graphite on slate"
+    },
+    "cloud-text": {
+      "$value": "#d7d9dd",
+      "$type": "color",
+      "$description": "Cloud Text — Secondary headings, button text, emphasized body — one step below full white, used where pure white would feel harsh"
+    },
+    "bone-text": {
+      "$value": "#e5e7eb",
+      "$type": "color",
+      "$description": "Bone Text — Primary text, headlines, high-contrast labels — the dominant foreground color against the slate canvas"
+    },
+    "signal-lime": {
+      "$value": "#a8ff53",
+      "$type": "color",
+      "$description": "Signal Lime — Green supporting accent for decorative details, logo mark, and primary CTA fill"
+    },
+    "syntax-violet": {
+      "$value": "#9c9af2",
+      "$type": "color",
+      "$description": "Syntax Violet — Code syntax highlighting (functions, keywords), media generation feature icon"
+    },
+    "syntax-pink": {
+      "$value": "#fa3abf",
+      "$type": "color",
+      "$description": "Syntax Pink — Code syntax (strings, special tokens), media processing feature icon"
+    },
+    "event-violet": {
+      "$value": "#7655fd",
+      "$type": "color",
+      "$description": "Event Violet — Headline highlight words, streaming feature icon, decorative gradient accent"
+    },
+    "loop-green": {
+      "$value": "#afec73",
+      "$type": "color",
+      "$description": "Loop Green — Code syntax (types, booleans), inline emphasis text"
+    },
+    "key-lime": {
+      "$value": "#d9f07c",
+      "$type": "color",
+      "$description": "Key Lime — Code syntax (variables, parameters)"
+    },
+    "tag-magenta": {
+      "$value": "#e888f8",
+      "$type": "color",
+      "$description": "Tag Magenta — Code syntax (property names, tags)"
+    },
+    "mute-red": {
+      "$value": "#f43f5e",
+      "$type": "color",
+      "$description": "Mute Red — Red supporting accent for decorative details and low-frequency emphasis"
+    }
+  },
+  "font": {
+    "satoshi": {
+      "$value": "'Satoshi', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "$type": "fontFamily",
+      "$description": "Display and heading — Satoshi carries every headline from 16px sub-labels up to the 60px hero"
+    },
+    "geist": {
+      "$value": "'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "$type": "fontFamily",
+      "$description": "Body, navigation, buttons, links, UI labels — Geist is the workhorse that keeps the interface legible"
+    },
+    "geist-mono": {
+      "$value": "'Geist Mono', 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+      "$type": "fontFamily",
+      "$description": "Code blocks, inline code, terminal output, log lines — locked at 14px"
+    }
+  },
+  "spacing": {
+    "4": { "$value": "4px", "$type": "dimension" },
+    "8": { "$value": "8px", "$type": "dimension" },
+    "12": { "$value": "12px", "$type": "dimension" },
+    "16": { "$value": "16px", "$type": "dimension" },
+    "24": { "$value": "24px", "$type": "dimension" },
+    "28": { "$value": "28px", "$type": "dimension" },
+    "32": { "$value": "32px", "$type": "dimension" },
+    "40": { "$value": "40px", "$type": "dimension" },
+    "48": { "$value": "48px", "$type": "dimension" },
+    "64": { "$value": "64px", "$type": "dimension" },
+    "96": { "$value": "96px", "$type": "dimension" },
+    "160": { "$value": "160px", "$type": "dimension" },
+    "192": { "$value": "192px", "$type": "dimension" }
+  },
+  "radius": {
+    "cards": { "$value": "4px", "$type": "dimension" },
+    "pills": { "$value": "9999px", "$type": "dimension" },
+    "inputs": { "$value": "4px", "$type": "dimension" },
+    "buttons": { "$value": "4px", "$type": "dimension" }
+  },
+  "surface": {
+    "canvas": { "$value": "#1c1e21", "$type": "color" },
+    "inset": { "$value": "#121317", "$type": "color" },
+    "card": { "$value": "#1c1e21", "$type": "color" },
+    "accent": { "$value": "#a8ff53", "$type": "color" }
+  }
+}

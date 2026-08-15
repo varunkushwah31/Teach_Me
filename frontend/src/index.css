@@ -1,248 +1,81 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
 
 @layer base {
   :root {
-    --bg-base: #06060A;
-    --bg-surface: rgba(13, 13, 23, 0.7);
-    --bg-surface-hover: rgba(28, 28, 48, 0.85);
-    --primary-orange: #F97316;
-    --primary-orange-hover: #EA580C;
-    --primary-orange-glow: rgba(249, 115, 22, 0.35);
-    --accent-cyan: #06B6D4;
-    --accent-cyan-bg: rgba(6, 182, 212, 0.12);
-    --danger-red: #EF4444;
-    --danger-red-bg: rgba(239, 68, 68, 0.12);
-    --text-main: #F8FAFC;
-    --text-muted: #94A3B8;
-    --border-color: rgba(148, 163, 184, 0.1);
-
-    --background: #06060A;
-    --foreground: #F8FAFC;
-    --card: rgba(13, 13, 23, 0.7);
-    --card-foreground: #F8FAFC;
-    --popover: #0D0D17;
-    --popover-foreground: #F8FAFC;
-    --primary: #F97316;
-    --primary-foreground: #FFFFFF;
-    --secondary: rgba(28, 28, 48, 0.8);
-    --secondary-foreground: #F8FAFC;
-    --muted: rgba(28, 28, 48, 0.4);
-    --muted-foreground: #94A3B8;
-    --accent: #06B6D4;
-    --accent-foreground: #FFFFFF;
-    --destructive: #EF4444;
-    --destructive-foreground: #FFFFFF;
-    --border: rgba(148, 163, 184, 0.1);
-    --input: rgba(28, 28, 48, 0.5);
-    --ring: #F97316;
-    --radius: 1rem;
-
-    --font-mono: 'Space Mono', 'JetBrains Mono', monospace;
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+    --background: #1c1e21;
+    --foreground: #e5e7eb;
+    --card: #1c1e21;
+    --card-foreground: #e5e7eb;
+    --popover: #121317;
+    --popover-foreground: #e5e7eb;
+    --primary: #a8ff53;
+    --primary-foreground: #121317;
+    --secondary: #272a2e;
+    --secondary-foreground: #d7d9dd;
+    --muted: #272a2e;
+    --muted-foreground: #878c99;
+    --accent: #272a2e;
+    --accent-foreground: #e5e7eb;
+    --destructive: #f43f5e;
+    --destructive-foreground: #ffffff;
+    --border: #272a2e;
+    --input: #272a2e;
+    --ring: #a8ff53;
+    --radius: 4px;
   }
 
-  body {
-    background-color: var(--bg-base);
-    color: var(--text-main);
-    font-family: var(--font-sans);
-    min-height: 100vh;
+  * {
+    border-color: #272a2e;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  }
+
+  html, body {
+    background-color: #1c1e21;
+    color: #e5e7eb;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
     overflow-x: hidden;
-    margin: 0;
-    padding: 0;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(249, 115, 22, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
-    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, h4, h5, h6, .heading-grotesk {
-    font-family: var(--font-heading);
-    letter-spacing: -0.02em;
-  }
-
-  code, kbd, samp, pre, .font-mono {
-    font-family: var(--font-mono);
+  code, pre, .font-code, .font-mono, select, input {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   }
 }
 
-/* Custom Scrollbars */
+/* Custom terminal scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #06060A;
+  background: #121317;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.15);
-  border-radius: 9999px;
+  background: #272a2e;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.3);
+  background: #3b3e45;
 }
 
-/* Custom UI Components and Glassmorphism */
-.glass-panel {
-  background: rgba(13, 13, 23, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+/* Animation Keyframes */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.97); }
 }
 
-.glass-input {
-  background: rgba(13, 13, 23, 0.45);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.glass-input:focus {
-  border-color: var(--primary-orange);
-  box-shadow: 0 0 15px rgba(249, 115, 22, 0.15);
-  outline: none;
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
 }
 
-.premium-card {
-  position: relative;
-  background: rgba(13, 13, 23, 0.65);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 1.25rem;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
-}
-.premium-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 1.25rem;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-.premium-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(249, 115, 22, 0.2);
-  box-shadow: 
-    0 12px 40px -10px rgba(0,0,0,0.5),
-    0 0 25px rgba(249, 115, 22, 0.05);
+@keyframes equalizer {
+  0%, 100% { height: 20%; }
+  50% { height: 95%; }
 }
 
-/* Custom Glow Effects */
-.orange-glow {
-  box-shadow: 0 0 30px var(--primary-orange-glow);
-}
-
-.cyan-glow {
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.25);
-}
-
-.glow-ambient-orange {
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  background: var(--primary-orange);
-  filter: blur(100px);
-  opacity: 0.15;
-  pointer-events: none;
-  border-radius: 9999px;
-}
-
-.glow-ambient-cyan {
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  background: var(--accent-cyan);
-  filter: blur(100px);
-  opacity: 0.15;
-  pointer-events: none;
-  border-radius: 9999px;
-}
-
-/* Gradients and Typography */
-.gradient-text-orange {
-  background: linear-gradient(135deg, #F97316 0%, #D946EF 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.gradient-text-cyan {
-  background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Animated Grid scan for dropzones */
-.scanning-grid {
-  background-image: 
-    linear-gradient(rgba(249, 115, 22, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(249, 115, 22, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-  position: relative;
-  overflow: hidden;
-}
-.scanning-grid::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: -100%;
-  left: 0;
-  background: linear-gradient(to bottom, transparent, rgba(249, 115, 22, 0.1) 50%, transparent);
-  animation: scan 3s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes scan {
-  0% { top: -100%; }
-  100% { top: 100%; }
-}
-
-/* Study mode custom progress circles */
-.progress-ring__circle {
-  transition: stroke-dashoffset 0.35s;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-}
-
-/* 3D Card Flipping */
-.flashcard-container {
-  perspective: 1000px;
-}
-.flashcard-inner {
-  position: relative;
-  width: 100%;
-  height: 280px;
-  text-align: center;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-.flashcard-flipped {
-  transform: rotateY(180deg);
-}
-.flashcard-front, .flashcard-back {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 2rem;
-  border-radius: 1.25rem;
-}
-.flashcard-back {
-  transform: rotateY(180deg);
-}
+.animate-equalizer-1 { animation: equalizer 0.8s ease-in-out infinite; }
+.animate-equalizer-2 { animation: equalizer 1.1s ease-in-out infinite 0.2s; }
+.animate-equalizer-3 { animation: equalizer 0.6s ease-in-out infinite 0.4s; }
+.animate-equalizer-4 { animation: equalizer 1.3s ease-in-out infinite 0.1s; }
+.animate-equalizer-5 { animation: equalizer 0.9s ease-in-out infinite 0.3s; }

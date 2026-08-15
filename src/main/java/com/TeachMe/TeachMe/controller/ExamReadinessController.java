@@ -3,6 +3,7 @@ package com.TeachMe.TeachMe.controller;
 import com.TeachMe.TeachMe.service.AuthService;
 import com.TeachMe.TeachMe.service.ExamReadinessService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ public class ExamReadinessController {
 
     @GetMapping("/calculate/{documentId}")
     @Operation(summary = "Calculate AI Exam Readiness", description = "Calculates preparedness score (0-100%) and targeted review recommendations")
+    @ApiResponse(responseCode = "200", description = "Exam readiness calculated successfully")
+    @ApiResponse(responseCode = "404", description = "Document not found")
     public ResponseEntity<Map<String, Object>> calculateReadiness(@PathVariable Long documentId) {
         Long userId = authService.getAuthenticatedUserId();
         return ResponseEntity.ok(examReadinessService.calculateReadiness(documentId, userId));

@@ -1,86 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AppShell } from './components/layout/AppShell';
-import { LandingView } from './pages/LandingView';
-import { LoginView } from './pages/LoginView';
-import { RegisterView } from './pages/RegisterView';
-import { DashboardView } from './pages/DashboardView';
-import { DocumentsView } from './pages/DocumentsView';
-import { ChatView } from './pages/ChatView';
-import { StudyView } from './pages/StudyView';
-import { SettingsView } from './pages/SettingsView';
-import { authApi, getAuthToken } from './lib/apiClient';
+import { useState } from 'react';
+import { Navbar } from './components/layout/Navbar';
+import { HeroSection } from './components/hero/HeroSection';
+import { ArchitectureWorkflowSection } from './components/features/ArchitectureWorkflowSection';
+import { InteractiveKnowledgeGraphSection } from './components/features/InteractiveKnowledgeGraphSection';
+import { HybridSearchSection } from './components/features/HybridSearchSection';
+import { ObservabilitySection } from './components/features/ObservabilitySection';
+import { ReliabilityCodeSection } from './components/features/ReliabilityCodeSection';
+import { StudyPlanOutlineSection } from './components/features/StudyPlanOutlineSection';
+import { GroupWorkspaceSection } from './components/features/GroupWorkspaceSection';
+import { TechStackStrip } from './components/features/TechStackStrip';
+import { RealtimeStreamsSection } from './components/features/RealtimeStreamsSection';
+import { RuntimeGridSection } from './components/features/RuntimeGridSection';
+import { FeatureShowcaseSection } from './components/features/FeatureShowcaseSection';
+import { TestimonialsSection } from './components/social/TestimonialsSection';
+import { StatsSection } from './components/social/StatsSection';
+import { Footer } from './components/layout/Footer';
+import { TeachMeStudioModal } from './components/interactive/TeachMeStudioModal';
+import { AuthModal } from './components/auth/AuthModal';
 
 export function App() {
-  const [user, setUser] = useState<{ email: string; name: string } | null>(() => {
-    const token = getAuthToken();
-    if (token) {
-      return { email: 'student@teachme.ai', name: 'Academic Student' };
-    }
-    return null;
-  });
+  const [studioOpen, setStudioOpen] = useState(false);
+  const [studioTab, setStudioTab] = useState('chat');
+  const [authOpen, setAuthOpen] = useState(false);
 
-  useEffect(() => {
-    const token = getAuthToken();
-    if (!token) return;
-
-    authApi.getProfile()
-      .then((profile) => {
-        if (profile) {
-          setUser(profile);
-        }
-      })
-      .catch(() => {
-        setUser({ email: 'student@teachme.ai', name: 'Academic Student' });
-      });
-  }, []);
-
-  const handleLoginSuccess = (userObj: { email: string; name: string }) => {
-    setUser(userObj);
+  const handleOpenStudio = (tab = 'chat') => {
+    setStudioTab(tab);
+    setStudioOpen(true);
   };
-
-  const handleLogout = async () => {
-    await authApi.logout();
-    setUser(null);
-  };
-
-  const guestUser = user || { email: 'guest@teachme.ai', name: 'Academic Student' };
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Landing View */}
-        <Route path="/landing" element={<LandingView onExploreDemo={() => setUser(guestUser)} />} />
+    <div className="min-h-screen bg-[#1c1e21] text-[#e5e7eb] flex flex-col font-['Geist'] selection:bg-[#a8ff53] selection:text-[#121317]">
+      {/* Sticky Header Bar */}
+      <Navbar
+        onOpenStudio={handleOpenStudio}
+        onOpenAuth={() => setAuthOpen(true)}
+      />
 
-        {/* Auth Routes */}
-        <Route
-          path="/login"
-          element={
-            user ? <Navigate to="/dashboard" replace /> : <LoginView onLoginSuccess={handleLoginSuccess} />
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            user ? <Navigate to="/dashboard" replace /> : <RegisterView onLoginSuccess={handleLoginSuccess} />
-          }
-        />
+      {/* Main Content Sections */}
+      <main className="flex-1">
+        {/* 1. Hero Section with Glow, Interactive Filter Pills & Code Editor */}
+        <HeroSection onOpenStudio={handleOpenStudio} />
 
-        {/* App Routes enclosed in AppShell layout */}
-        <Route
-          path="/"
-          element={<AppShell user={guestUser} onLogout={handleLogout} />}
-        >
-          <Route path="dashboard" element={<DashboardView />} />
-          <Route path="documents" element={<DocumentsView />} />
-          <Route path="chat" element={<ChatView />} />
-          <Route path="study" element={<StudyView />} />
-          <Route path="settings" element={<SettingsView />} />
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        {/* 2. Architecture & Workflows (4 Flow Cards: Agent, Chaining, Routing, Parallelization) */}
+        <ArchitectureWorkflowSection onOpenStudio={() => handleOpenStudio('documents')} />
+
+        {/* 3. Interactive Concept Knowledge Graph (Vector Graph Reasoning) */}
+        <InteractiveKnowledgeGraphSection onOpenStudio={handleOpenStudio} />
+
+        {/* 4. Hybrid Vector Search & Cross-Encoder Re-Ranking */}
+        <HybridSearchSection onOpenStudio={handleOpenStudio} />
+
+        {/* 5. Task Queue & Live Observability Monitor */}
+        <ObservabilitySection />
+
+        {/* 6. Reliability & Step Checkpointing Code Viewer */}
+        <ReliabilityCodeSection />
+
+        {/* 7. Adaptive Study Roadmaps & Cornell Lecture Outlines */}
+        <StudyPlanOutlineSection onOpenStudio={handleOpenStudio} />
+
+        {/* 8. Collaborative Multiplayer Study Rooms & Anki Deck Sync */}
+        <GroupWorkspaceSection onOpenStudio={handleOpenStudio} />
+
+        {/* 9. Technology Stack Logo Strip */}
+        <TechStackStrip />
+
+        {/* 10. Realtime Streaming & Chat UI Demo */}
+        <RealtimeStreamsSection onOpenStudio={handleOpenStudio} />
+
+        {/* 11. Developer Runtime Grid (6 Cards) */}
+        <RuntimeGridSection />
+
+        {/* 12. Core TeachMe AI Engines (Quiz, SM-2, Map-Reduce, Podcast) */}
+        <FeatureShowcaseSection onOpenStudio={handleOpenStudio} />
+
+        {/* 13. Developer Testimonials */}
+        <TestimonialsSection />
+
+        {/* 14. Metrics & Social Proof */}
+        <StatsSection />
+      </main>
+
+      {/* Footer & Pre-Footer Banner */}
+      <Footer onOpenStudio={() => handleOpenStudio('documents')} />
+
+      {/* Interactive TeachMe Studio Modal (Reflecting Spring Boot Backend) */}
+      <TeachMeStudioModal
+        isOpen={studioOpen}
+        onClose={() => setStudioOpen(false)}
+        initialTab={studioTab}
+      />
+
+      {/* Authentication Modal (JWT Login & Registration) */}
+      <AuthModal
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onSuccess={() => handleOpenStudio('documents')}
+      />
+    </div>
   );
 }
 

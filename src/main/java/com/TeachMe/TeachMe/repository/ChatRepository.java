@@ -43,7 +43,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     Page<Chat> findBySessionIdOrderByCreatedAtDesc(String sessionId, Pageable pageable);
 
-    Page<Chat> findBySessionIdAndUserIdOrderByCreatedAtDesc(String sessionId, Pageable pageable);
+    Page<Chat> findBySessionIdAndUserIdOrderByCreatedAtDesc(String sessionId, Long userId, Pageable pageable);
 
     @Query("SELECT c FROM Chat c WHERE c.user.id = :userId AND (LOWER(c.question) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(c.answer) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     Page<Chat> searchByUserIdAndTerm(@Param("userId") Long userId, @Param("searchTerm") String searchTerm, Pageable pageable);

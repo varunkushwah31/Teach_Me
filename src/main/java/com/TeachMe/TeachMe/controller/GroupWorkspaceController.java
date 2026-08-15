@@ -3,6 +3,7 @@ package com.TeachMe.TeachMe.controller;
 import com.TeachMe.TeachMe.service.AuthService;
 import com.TeachMe.TeachMe.service.GroupWorkspaceService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ public class GroupWorkspaceController {
 
     @PostMapping("/create")
     @Operation(summary = "Create Group Workspace", description = "Creates a new shared study workspace for collaborating on course documents")
+    @ApiResponse(responseCode = "200", description = "Workspace created successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
     public ResponseEntity<Map<String, Object>> createWorkspace(
             @RequestParam String name,
             @RequestParam(defaultValue = "Study Group Workspace") String description) {
@@ -30,6 +33,9 @@ public class GroupWorkspaceController {
 
     @PostMapping("/{workspaceId}/share/{documentId}")
     @Operation(summary = "Share Document with Workspace", description = "Shares document vector indices with all members of a study workspace")
+    @ApiResponse(responseCode = "200", description = "Document shared successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "404", description = "Workspace or document not found")
     public ResponseEntity<Map<String, Object>> shareDocument(
             @PathVariable Long workspaceId,
             @PathVariable Long documentId) {

@@ -4,6 +4,9 @@ import com.TeachMe.TeachMe.dto.DocumentAnalyticsDTO;
 import com.TeachMe.TeachMe.entity.User;
 import com.TeachMe.TeachMe.repository.DocumentRepository;
 import com.TeachMe.TeachMe.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -20,6 +23,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/documents")
 @RequiredArgsConstructor
+@Tag(name = "Document Analytics", description = "Endpoints for document metadata extraction, readability analysis, and keyword extraction.")
 public class DocumentAnalyticsController {
 
     private final DocumentRepository documentRepository;
@@ -27,6 +31,10 @@ public class DocumentAnalyticsController {
     private final UserRepository userRepository;
 
     @GetMapping("/{documentId}/analytics")
+    @Operation(summary = "Get document analytics", description = "Computes word count, reading time, readability grade level, and top keywords for a document.")
+    @ApiResponse(responseCode = "200", description = "Document analytics retrieved successfully")
+    @ApiResponse(responseCode = "403", description = "Access denied: Document not owned by user")
+    @ApiResponse(responseCode = "404", description = "Document not found")
     public ResponseEntity<DocumentAnalyticsDTO> getDocumentAnalytics(
             @PathVariable Long documentId,
             @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -68,6 +76,7 @@ public class DocumentAnalyticsController {
         return ResponseEntity.ok(dto);
     }
 
+    // Private helper methods...
     private String calculateFleschKincaid(List<Document> chunks) {
         if (chunks.isEmpty()) return "Grade 10 (High School)";
         long sentenceCount = 0;
