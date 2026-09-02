@@ -1,0 +1,6 @@
+# BuildKit cache directories
+**/.m2
+**/node_modules
+**/target
+frontend/dist
+.docker

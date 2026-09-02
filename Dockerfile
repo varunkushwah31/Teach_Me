@@ -1,25 +1,46 @@
-# Stage 1: Build the application
-FROM maven:3.9-eclipse-temurin-25 AS build
+# Optimized Dockerfile for TeachMe Backend (Spring Boot) - Render Deployment
+# Build Backend with Maven
+FROM maven:3.9.9-eclipse-temurin-21 AS backend-builder
+
 WORKDIR /app
 
-# 1. Copy ONLY the pom.xml first
+# Copy Maven wrapper and pom.xml first for dependency caching
+COPY mvnw .
+COPY mvnw.cmd .
+COPY .mvn .mvn
 COPY pom.xml .
 
-# 2. Download all dependencies (Docker will cache this massive layer!)
-RUN mvn dependency:go-offline
+# Download dependencies (cached layer)
+RUN --mount=type=cache,target=/root/.m2 \
+    ./mvnw dependency:go-offline -B
 
-# 3. NOW copy your source code
+# Copy source and build
 COPY src ./src
+RUN --mount=type=cache,target=/root/.m2 \
+    ./mvnw package -DskipTests -B
 
+# Final Runtime Image
+FROM eclipse-temurin:21-jre-alpine
 
-# 4. Compile the application using the cached dependencies
-RUN mvn clean package -DskipTests
-
-# Stage 2: Create the production image
-FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
-RUN addgroup -g 1000 -S appgroup && adduser -u 1000 -S appuser -G appgroup
-COPY --from=build /app/target/TeachMe-0.0.1-SNAPSHOT.jar app.jar
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+# Create non-root user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+# Copy built JAR from backend builder
+COPY --from=backend-builder /app/target/*.jar app.jar
+
+# Change ownership
+RUN chown -R appuser:appgroup /app
+
 USER appuser
+
 EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

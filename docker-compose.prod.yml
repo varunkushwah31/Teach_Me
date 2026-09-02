@@ -1,3 +1,7 @@
+# Production Docker Compose - Self-hosted with Ollama
+# Use this for VPS / Cloud VM deployment (not Render/Vercel)
+# Run: docker-compose -f docker-compose.prod.yml up -d
+
 version: '3.8'
 
 services:
@@ -6,12 +10,10 @@ services:
     container_name: teachme-db
     environment:
       - POSTGRES_USER=springai
-      - POSTGRES_PASSWORD=secret
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=vectordb
-    ports:
-      - "5433:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U springai -d vectordb"]
@@ -19,30 +21,33 @@ services:
       timeout: 5s
       retries: 5
 
-  # Local AI Engine (Ollama)
+  # Ollama - Self-hosted LLM
+  # For production, consider:
+  # 1. Dedicated GPU instance (RunPod, Lambda Labs, vast.ai)
+  # 2. Ollama Cloud (when available)
+  # 3. Managed LLM APIs (OpenAI, Anthropic, Groq) - update Spring AI config
   ollama:
     image: ollama/ollama:latest
     container_name: teachme-ollama
     ports:
       - "11434:11434"
     volumes:
-       - D:/Ollama:/root/.ollama
+      - ollama_data:/root/.ollama
     deploy:
-       resources:
-         reservations:
-           devices:
-             - driver: nvidia
-               count: 1
-               capabilities: [gpu]
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 120s
 
-  # Spring Boot Backend
   backend:
     build:
       context: .
@@ -53,10 +58,11 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/vectordb
       - SPRING_DATASOURCE_USERNAME=springai
-      - SPRING_DATASOURCE_PASSWORD=secret
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - SPRING_AI_OLLAMA_BASE_URL=http://ollama:11434
-      - JWT_SECRET_KEY=92f32d34fbc9ea47b621ff2fba4259439dd57b41077d75a3c5a5b9b892b61311
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SPRING_PROFILES_ACTIVE=docker
+      - CORS_ALLOWED_ORIGINS=https://your-domain.com
     depends_on:
       postgres:
         condition: service_healthy
@@ -70,14 +76,14 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend (Nginx + React) - Local Development
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: teachme-frontend
     ports:
-      - "5173:80"
+      - "80:80"
+      - "443:443"
     depends_on:
       - backend
     restart: always
@@ -86,3 +92,22 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  # Optional: Reverse proxy with SSL (Traefik/Caddy)
+  # Uncomment and configure for production HTTPS
+  # proxy:
+  #   image: traefik:v3.0
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - ./traefik.yml:/etc/traefik/traefik.yml:ro
+  #     - ./acme.json:/acme.json
+  #   depends_on:
+  #     - frontend
+  #     - backend
+
+volumes:
+  postgres_data:
+  ollama_data:

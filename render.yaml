@@ -1,0 +1,42 @@
+# Render Deployment: Backend (Spring Boot) - render.yaml
+# Place this file in your repo root for Render to auto-detect
+
+services:
+  - type: web
+    name: teachme-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: teachme-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: teachme-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: teachme-db
+          property: password
+      - key: SPRING_AI_OLLAMA_BASE_URL
+        value: "https://your-ollama-host:11434"  # Replace with actual Ollama URL
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: SPRING_PROFILES_ACTIVE
+        value: docker
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://your-vercel-app.vercel.app"
+
+databases:
+  - name: teachme-db
+    databaseName: vectordb
+    user: springai
+    plan: free
+    region: oregon
+    # pgvector extension needs to be enabled
+    # Render PostgreSQL supports pgvector by default

@@ -1,0 +1,94 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  application:
+    name: TeachMe
+
+  servlet:
+    multipart:
+      max-file-size: 8388608
+      max-request-size: 8388608
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/vectordb}
+    username: ${SPRING_DATASOURCE_USERNAME:springai}
+    password: ${SPRING_DATASOURCE_PASSWORD:secret}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 5000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          fetch_size: 50
+          batch_size: 10
+        order_inserts: true
+        order_updates: true
+    show-sql: false
+    open-in-view: false
+
+  ai:
+    ollama:
+      base-url: ${SPRING_AI_OLLAMA_BASE_URL:http://ollama:11434}
+      chat:
+        model: deepseek-r1:8b
+        keep-alive: 0m
+        num-ctx: 8192
+      embedding:
+        model: nomic-embed-text
+        keep-alive: 0m
+
+    vectorstore:
+      pgvector:
+        dimensions: 768
+        distance-type: COSINE_DISTANCE
+        index-type: HNSW
+        initialize-schema: true
+
+server:
+  port: 8081
+  tomcat:
+    connection-timeout: 10000ms
+    keep-alive-timeout: 60000ms
+    max-http-form-post-size: 10MB
+  max-http-request-header-size: 16KB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus,metrics"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: TeachMe-RAG-Engine
+
+info:
+  app:
+    name: "TeachMe AI Backend"
+    description: "Enterprise RAG Pipeline"
+    version: "1.0.0"
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: 86400000
+      refresh-token-expiration: 604800000
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
