@@ -1,9 +1,5 @@
 # Production Docker Compose - Self-hosted with Ollama
 # Use this for VPS / Cloud VM deployment (not Render/Vercel)
-# Run: docker-compose -f docker-compose.prod.yml up -d
-
-version: '3.8'
-
 services:
   postgres:
     image: pgvector/pgvector:pg16
@@ -42,11 +38,11 @@ services:
               capabilities: [gpu]
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 120s
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   backend:
     build:
@@ -88,7 +84,7 @@ services:
       - backend
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

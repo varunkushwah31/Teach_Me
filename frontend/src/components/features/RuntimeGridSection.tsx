@@ -1,5 +1,12 @@
 import React from 'react';
-import { Bot, Database, Sparkles, Layers, Volume2, Sliders } from 'lucide-react';
+import {
+  RobotIcon,
+  DatabaseIcon,
+  SparkleIcon,
+  StackIcon,
+  SpeakerHighIcon,
+  SlidersIcon
+} from '@phosphor-icons/react';
 
 interface RuntimeCard {
   title: string;
@@ -13,42 +20,42 @@ const RUNTIME_CARDS: RuntimeCard[] = [
   {
     title: 'Local Ollama & GGUF Models',
     category: 'Private Inference',
-    icon: <Sliders className="w-4 h-4" />,
+    icon: <SlidersIcon className="w-4 h-4" />,
     iconColor: '#a8ff53', // Signal Lime
     description: 'Run quantized Llama 3.3 and DeepSeek R1 locally on your workstation with zero cloud token costs and 100% data privacy.'
   },
   {
     title: 'Spring AI & PgVector Store',
     category: 'Vector Database',
-    icon: <Database className="w-4 h-4" />,
+    icon: <DatabaseIcon className="w-4 h-4" />,
     iconColor: '#e5e7eb', // Bone Text
     description: 'High-dimensional vector storage with PostgreSQL HNSW indexing, delivering sub-50ms cosine similarity queries.'
   },
   {
     title: 'SuperMemo-2 (SM-2) Memory',
     category: 'Cognitive Science',
-    icon: <Layers className="w-4 h-4" />,
+    icon: <StackIcon className="w-4 h-4" />,
     iconColor: '#fa3abf', // Syntax Pink
     description: 'Adaptive spaced repetition algorithm that dynamically calculates Ease Factors and expands review intervals for long-term retention.'
   },
   {
     title: 'Bloom Cognitive Auto-Quiz',
     category: 'Assessment Engine',
-    icon: <Bot className="w-4 h-4" />,
+    icon: <RobotIcon className="w-4 h-4" />,
     iconColor: '#9c9af2', // Syntax Violet
     description: 'Generates 5-question multiple choice diagnostic tests from document vectors, complete with instant grading and chapter citations.'
   },
   {
     title: 'Distributed Map-Reduce Summaries',
     category: 'Synthesis Pipeline',
-    icon: <Sparkles className="w-4 h-4" />,
+    icon: <SparkleIcon className="w-4 h-4" />,
     iconColor: '#afec73', // Loop Green
     description: 'Parallel MAP chunk analysis synthesized through REDUCE into executive 300-word briefs for 100+ page textbook PDFs.'
   },
   {
     title: '2-Speaker AI Podcast Generator',
     category: 'Audio Learning',
-    icon: <Volume2 className="w-4 h-4" />,
+    icon: <SpeakerHighIcon className="w-4 h-4" />,
     iconColor: '#d9f07c', // Key Lime
     description: 'Converts dense study material into engaging 2-host conversational dialogues (Alex & Maya) with simulated audio waveform playback.'
   }
@@ -57,10 +64,10 @@ const RUNTIME_CARDS: RuntimeCard[] = [
 export const RuntimeGridSection: React.FC = () => {
   return (
     <section className="py-24 border-t border-[#272a2e] bg-[#1c1e21]">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="mb-14 max-w-[700px]">
+        <div className="mb-14 max-w-175">
           <div className="inline-flex items-center gap-1.5 text-[#a8ff53] font-['Geist_Mono'] text-[13px] font-medium mb-3">
             <span>Built for Academic Mastery</span>
           </div>
@@ -76,10 +83,10 @@ export const RuntimeGridSection: React.FC = () => {
 
         {/* 6-Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {RUNTIME_CARDS.map((card, idx) => (
+          {RUNTIME_CARDS.map((card) => (
             <div
-              key={idx}
-              className="bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-[4px] p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-xl group"
+              key={card.title}
+              className="bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-sm p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-xl group"
             >
               <div>
                 {/* Header Row: Category Badge & Icon */}
@@ -88,7 +95,7 @@ export const RuntimeGridSection: React.FC = () => {
                     {card.category}
                   </span>
                   <div
-                    className="w-7 h-7 rounded-[4px] bg-[#1c1e21] border border-[#272a2e] flex items-center justify-center transition-colors group-hover:border-[#3b3e45]"
+                    className="w-7 h-7 rounded-sm bg-[#1c1e21] border border-[#272a2e] flex items-center justify-center transition-colors group-hover:border-[#3b3e45]"
                     style={{ color: card.iconColor }}
                   >
                     {card.icon}

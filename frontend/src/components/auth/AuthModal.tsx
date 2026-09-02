@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
-import { Lock, Mail, ArrowRight, Check, AlertCircle, Sparkles, ShieldCheck, Eye, EyeOff } from 'lucide-react';
-import { TeachMeAPI } from '../../services/teachMeService';
+import {
+  LockIcon,
+  EnvelopeIcon,
+  ArrowRightIcon,
+  CheckIcon,
+  WarningCircleIcon,
+  SparkleIcon,
+  ShieldCheckIcon,
+  EyeIcon,
+  EyeSlashIcon
+} from '@phosphor-icons/react';
+import { TeachMeAPI } from '@/services/teachMeService.ts';
 import {
   Dialog,
   DialogContent,
@@ -27,7 +37,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage(null);
@@ -67,10 +77,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[460px] p-0 overflow-hidden bg-[#121317] border-[#3b3e45] shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+      <DialogContent className="max-w-115 p-0 overflow-hidden bg-[#121317] border-[#3b3e45] shadow-[0_0_50px_rgba(0,0,0,0.8)]">
         
         {/* Top Terminal Header Glow */}
-        <div className="p-6 pb-4 border-b border-[#272a2e] bg-gradient-to-b from-[#1c1e21] to-[#121317]">
+        <div className="p-6 pb-4 border-b border-[#272a2e] bg-linear-to-b from-[#1c1e21] to-[#121317]">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded flex items-center justify-center bg-[#1c1e21] border border-[#3b3e45]">
@@ -116,9 +126,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
             </TabsList>
 
             {/* Quick Demo Credentials Bar */}
-            <div className="flex items-center justify-between mt-3 px-3 py-2 bg-[#1c1e21]/70 border border-[#272a2e] rounded-[4px] text-[12px]">
+            <div className="flex items-center justify-between mt-3 px-3 py-2 bg-[#1c1e21]/70 border border-[#272a2e] rounded-sm text-[12px]">
               <span className="text-[#878c99] font-['Geist_Mono'] flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#a8ff53]" /> One-click Demo:
+                <SparkleIcon className="w-3.5 h-3.5 text-[#a8ff53]" /> One-click Demo:
               </span>
               <div className="flex items-center gap-1.5">
                 <button
@@ -140,40 +150,41 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
 
             {/* Alert Messages */}
             {errorMessage && (
-              <div className="mt-3 p-3 bg-[#f43f5e]/15 border border-[#f43f5e]/40 rounded-[4px] text-[12.5px] text-[#f43f5e] flex items-center gap-2 font-['Geist']">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="mt-3 p-3 bg-[#f43f5e]/15 border border-[#f43f5e]/40 rounded-sm text-[12.5px] text-[#f43f5e] flex items-center gap-2 font-['Geist']">
+                <WarningCircleIcon className="w-4 h-4 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
             )}
 
             {successMessage && (
-              <div className="mt-3 p-3 bg-[#a8ff53]/15 border border-[#a8ff53]/40 rounded-[4px] text-[12.5px] text-[#a8ff53] flex items-center gap-2 font-['Geist_Mono']">
-                <Check className="w-4 h-4 shrink-0" />
+              <div className="mt-3 p-3 bg-[#a8ff53]/15 border border-[#a8ff53]/40 rounded-sm text-[12.5px] text-[#a8ff53] flex items-center gap-2 font-['Geist_Mono']">
+                <CheckIcon className="w-4 h-4 shrink-0" />
                 <span>{successMessage}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-3.5 mt-4">
               <div>
-                <label className="block text-[12.5px] font-medium text-[#d7d9dd] mb-1.5 font-['Geist']">
+                <label htmlFor="auth-email" className="block text-[12.5px] font-medium text-[#d7d9dd] mb-1.5 font-['Geist'] cursor-pointer">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-[#878c99] absolute left-3 top-2.5" />
+                  <EnvelopeIcon className="w-4 h-4 text-[#878c99] absolute left-3 top-2.5" />
                   <Input
+                    id="auth-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="student@teachme.ai"
                     required
-                    className="pl-9 bg-[#1c1e21] border-[#272a2e] text-[#e5e7eb] focus-visible:border-[#a8ff53]"
+                    className="pl-9 bg-[#1c1e21] border-[#272a2e] text-[#e5e7eb]"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-[12.5px] font-medium text-[#d7d9dd] font-['Geist']">
+                  <label htmlFor="auth-password" className="text-[12.5px] font-medium text-[#d7d9dd] font-['Geist'] cursor-pointer">
                     Password
                   </label>
                   {activeTab === 'login' && (
@@ -183,21 +194,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
                   )}
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-[#878c99] absolute left-3 top-2.5" />
+                  <LockIcon className="w-4 h-4 text-[#878c99] absolute left-3 top-2.5" />
                   <Input
+                    id="auth-password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
                     required
-                    className="pl-9 pr-9 bg-[#1c1e21] border-[#272a2e] text-[#e5e7eb] focus-visible:border-[#a8ff53]"
+                    className="pl-9 pr-9 bg-[#1c1e21] border-[#272a2e] text-[#e5e7eb]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-2.5 text-[#878c99] hover:text-[#e5e7eb] cursor-pointer"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -206,10 +218,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2.5 mt-2 bg-[#a8ff53] hover:bg-[#b8ff70] active:scale-[0.99] text-[#121317] font-['Geist'] font-medium text-[14px] rounded-[4px] shadow-[inset_0_0_0_1px_rgba(168,255,83,0.4),0_0_20px_rgba(168,255,83,0.15)] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-2.5 mt-2 bg-[#a8ff53] hover:bg-[#b8ff70] active:scale-[0.99] text-[#121317] font-['Geist'] font-medium text-[14px] rounded-sm shadow-[inset_0_0_0_1px_rgba(168,255,83,0.4),0_0_20px_rgba(168,255,83,0.15)] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <span>{activeTab === 'register' ? 'Create Account & Sign In' : 'Sign In with JWT'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRightIcon className="w-4 h-4" />
               </button>
             </form>
 
@@ -221,7 +233,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         {/* OAuth & Security Footer */}
         <div className="p-4 bg-[#15171c] border-t border-[#272a2e] mt-4 flex items-center justify-between text-[11.5px] text-[#878c99] font-['Geist_Mono']">
           <div className="flex items-center gap-1.5 text-[#878c99]">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#a8ff53]" />
+            <ShieldCheckIcon className="w-3.5 h-3.5 text-[#a8ff53]" />
             <span>BCrypt Encrypted (12 Rounds)</span>
           </div>
           <span>PostgreSQL State</span>

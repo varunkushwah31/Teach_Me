@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Database, ArrowRight } from 'lucide-react';
-import type { SearchResultChunkDTO } from '../../types/backend';
+import { MagnifyingGlassIcon, DatabaseIcon, ArrowRightIcon } from '@phosphor-icons/react';
+import type { SearchResultChunkDTO } from '@/types/backend.ts';
 
 interface HybridSearchSectionProps {
   onOpenStudio?: (tab?: string) => void;
@@ -58,19 +58,19 @@ export const HybridSearchSection: React.FC<HybridSearchSectionProps> = ({ onOpen
 
   return (
     <section id="search" className="py-24 border-t border-[#272a2e] bg-[#1c1e21] font-['Geist']">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
             <div className="inline-flex items-center gap-1.5 text-[#a8ff53] font-['Geist_Mono'] text-[13px] font-medium mb-3">
-              <Database className="w-3.5 h-3.5" />
+              <DatabaseIcon className="w-3.5 h-3.5" />
               <span>Sub-50ms PgVector Semantic Retrieval</span>
             </div>
             <h2 className="font-['Satoshi'] font-bold text-[32px] sm:text-[38px] text-[#e5e7eb] mb-3">
               Instant Concept Search Across All Course Materials
             </h2>
-            <p className="text-[15px] sm:text-[16px] text-[#878c99] max-w-[620px] leading-[1.58]">
+            <p className="text-[15px] sm:text-[16px] text-[#878c99] max-w-155 leading-[1.58]">
               TeachMe indexes your textbooks in PgVector with HNSW cosine distance search, instantly locating exact formulas, case precedents, and diagrams in milliseconds.
             </p>
           </div>
@@ -80,23 +80,23 @@ export const HybridSearchSection: React.FC<HybridSearchSectionProps> = ({ onOpen
             className="group inline-flex items-center gap-1.5 text-[14px] text-[#a8ff53] hover:underline cursor-pointer mt-4 md:mt-0"
           >
             <span>Search in Studio</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
 
         {/* Search Interactive Window */}
-        <div className="bg-[#121317] border border-[#272a2e] rounded-[4px] p-6 shadow-2xl space-y-6">
+        <div className="bg-[#121317] border border-[#272a2e] rounded-sm p-6 shadow-2xl space-y-6">
           
           {/* Query Bar */}
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <div className="relative flex-1 w-full">
-              <Search className="w-4 h-4 text-[#878c99] absolute left-3 top-3" />
+              <MagnifyingGlassIcon className="w-4 h-4 text-[#878c99] absolute left-3 top-3" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search across all uploaded textbook chunks..."
-                className="w-full bg-[#1c1e21] border border-[#272a2e] rounded-[4px] pl-9 pr-4 py-2 text-[14px] text-[#e5e7eb] focus:outline-none focus:border-[#a8ff53]"
+                className="w-full bg-[#1c1e21] border border-[#272a2e] rounded-sm pl-9 pr-4 py-2 text-[14px] text-[#e5e7eb] focus:outline-none"
               />
             </div>
           </div>
@@ -108,7 +108,7 @@ export const HybridSearchSection: React.FC<HybridSearchSectionProps> = ({ onOpen
               <button
                 key={q}
                 onClick={() => handleSelectQuery(q)}
-                className={`px-2.5 py-1 rounded-[4px] border font-['Geist_Mono'] transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-sm border font-['Geist_Mono'] transition-colors cursor-pointer ${
                   query === q
                     ? 'bg-[#a8ff53] text-[#121317] font-semibold border-[#a8ff53]'
                     : 'bg-[#1c1e21] border-[#272a2e] text-[#d7d9dd] hover:border-[#3b3e45]'
@@ -124,7 +124,7 @@ export const HybridSearchSection: React.FC<HybridSearchSectionProps> = ({ onOpen
             {results.map((res) => (
               <div
                 key={res.chunkId}
-                className="p-4 bg-[#1c1e21] border border-[#272a2e] rounded-[4px] space-y-2 hover:border-[#3b3e45] transition-colors"
+                className="p-4 bg-[#1c1e21] border border-[#272a2e] rounded-sm space-y-2 hover:border-[#3b3e45] transition-colors"
               >
                 <div className="flex items-center justify-between text-[12px] font-['Geist_Mono']">
                   <div className="flex items-center gap-2">

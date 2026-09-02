@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { Calendar, CheckCircle2, Download, Clock, ArrowRight } from 'lucide-react';
-import { TeachMeAPI } from '../../services/teachMeService';
-import type { StudyPlanDTO, NoteOutlineDTO } from '../../types/backend';
+import {
+  CalendarIcon,
+  CheckCircleIcon,
+  DownloadSimpleIcon,
+  ClockIcon,
+  ArrowRightIcon
+} from '@phosphor-icons/react';
+import { TeachMeAPI } from '@/services/teachMeService.ts';
+import type { StudyPlanDTO, NoteOutlineDTO } from '@/types/backend.ts';
 
 interface StudyPlanOutlineSectionProps {
   onOpenStudio?: (tab?: string) => void;
@@ -85,19 +91,19 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
 
   return (
     <section id="study-plans" className="py-24 border-t border-[#272a2e] bg-[#1c1e21] font-['Geist']">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
             <div className="inline-flex items-center gap-1.5 text-[#d9f07c] font-['Geist_Mono'] text-[13px] font-medium mb-3">
-              <Calendar className="w-3.5 h-3.5" />
+              <CalendarIcon className="w-3.5 h-3.5" />
               <span>Personalized Study Roadmaps</span>
             </div>
             <h2 className="font-['Satoshi'] font-bold text-[32px] sm:text-[38px] text-[#e5e7eb] mb-3">
               Day-by-Day Study Plans & Cornell Lecture Outlines
             </h2>
-            <p className="text-[15px] sm:text-[16px] text-[#878c99] max-w-[620px] leading-[1.58]">
+            <p className="text-[15px] sm:text-[16px] text-[#878c99] max-w-155 leading-[1.58]">
               TeachMe synthesizes your course syllabus and textbook chapters into daily milestone schedules, key formulas, and Cornell lecture notes.
             </p>
           </div>
@@ -105,7 +111,7 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
           <div className="flex items-center gap-2 mt-4 md:mt-0">
             <button
               onClick={() => setActiveView('plan')}
-              className={`px-3 py-1.5 rounded-[4px] text-[13px] transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 rounded-sm text-[13px] transition-colors cursor-pointer ${
                 activeView === 'plan'
                   ? 'bg-[#272a2e] text-[#a8ff53] font-medium border border-[#3b3e45]'
                   : 'text-[#878c99] hover:text-[#e5e7eb]'
@@ -115,7 +121,7 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
             </button>
             <button
               onClick={() => setActiveView('outline')}
-              className={`px-3 py-1.5 rounded-[4px] text-[13px] transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 rounded-sm text-[13px] transition-colors cursor-pointer ${
                 activeView === 'outline'
                   ? 'bg-[#272a2e] text-[#a8ff53] font-medium border border-[#3b3e45]'
                   : 'text-[#878c99] hover:text-[#e5e7eb]'
@@ -127,7 +133,7 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
         </div>
 
         {/* Content Box */}
-        <div className="bg-[#121317] border border-[#272a2e] rounded-[4px] p-6 sm:p-8 shadow-2xl">
+        <div className="bg-[#121317] border border-[#272a2e] rounded-sm p-6 sm:p-8 shadow-2xl">
           
           {/* VIEW 1: Day-by-Day Study Plan */}
           {activeView === 'plan' && (
@@ -147,7 +153,7 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
                   className="inline-flex items-center gap-1.5 text-[13px] text-[#a8ff53] hover:underline cursor-pointer"
                 >
                   <span>Check Exam Readiness</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRightIcon className="w-3.5 h-3.5" />
                 </button>
               </div>
 
@@ -156,7 +162,7 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
                 {studyPlan.schedule.map((day) => (
                   <div
                     key={day.day}
-                    className="p-4 bg-[#1c1e21] border border-[#272a2e] hover:border-[#3b3e45] rounded-[4px] flex flex-col justify-between space-y-3"
+                    className="p-4 bg-[#1c1e21] border border-[#272a2e] hover:border-[#3b3e45] rounded-sm flex flex-col justify-between space-y-3"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -164,7 +170,7 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
                           Day {day.day}
                         </span>
                         <span className="text-[11px] text-[#878c99] flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> {day.estimatedHours}h
+                          <ClockIcon className="w-3 h-3" /> {day.estimatedHours}h
                         </span>
                       </div>
 
@@ -173,8 +179,8 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
                       </div>
 
                       <ul className="space-y-1.5 text-[12px] text-[#878c99]">
-                        {day.tasks.map((task, tIdx) => (
-                          <li key={tIdx} className="flex items-start gap-1.5">
+                        {day.tasks.map((task) => (
+                          <li key={task} className="flex items-start gap-1.5">
                             <span className="text-[#a8ff53] mt-0.5">•</span>
                             <span>{task}</span>
                           </li>
@@ -183,7 +189,7 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
                     </div>
 
                     <div className="pt-2 border-t border-[#272a2e]/60 text-[11px] text-[#afec73] flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" />
+                      <CheckCircleIcon className="w-3 h-3" />
                       <span>Milestone Check</span>
                     </div>
                   </div>
@@ -209,15 +215,15 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
                   onClick={() => TeachMeAPI.export.downloadMarkdownOutline(outline)}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-[#a8ff53] text-[#121317] font-medium text-[12px] rounded hover:bg-[#b8ff70] cursor-pointer"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <DownloadSimpleIcon className="w-3.5 h-3.5" />
                   <span>Download .MD Notes</span>
                 </button>
               </div>
 
               {/* Outline Sections */}
               <div className="space-y-4">
-                {outline.sections.map((sec, idx) => (
-                  <div key={idx} className="p-4 bg-[#1c1e21] border border-[#272a2e] rounded-[4px] space-y-3">
+                {outline.sections.map((sec) => (
+                  <div key={sec.heading} className="p-4 bg-[#1c1e21] border border-[#272a2e] rounded-sm space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="font-semibold text-[15px] text-[#e5e7eb]">
                         {sec.heading}
@@ -226,15 +232,15 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
                     </div>
 
                     <ul className="list-disc list-inside text-[13px] text-[#878c99] space-y-1">
-                      {sec.keyPoints.map((pt, pIdx) => (
-                        <li key={pIdx}>{pt}</li>
+                      {sec.keyPoints.map((pt) => (
+                        <li key={pt}>{pt}</li>
                       ))}
                     </ul>
 
                     {sec.formulas && (
                       <div className="p-3 bg-[#121317] border border-[#272a2e] rounded font-['Geist_Mono'] text-[12px] text-[#a8ff53]">
-                        {sec.formulas.map((f, fIdx) => (
-                          <div key={fIdx}>Reaction Equation: {f}</div>
+                        {sec.formulas.map((f) => (
+                          <div key={f}>Reaction Equation: {f}</div>
                         ))}
                       </div>
                     )}

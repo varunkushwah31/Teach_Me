@@ -1,23 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, User, CheckCircle2, ArrowRight } from 'lucide-react';
+import { SparkleIcon, UserIcon, CheckCircleIcon, ArrowRightIcon } from '@phosphor-icons/react';
 
 interface RealtimeStreamsSectionProps {
   onOpenStudio?: (tab?: string) => void;
 }
+
+const SAMPLE_RESPONSES: Record<string, string> = {
+  'Explain SM-2 Spaced Repetition in TeachMe':
+    'The SuperMemo-2 (SM-2) algorithm computes optimal review intervals based on recall quality q (0-5). TeachMe recalculates the Ease Factor (EF) after every flashcard submission: EF\' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)). If quality >= 3, interval I(n) scales exponentially, guaranteeing maximum long-term memory retention.',
+  'How does Map-Reduce Document Summarization work?':
+    'TeachMe splits massive 100+ page PDFs into 500-token chunks. The MAP phase prompts parallel Spring AI workers to extract key concepts per chunk simultaneously. The REDUCE phase then synthesizes all intermediate summaries into a cohesive, non-redundant 300-word executive brief in under 2 seconds.',
+  'Show Spring AI ChatClient tool calling':
+    'Spring AI exposes `@Tool` annotated methods to LLM models like Ollama or GPT-4o. When a student asks about their quiz readiness, ChatClient invokes `queryVectorStore()` to retrieve verified textbook citations before streaming markdown responses back to the React UI via Server-Sent Events.'
+};
 
 export const RealtimeStreamsSection: React.FC<RealtimeStreamsSectionProps> = ({ onOpenStudio }) => {
   const [typedOutput, setTypedOutput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [activePrompt, setActivePrompt] = useState('Explain SM-2 Spaced Repetition in TeachMe');
 
-  const SAMPLE_RESPONSES: Record<string, string> = {
-    'Explain SM-2 Spaced Repetition in TeachMe':
-      'The SuperMemo-2 (SM-2) algorithm computes optimal review intervals based on recall quality q (0-5). TeachMe recalculates the Ease Factor (EF) after every flashcard submission: EF\' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)). If quality >= 3, interval I(n) scales exponentially, guaranteeing maximum long-term memory retention.',
-    'How does Map-Reduce Document Summarization work?':
-      'TeachMe splits massive 100+ page PDFs into 500-token chunks. The MAP phase prompts parallel Spring AI workers to extract key concepts per chunk simultaneously. The REDUCE phase then synthesizes all intermediate summaries into a cohesive, non-redundant 300-word executive brief in under 2 seconds.',
-    'Show Spring AI ChatClient tool calling':
-      'Spring AI exposes `@Tool` annotated methods to LLM models like Ollama or GPT-4o. When a student asks about their quiz readiness, ChatClient invokes `queryVectorStore()` to retrieve verified textbook citations before streaming markdown responses back to the React UI via Server-Sent Events.'
-  };
+  useEffect(() => {
+    const fullText = SAMPLE_RESPONSES['Explain SM-2 Spaced Repetition in TeachMe'];
+    let idx = 0;
+    const interval = setInterval(() => {
+      if (idx <= fullText.length) {
+        setTypedOutput(fullText.slice(0, idx));
+        idx += 3;
+      } else {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 25);
+    return () => clearInterval(interval);
+  }, []);
 
   const startStream = (prompt: string) => {
     setActivePrompt(prompt);
@@ -38,17 +53,13 @@ export const RealtimeStreamsSection: React.FC<RealtimeStreamsSectionProps> = ({ 
     }, 25);
   };
 
-  useEffect(() => {
-    startStream('Explain SM-2 Spaced Repetition in TeachMe');
-  }, []);
-
   return (
     <section className="py-24 border-t border-[#272a2e] bg-[#1c1e21]">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Top Text Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
-          <div className="max-w-[700px]">
+          <div className="max-w-175">
             <div className="inline-flex items-center gap-1.5 text-[#9c9af2] font-['Geist_Mono'] text-[13px] font-medium mb-3">
               <span>Realtime Server-Sent Events</span>
             </div>
@@ -67,19 +78,19 @@ export const RealtimeStreamsSection: React.FC<RealtimeStreamsSectionProps> = ({ 
             className="group mt-4 md:mt-0 inline-flex items-center gap-1.5 text-[14px] font-['Geist'] text-[#a8ff53] hover:underline cursor-pointer"
           >
             <span>Try live stream in Studio</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
 
         {/* Mock Chat Window Container */}
-        <div className="bg-[#121317] border border-[#272a2e] rounded-[4px] p-4 sm:p-6 shadow-2xl relative">
+        <div className="bg-[#121317] border border-[#272a2e] rounded-sm p-4 sm:p-6 shadow-2xl relative">
           
           <div className="text-center text-[12px] text-[#878c99] mb-4 font-['Geist_Mono']">
             POST /api/chat/ask/stream • Live Server-Sent Events (SSE) Pipe
           </div>
 
           {/* Chat Window Frame */}
-          <div className="max-w-[750px] mx-auto bg-[#1c1e21] border border-[#272a2e] rounded-[4px] overflow-hidden">
+          <div className="max-w-187.5 mx-auto bg-[#1c1e21] border border-[#272a2e] rounded-sm overflow-hidden">
             
             {/* Window Header */}
             <div className="p-3 bg-[#15171c] border-b border-[#272a2e] flex items-center justify-between">
@@ -102,9 +113,9 @@ export const RealtimeStreamsSection: React.FC<RealtimeStreamsSectionProps> = ({ 
               
               {/* User Message */}
               <div className="flex justify-end">
-                <div className="max-w-[85%] bg-[#272a2e] border border-[#3b3e45] text-[#e5e7eb] px-4 py-2.5 rounded-[4px] text-[14px]">
+                <div className="max-w-[85%] bg-[#272a2e] border border-[#3b3e45] text-[#e5e7eb] px-4 py-2.5 rounded-sm text-[14px]">
                   <div className="flex items-center gap-2 mb-1 text-[11px] text-[#878c99]">
-                    <User className="w-3 h-3 text-[#a8ff53]" />
+                    <UserIcon className="w-3 h-3 text-[#a8ff53]" />
                     <span>Student / User</span>
                   </div>
                   {activePrompt}
@@ -113,10 +124,10 @@ export const RealtimeStreamsSection: React.FC<RealtimeStreamsSectionProps> = ({ 
 
               {/* AI Agent Response */}
               <div className="flex justify-start">
-                <div className="max-w-[90%] bg-[#121317] border border-[#272a2e] text-[#e5e7eb] p-4 rounded-[4px] text-[14px] font-['Geist'] leading-[1.6]">
+                <div className="max-w-[90%] bg-[#121317] border border-[#272a2e] text-[#e5e7eb] p-4 rounded-sm text-[14px] font-['Geist'] leading-[1.6]">
                   <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-[#272a2e]">
                     <div className="flex items-center gap-1.5 text-[12px] text-[#9c9af2] font-['Geist_Mono']">
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <SparkleIcon className="w-3.5 h-3.5" />
                       <span>TeachMe AI Tutor</span>
                     </div>
                     <span className="text-[11px] text-[#afec73] font-['Geist_Mono']">
@@ -131,7 +142,7 @@ export const RealtimeStreamsSection: React.FC<RealtimeStreamsSectionProps> = ({ 
 
                   {!isTyping && (
                     <div className="mt-3 pt-2 border-t border-[#272a2e]/60 flex items-center gap-2 text-[11px] text-[#878c99]">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#a8ff53]" />
+                      <CheckCircleIcon className="w-3.5 h-3.5 text-[#a8ff53]" />
                       <span>Verified against document source (PDF p. 12-14)</span>
                     </div>
                   )}

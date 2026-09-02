@@ -1,24 +1,34 @@
-import { apiRequest, setAuthToken, clearAuthToken, getAuthToken } from './apiClient';
+import {API_BASE_URL, apiRequest, clearAuthToken, getAuthToken, setAuthToken} from './apiClient';
+import {getStoredAIConfig} from './aiConfigService';
 import type {
   AuthResponse,
-  DocumentHistoryDTO,
-  PaginatedResponse,
+  ChatHistoryDTO,
+  CitationDTO,
   DocumentAnalyticsDTO,
+  DocumentHistoryDTO,
+  DocumentSummaryDTO,
+  ExamReadinessDTO,
+  FlashcardDTO,
+  GroupWorkspaceDTO,
+  KnowledgeGraphDTO,
+  NoteOutlineDTO,
+  OllamaModelInfo,
+  PaginatedResponse,
+  PodcastScriptDTO,
   QuizDTO,
   QuizResponseDTO,
-  FlashcardDTO,
-  DocumentSummaryDTO,
-  KnowledgeGraphDTO,
-  PodcastScriptDTO,
-  ExamReadinessDTO,
-  NoteOutlineDTO,
-  StudyPlanDTO,
   SearchResultChunkDTO,
-  GroupWorkspaceDTO,
-  OllamaModelInfo,
-  CitationDTO,
-  ChatHistoryDTO
+  StudyPlanDTO
 } from '../types/backend';
+
+function generateSecureRandomId(max = 1000): number {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return (array[0] % max) + 1;
+  }
+  return Math.floor(Math.random() * max) + 1;
+}
 
 export const TeachMeAPI = {
   // Authentication (/api/auth)
@@ -196,14 +206,25 @@ export const TeachMeAPI = {
       onChunk?: (token: string) => void
     ): Promise<string> => {
       const token = getAuthToken();
+      const aiConfig = typeof window !== 'undefined' ? getStoredAIConfig() : null;
       try {
-        const response = await fetch('/api/chat/ask/stream', {
+        const response = await fetch(`${API_BASE_URL}/chat/ask/stream`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(aiConfig?.provider ? { 'X-AI-Provider': aiConfig.provider } : {}),
+            ...(aiConfig?.apiKey ? { 'X-AI-Key': aiConfig.apiKey } : {}),
+            ...(aiConfig?.model ? { 'X-AI-Model': aiConfig.model } : {})
           },
-          body: JSON.stringify({ question, chatId, documentIds })
+          body: JSON.stringify({
+            question,
+            chatId,
+            documentIds,
+            aiProvider: aiConfig?.provider,
+            aiModel: aiConfig?.model,
+            temperature: aiConfig?.temperature
+          })
         });
 
         if (!response.ok || !response.body) {
@@ -225,11 +246,9 @@ export const TeachMeAPI = {
         return fullText;
       } catch {
         const mockAnswer = `According to your document "${documentIds[0] ? 'Cellular_Respiration_Ch4.pdf' : 'Selected Docs'}": Cellular respiration is the biochemical process by which cells convert glucose into adenosine triphosphate (ATP). The four sequential stages are Glycolysis (yielding 2 ATP + 2 NADH), Pyruvate Oxidation, the Citric Acid Cycle, and Oxidative Phosphorylation driving ATP Synthase via a proton electrochemical gradient.`;
-        let accumulated = '';
-        for (const char of mockAnswer.split(' ')) {
+        for (const word of mockAnswer.split(' ')) {
           await new Promise(r => setTimeout(r, 40));
-          accumulated += char + ' ';
-          onChunk?.(char + ' ');
+          onChunk?.(word + ' ');
         }
         return mockAnswer;
       }
@@ -295,7 +314,7 @@ export const TeachMeAPI = {
         return await apiRequest<QuizDTO>(`/quiz/generate/${documentId}`, { method: 'POST' });
       } catch {
         return {
-          id: Math.floor(Math.random() * 1000) + 1,
+          id: generateSecureRandomId(),
           title: 'Document Mastery Assessment',
           description: 'Adaptive diagnostic quiz generated from document chunks',
           totalQuestions: 5,
@@ -406,7 +425,7 @@ export const TeachMeAPI = {
         });
       } catch {
         return {
-          id: Math.floor(Math.random() * 1000) + 1,
+          id: generateSecureRandomId(),
           front,
           back,
           deckName,
@@ -463,7 +482,7 @@ export const TeachMeAPI = {
         });
       } catch {
         const newEF = Math.max(1.3, 2.5 + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
-        const nextReviewDays = quality < 3 ? 1 : Math.round(1 * newEF);
+        const nextReviewDays = quality < 3 ? 1 : Math.round(newEF);
         return {
           message: 'Review saved with SM-2 algorithm update',
           nextReviewDays,
@@ -724,13 +743,12 @@ export const TeachMeAPI = {
 
     create: async (name: string, description = 'Study Group'): Promise<GroupWorkspaceDTO> => {
       try {
-        const res = await apiRequest<GroupWorkspaceDTO>(`/workspaces/create?name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`, {
+        return await apiRequest<GroupWorkspaceDTO>(`/workspaces/create?name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`, {
           method: 'POST'
         });
-        return res;
       } catch {
         return {
-          id: Date.now(),
+          id: generateSecureRandomId(),
           name,
           description,
           ownerId: 1,
@@ -752,7 +770,7 @@ export const TeachMeAPI = {
       link.download = `${deckName || 'TeachMe_Flashcards'}_Anki.txt`;
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      link.remove();
     },
 
     downloadMarkdownOutline: (outline: NoteOutlineDTO) => {
@@ -772,7 +790,7 @@ export const TeachMeAPI = {
       link.download = `TeachMe_Study_Notes_${outline.documentId}.md`;
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      link.remove();
     }
   },
 

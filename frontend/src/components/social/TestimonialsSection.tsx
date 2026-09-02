@@ -38,24 +38,24 @@ const TESTIMONIALS: Testimonial[] = [
 export const TestimonialsSection: React.FC = () => {
   return (
     <section id="testimonials" className="py-24 border-t border-[#272a2e] bg-[#1c1e21]">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="mb-14 text-center">
           <h2 className="font-['Satoshi'] font-semibold text-[32px] sm:text-[38px] text-[#e5e7eb] mb-3">
             Loved by developers
           </h2>
-          <p className="font-['Geist'] text-[16px] text-[#878c99] max-w-[600px] mx-auto leading-[1.5]">
+          <p className="font-['Geist'] text-[16px] text-[#878c99] max-w-150 mx-auto leading-normal">
             Engineers and educators around the world rely on TeachMe for mission-critical learning intelligence.
           </p>
         </div>
 
         {/* 3-Column Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t, idx) => (
+          {TESTIMONIALS.map((t) => (
             <div
-              key={idx}
-              className="bg-[#1c1e21] border border-[#272a2e] hover:border-[#3b3e45] rounded-[4px] p-6 sm:p-7 flex flex-col justify-between transition-colors duration-200"
+              key={t.author}
+              className="bg-[#1c1e21] border border-[#272a2e] hover:border-[#3b3e45] rounded-sm p-6 sm:p-7 flex flex-col justify-between transition-colors duration-200"
             >
               <div>
                 {/* Quote Text */}

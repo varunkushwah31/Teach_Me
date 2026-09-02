@@ -1,24 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight, User, Sliders } from 'lucide-react';
-import { TeachMeAPI } from '../../services/teachMeService';
+import { ListIcon, XIcon, ArrowRightIcon, UserIcon, KeyIcon } from '@phosphor-icons/react';
+import { TeachMeAPI } from '@/services/teachMeService.ts';
+import { getStoredAIConfig, type AIProviderConfig } from '@/services/aiConfigService.ts';
 
 interface NavbarProps {
   onOpenStudio?: (initialTab?: string) => void;
   onOpenAuth?: () => void;
+  onOpenApiKeySettings?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth, onOpenApiKeySettings }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuth] = useState(() => TeachMeAPI.auth.isAuthenticated());
+  const [aiConfig, setAiConfig] = useState<AIProviderConfig>(getStoredAIConfig);
 
   useEffect(() => {
-    setIsAuth(TeachMeAPI.auth.isAuthenticated());
     const handleScroll = () => {
       setScrolled(window.scrollY > 15);
     };
+    const handleConfigUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<AIProviderConfig>;
+      if (customEvent.detail) {
+        setAiConfig(customEvent.detail);
+      } else {
+        setAiConfig(getStoredAIConfig());
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('teachme_ai_config_updated', handleConfigUpdate);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('teachme_ai_config_updated', handleConfigUpdate);
+    };
   }, []);
 
   return (
@@ -29,11 +44,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth }) => {
           : 'bg-[#1c1e21]/70 backdrop-blur-sm border-b border-[#272a2e]/50'
       }`}
     >
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-310 mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         
         {/* Brand Logo */}
         <div className="flex items-center gap-6 shrink-0">
-          <a href="#" className="flex items-center gap-2 group">
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2 group"
+          >
             <div className="w-5 h-5 flex items-center justify-center">
               <svg
                 viewBox="0 0 24 24"
@@ -96,20 +118,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth }) => {
         {/* Right Action Buttons */}
         <div className="hidden md:flex items-center gap-2.5 shrink-0">
           <button
-            onClick={() => onOpenStudio?.('settings')}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12.5px] font-mono text-[#d7d9dd] hover:text-[#e5e7eb] border border-[#272a2e] hover:border-[#3b3e45] rounded-[4px] bg-[#121317]/80 transition-colors whitespace-nowrap cursor-pointer"
-            title="Configure Local Ollama or Custom API Keys"
+            onClick={() => onOpenApiKeySettings ? onOpenApiKeySettings() : onOpenStudio?.('settings')}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12.5px] font-mono text-[#d7d9dd] hover:text-[#e5e7eb] border border-[#272a2e] hover:border-[#a8ff53]/50 rounded-sm bg-[#121317]/80 transition-colors whitespace-nowrap cursor-pointer group"
+            title="Configure AI API Keys (OpenAI, Claude, Gemini, Groq, DeepSeek) or Local Ollama"
           >
-            <Sliders className="w-3.5 h-3.5 text-[#a8ff53]" />
-            <span>Ollama / API Config</span>
+            <KeyIcon className="w-3.5 h-3.5 text-[#a8ff53] group-hover:rotate-12 transition-transform" weight="bold" />
+            <span className="capitalize">{aiConfig.provider}</span>
+            <span className="text-[10px] text-[#a8ff53] bg-[#a8ff53]/10 px-1.5 py-0.2 rounded border border-[#a8ff53]/20">
+              {aiConfig.provider === 'ollama' ? 'Local' : 'Custom Key'}
+            </span>
           </button>
 
           {isAuth ? (
             <button
               onClick={() => onOpenStudio?.('documents')}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[12.5px] font-mono text-[#a8ff53] bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-[4px] whitespace-nowrap cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[12.5px] font-mono text-[#a8ff53] bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-sm whitespace-nowrap cursor-pointer"
             >
-              <User className="w-3.5 h-3.5" />
+              <UserIcon className="w-3.5 h-3.5" />
               <span>Workspace</span>
             </button>
           ) : (
@@ -123,10 +148,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth }) => {
 
           <button
             onClick={() => onOpenStudio?.('documents')}
-            className="group flex items-center gap-1.5 px-3.5 py-1.5 bg-[#a8ff53] hover:bg-[#b8ff70] active:scale-[0.98] text-[#121317] font-semibold text-[13px] rounded-[4px] shadow-[inset_0_0_0_1px_rgba(168,255,83,0.3)] transition-all whitespace-nowrap cursor-pointer"
+            className="group flex items-center gap-1.5 px-3.5 py-1.5 bg-[#a8ff53] hover:bg-[#b8ff70] active:scale-[0.98] text-[#121317] font-semibold text-[13px] rounded-sm shadow-[inset_0_0_0_1px_rgba(168,255,83,0.3)] transition-all whitespace-nowrap cursor-pointer"
           >
             <span>Start Studying</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRightIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
 
@@ -134,15 +159,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth }) => {
         <div className="flex lg:hidden items-center gap-2">
           <button
             onClick={() => onOpenStudio?.('documents')}
-            className="px-2.5 py-1 bg-[#a8ff53] text-[#121317] font-semibold text-[12px] rounded-[4px]"
+            className="px-2.5 py-1 bg-[#a8ff53] text-[#121317] font-semibold text-[12px] rounded-sm"
           >
             Study Now
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 text-[#d7d9dd] hover:text-[#e5e7eb] border border-[#272a2e] rounded-[4px]"
+            className="p-1.5 text-[#d7d9dd] hover:text-[#e5e7eb] border border-[#272a2e] rounded-sm cursor-pointer"
           >
-            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            {mobileMenuOpen ? <XIcon className="w-4 h-4" /> : <ListIcon className="w-4 h-4" />}
           </button>
         </div>
 
@@ -153,39 +178,43 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth }) => {
         <div className="lg:hidden bg-[#121317] border-b border-[#272a2e] px-4 py-4 space-y-2.5 text-[14px]">
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('documents'); }}
-            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1"
+            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
             📄 Upload Course PDF
           </button>
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('chat'); }}
-            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1"
+            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
             💬 AI Tutor Q&A
           </button>
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('quiz'); }}
-            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1"
+            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
             📝 Practice Quizzes
           </button>
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('flashcards'); }}
-            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1"
+            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
             🧠 SM-2 Spaced Flashcards
           </button>
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('podcast'); }}
-            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1"
+            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
             🎙️ Audio Podcasts
           </button>
           <button
-            onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('settings'); }}
-            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 font-mono text-[13px]"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              if (onOpenApiKeySettings) onOpenApiKeySettings();
+              else onOpenStudio?.('settings');
+            }}
+            className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 font-mono text-[13px] cursor-pointer"
           >
-            ⚙️ Ollama / Custom API Settings
+            🔑 AI Provider & API Keys ({aiConfig.provider})
           </button>
         </div>
       )}

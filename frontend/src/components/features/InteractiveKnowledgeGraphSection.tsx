@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, ArrowRight } from 'lucide-react';
+import { ShareNetworkIcon, ArrowRightIcon } from '@phosphor-icons/react';
 
 interface KnowledgeNode {
   id: string;
@@ -61,16 +61,16 @@ const NODES: KnowledgeNode[] = [
     id: 'crispr-mutations',
     label: 'Genetic Mutations & Repair',
     x: 400,
-    y: 340,
+    y: 60,
     group: 'application',
-    color: '#e888f8',
-    description: 'Base substitutions, frameshifts, and mismatch repair mechanisms (such as Cas9 / CRISPR targeted endonuclease editing).'
+    color: '#f43f5e',
+    description: 'Base mismatches, tautomeric shifts, and radiation-induced double-strand breaks repaired by homologous recombination or CRISPR endonuclease.'
   }
 ];
 
 const EDGES = [
-  { from: 'dna-core', to: 'transcription', label: 'transcribes to' },
-  { from: 'transcription', to: 'translation', label: 'translates into' },
+  { from: 'dna-core', to: 'transcription', label: 'transcribes into' },
+  { from: 'transcription', to: 'translation', label: 'translated by' },
   { from: 'translation', to: 'protein-folding', label: 'folds into' },
   { from: 'protein-folding', to: 'metabolism', label: 'catalyzes' },
   { from: 'dna-core', to: 'crispr-mutations', label: 'mutations in' },
@@ -87,19 +87,19 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
 
   return (
     <section id="knowledge-graph" className="py-24 border-t border-[#272a2e] bg-[#1c1e21] relative overflow-hidden font-['Geist']">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
             <div className="inline-flex items-center gap-1.5 text-[#e888f8] font-['Geist_Mono'] text-[13px] font-medium mb-3">
-              <Share2 className="w-3.5 h-3.5" />
+              <ShareNetworkIcon className="w-3.5 h-3.5" />
               <span>Interactive Concept Relationship Graph</span>
             </div>
             <h2 className="font-['Satoshi'] font-bold text-[32px] sm:text-[38px] text-[#e5e7eb] mb-3">
               Visual Concept Maps Extracted from Course Chapters
             </h2>
-            <p className="text-[15px] sm:text-[16px] text-[#878c99] max-w-[620px] leading-[1.58]">
+            <p className="text-[15px] sm:text-[16px] text-[#878c99] max-w-155 leading-[1.58]">
               TeachMe extracts interconnected topics and causal relationships from your uploaded textbook PDFs into an interactive concept graph. Click any node to explore.
             </p>
           </div>
@@ -109,26 +109,26 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
             className="group inline-flex items-center gap-1.5 text-[14px] text-[#a8ff53] hover:underline cursor-pointer mt-4 md:mt-0"
           >
             <span>Explore full concept graph in Studio</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
 
         {/* Interactive Graph Box */}
-        <div className="bg-[#121317] border border-[#272a2e] rounded-[4px] p-6 shadow-2xl relative">
+        <div className="bg-[#121317] border border-[#272a2e] rounded-sm p-6 shadow-2xl relative">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
             {/* SVG Visualizer */}
-            <div className="lg:col-span-8 bg-[#1c1e21] border border-[#272a2e] rounded-[4px] p-4 flex items-center justify-center relative min-h-[380px] overflow-hidden">
-              <svg viewBox="0 0 800 420" className="w-full h-full max-h-[380px]">
+            <div className="lg:col-span-8 bg-[#1c1e21] border border-[#272a2e] rounded-sm p-4 flex items-center justify-center relative min-h-95 overflow-hidden">
+              <svg viewBox="0 0 800 420" className="w-full h-full max-h-95">
                 {/* Edges */}
-                {EDGES.map((edge, idx) => {
+                {EDGES.map((edge) => {
                   const src = NODES.find(n => n.id === edge.from)!;
                   const dst = NODES.find(n => n.id === edge.to)!;
                   const isHighlighted = selectedNode.id === src.id || selectedNode.id === dst.id;
 
                   return (
-                    <g key={idx}>
+                    <g key={`${edge.from}->${edge.to}`}>
                       <line
                         x1={src.x}
                         y1={src.y}
@@ -195,7 +195,7 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
             </div>
 
             {/* Selected Node Details Inspector */}
-            <div className="lg:col-span-4 bg-[#1c1e21] border border-[#272a2e] rounded-[4px] p-5 space-y-4">
+            <div className="lg:col-span-4 bg-[#1c1e21] border border-[#272a2e] rounded-sm p-5 space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-[#272a2e]">
                 <div className="flex items-center gap-2">
                   <div
@@ -223,7 +223,7 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
               <div className="pt-3 border-t border-[#272a2e]/60">
                 <button
                   onClick={() => onOpenStudio?.('knowledge')}
-                  className="w-full py-2 bg-[#272a2e] hover:bg-[#3b3e45] text-[#a8ff53] text-[13px] font-medium rounded-[4px] transition-colors cursor-pointer text-center"
+                  className="w-full py-2 bg-[#272a2e] hover:bg-[#3b3e45] text-[#a8ff53] text-[13px] font-medium rounded-sm transition-colors cursor-pointer text-center"
                 >
                   Generate Practice Quiz for this Node →
                 </button>

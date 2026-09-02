@@ -1,25 +1,25 @@
 import React from 'react';
-import { Heart } from 'lucide-react';
+import { HeartIcon } from '@phosphor-icons/react';
 
 export const StatsSection: React.FC = () => {
   return (
     <section className="py-20 border-t border-[#272a2e] bg-[#1c1e21] text-center">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Heart Glow Icon */}
         <div className="flex justify-center mb-6">
           <div className="w-12 h-12 rounded-full bg-[#121317] border border-[#272a2e] flex items-center justify-center shadow-[0_0_25px_rgba(244,63,94,0.15)]">
-            <Heart className="w-5 h-5 text-[#f43f5e] fill-[#f43f5e]/20" />
+            <HeartIcon className="w-5 h-5 text-[#f43f5e]" weight="fill" />
           </div>
         </div>
 
         {/* Social Proof Quote */}
-        <p className="font-['Geist'] text-[18px] text-[#e5e7eb] max-w-[540px] mx-auto mb-14 leading-[1.5]">
+        <p className="font-['Geist'] text-[18px] text-[#e5e7eb] max-w-135 mx-auto mb-14 leading-normal">
           We transparently build TeachMe in the open. Loved by students, researchers, and engineers everywhere.
         </p>
 
         {/* 3 Metric Figures */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-[800px] mx-auto pt-6 border-t border-[#272a2e]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-200 mx-auto pt-6 border-t border-[#272a2e]">
           <div>
             <div className="font-['Satoshi'] font-semibold text-[44px] text-[#e5e7eb] mb-1">
               15M+

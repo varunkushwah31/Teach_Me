@@ -17,11 +17,13 @@ import { StatsSection } from './components/social/StatsSection';
 import { Footer } from './components/layout/Footer';
 import { TeachMeStudioModal } from './components/interactive/TeachMeStudioModal';
 import { AuthModal } from './components/auth/AuthModal';
+import { ApiKeySettingsModal } from './components/settings/ApiKeySettingsModal';
 
 export function App() {
   const [studioOpen, setStudioOpen] = useState(false);
   const [studioTab, setStudioTab] = useState('chat');
   const [authOpen, setAuthOpen] = useState(false);
+  const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
 
   const handleOpenStudio = (tab = 'chat') => {
     setStudioTab(tab);
@@ -34,12 +36,16 @@ export function App() {
       <Navbar
         onOpenStudio={handleOpenStudio}
         onOpenAuth={() => setAuthOpen(true)}
+        onOpenApiKeySettings={() => setApiKeyModalOpen(true)}
       />
 
       {/* Main Content Sections */}
       <main className="flex-1">
         {/* 1. Hero Section with Glow, Interactive Filter Pills & Code Editor */}
-        <HeroSection onOpenStudio={handleOpenStudio} />
+        <HeroSection
+          onOpenStudio={handleOpenStudio}
+          onOpenApiKeySettings={() => setApiKeyModalOpen(true)}
+        />
 
         {/* 2. Architecture & Workflows (4 Flow Cards: Agent, Chaining, Routing, Parallelization) */}
         <ArchitectureWorkflowSection onOpenStudio={() => handleOpenStudio('documents')} />
@@ -96,6 +102,12 @@ export function App() {
         isOpen={authOpen}
         onClose={() => setAuthOpen(false)}
         onSuccess={() => handleOpenStudio('documents')}
+      />
+
+      {/* AI Provider & Custom API Key Modal */}
+      <ApiKeySettingsModal
+        isOpen={apiKeyModalOpen}
+        onClose={() => setApiKeyModalOpen(false)}
       />
     </div>
   );

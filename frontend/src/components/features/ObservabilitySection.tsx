@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Clock, Activity, BookOpen, Layers, Sparkles, Volume2 } from 'lucide-react';
+import {
+  CheckCircleIcon,
+  ClockIcon,
+  PulseIcon,
+  BookOpenIcon,
+  StackIcon,
+  SparkleIcon,
+  SpeakerHighIcon
+} from '@phosphor-icons/react';
 
 export const ObservabilitySection: React.FC = () => {
   const [pulseCount, setPulseCount] = useState(0);
@@ -13,12 +21,12 @@ export const ObservabilitySection: React.FC = () => {
 
   return (
     <section id="study-engine" className="py-24 border-t border-[#272a2e] bg-[#1c1e21] relative overflow-hidden font-['Geist']">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="mb-14 max-w-[750px]">
+        <div className="mb-14 max-w-187.5">
           <div className="inline-flex items-center gap-1.5 text-[#a8ff53] font-['Geist_Mono'] text-[13px] font-medium mb-3">
-            <Activity className="w-3.5 h-3.5" />
+            <PulseIcon className="w-3.5 h-3.5" />
             <span>Autonomous Study Processing Engine</span>
           </div>
           <h2 className="font-['Satoshi'] font-bold text-[32px] sm:text-[38px] text-[#e5e7eb] mb-3">
@@ -33,11 +41,11 @@ export const ObservabilitySection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           {/* Left: Study Pipeline Console Pane */}
-          <div className="lg:col-span-7 bg-[#121317] border border-[#272a2e] rounded-[4px] p-6 shadow-2xl font-['Geist_Mono']">
+          <div className="lg:col-span-7 bg-[#121317] border border-[#272a2e] rounded-sm p-6 shadow-2xl font-['Geist_Mono']">
             {/* Window Top Bar */}
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#272a2e]">
               <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-[#a8ff53]" />
+                <PulseIcon className="w-4 h-4 text-[#a8ff53]" />
                 <span className="text-[14px] font-semibold text-[#e5e7eb]">Active Study Pipeline</span>
               </div>
               <div className="flex items-center gap-2 text-[12px] text-[#878c99]">
@@ -49,16 +57,16 @@ export const ObservabilitySection: React.FC = () => {
             {/* Study Task Rows */}
             <div className="space-y-3">
               {/* Row 1: PDF Vector Ingestion */}
-              <div className="flex items-center justify-between p-3 bg-[#1c1e21] border border-[#272a2e] rounded-[4px] hover:border-[#3b3e45] transition-colors">
+              <div className="flex items-center justify-between p-3 bg-[#1c1e21] border border-[#272a2e] rounded-sm hover:border-[#3b3e45] transition-colors">
                 <div className="flex items-center gap-2.5">
-                  <BookOpen className="w-4 h-4 text-[#a8ff53]" />
-                  <span className="text-[13px] text-[#e5e7eb] font-medium truncate max-w-[280px]">
+                  <BookOpenIcon className="w-4 h-4 text-[#a8ff53]" />
+                  <span className="text-[13px] text-[#e5e7eb] font-medium truncate max-w-70">
                     chunk_pdf(Biology_Ch4_Cellular_Respiration.pdf)
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5 text-[12px] text-[#afec73]">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <CheckCircleIcon className="w-3.5 h-3.5" />
                     <span>48 Chunks (1.2s)</span>
                   </div>
                   <span className="px-1.5 py-0.5 bg-[#272a2e] text-[#a8ff53] text-[10px] rounded-[3px]">
@@ -68,16 +76,16 @@ export const ObservabilitySection: React.FC = () => {
               </div>
 
               {/* Row 2: Bloom Auto-Quiz */}
-              <div className="flex items-center justify-between p-3 bg-[#1c1e21] border border-[#272a2e] rounded-[4px] hover:border-[#3b3e45] transition-colors">
+              <div className="flex items-center justify-between p-3 bg-[#1c1e21] border border-[#272a2e] rounded-sm hover:border-[#3b3e45] transition-colors">
                 <div className="flex items-center gap-2.5">
-                  <Sparkles className="w-4 h-4 text-[#fa3abf]" />
-                  <span className="text-[13px] text-[#e5e7eb] font-medium truncate max-w-[280px]">
+                  <SparkleIcon className="w-4 h-4 text-[#fa3abf]" />
+                  <span className="text-[13px] text-[#e5e7eb] font-medium truncate max-w-70">
                     generate_bloom_quiz(Organic_Chemistry_SN2)
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5 text-[12px] text-[#afec73]">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <CheckCircleIcon className="w-3.5 h-3.5" />
                     <span>5 MCQs Ready</span>
                   </div>
                   <span className="px-1.5 py-0.5 bg-[#272a2e] text-[#fa3abf] text-[10px] rounded-[3px]">
@@ -87,16 +95,16 @@ export const ObservabilitySection: React.FC = () => {
               </div>
 
               {/* Row 3: SM-2 Ease Recalculation */}
-              <div className="flex items-center justify-between p-3 bg-[#1c1e21] border border-[#7655fd]/30 rounded-[4px] shadow-[0_0_15px_rgba(118,85,253,0.08)]">
+              <div className="flex items-center justify-between p-3 bg-[#1c1e21] border border-[#7655fd]/30 rounded-sm shadow-[0_0_15px_rgba(118,85,253,0.08)]">
                 <div className="flex items-center gap-2.5">
-                  <Layers className="w-4 h-4 text-[#9c9af2]" />
-                  <span className="text-[13px] text-[#e5e7eb] font-medium truncate max-w-[280px]">
+                  <StackIcon className="w-4 h-4 text-[#9c9af2]" />
+                  <span className="text-[13px] text-[#e5e7eb] font-medium truncate max-w-70">
                     sm2_recalculate_ease(Neuroscience_Deck)
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5 text-[12px] text-[#9c9af2]">
-                    <Clock className="w-3.5 h-3.5 animate-spin" />
+                    <ClockIcon className="w-3.5 h-3.5 animate-spin" />
                     <span>EF: 2.65 • Next: 6d</span>
                   </div>
                   <span className="px-1.5 py-0.5 bg-[#7655fd]/20 text-[#9c9af2] text-[10px] font-semibold rounded-[3px]">
@@ -106,16 +114,16 @@ export const ObservabilitySection: React.FC = () => {
               </div>
 
               {/* Row 4: 2-Speaker AI Podcast */}
-              <div className="flex items-center justify-between p-3 bg-[#1c1e21] border border-[#272a2e] rounded-[4px] hover:border-[#3b3e45] transition-colors">
+              <div className="flex items-center justify-between p-3 bg-[#1c1e21] border border-[#272a2e] rounded-sm hover:border-[#3b3e45] transition-colors">
                 <div className="flex items-center gap-2.5">
-                  <Volume2 className="w-4 h-4 text-[#d9f07c]" />
-                  <span className="text-[13px] text-[#e5e7eb] font-medium truncate max-w-[280px]">
+                  <SpeakerHighIcon className="w-4 h-4 text-[#d9f07c]" />
+                  <span className="text-[13px] text-[#e5e7eb] font-medium truncate max-w-70">
                     synthesize_audio_podcast(Relativity_Alex_Maya)
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5 text-[12px] text-[#afec73]">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <CheckCircleIcon className="w-3.5 h-3.5" />
                     <span>8-Min Episode</span>
                   </div>
                   <span className="px-1.5 py-0.5 bg-[#272a2e] text-[#d9f07c] text-[10px] rounded-[3px]">

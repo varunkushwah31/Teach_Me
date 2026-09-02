@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
+import { SparkleIcon } from '@phosphor-icons/react';
 
 const SUBJECT_PILLS = [
   { label: 'Biology & Medicine', tag: 'MCAT / USMLE' },
@@ -14,18 +14,18 @@ const SUBJECT_PILLS = [
 export const TechStackStrip: React.FC = () => {
   return (
     <section className="py-12 border-t border-[#272a2e] bg-[#1c1e21] font-['Geist']">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8 justify-between">
           <div className="text-[14px] text-[#b5b8c0] font-medium whitespace-nowrap flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#a8ff53]" />
+            <SparkleIcon className="w-4 h-4 text-[#a8ff53]" />
             <span>Built for students across any discipline & model:</span>
           </div>
 
           {/* Clean flex wrap pill badges */}
           <div className="flex flex-wrap items-center gap-2">
-            {SUBJECT_PILLS.map((sub, idx) => (
+            {SUBJECT_PILLS.map((sub) => (
               <div
-                key={idx}
+                key={sub.label}
                 className="flex items-center gap-2 px-3 py-1 bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-full text-[12.5px] transition-colors cursor-default"
               >
                 <span className="text-[#e5e7eb] font-medium">{sub.label}</span>

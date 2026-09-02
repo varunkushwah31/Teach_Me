@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRightIcon } from '@phosphor-icons/react';
 
 interface FooterProps {
   onOpenStudio?: (tab?: string) => void;
@@ -10,13 +10,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
     <footer className="border-t border-[#272a2e] bg-[#121317] text-[#878c99] text-[14px]">
       
       {/* Pre-Footer Call to Action Banner */}
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-16 border-b border-[#272a2e]">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#1c1e21] border border-[#272a2e] p-8 sm:p-10 rounded-[4px]">
+      <div className="max-w-300 mx-auto px-4 sm:px-6 py-16 border-b border-[#272a2e]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#1c1e21] border border-[#272a2e] p-8 sm:p-10 rounded-sm">
           <div>
             <h2 className="font-bold text-[26px] sm:text-[32px] text-[#e5e7eb] mb-2 tracking-tight">
               Ready to Ace Your Next Exam?
             </h2>
-            <p className="text-[15px] text-[#878c99] max-w-[520px] leading-relaxed">
+            <p className="text-[15px] text-[#878c99] max-w-130 leading-relaxed">
               Upload your textbook chapters, lecture slides, or syllabus to generate instant quizzes, SM-2 flashcards, and audio podcasts.
             </p>
           </div>
@@ -24,17 +24,17 @@ export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => onOpenStudio?.('documents')}
-              className="group flex items-center gap-2 px-5 py-3 bg-[#a8ff53] hover:bg-[#b8ff70] text-[#121317] font-semibold text-[14.5px] rounded-[4px] shadow-[inset_0_0_0_1px_rgba(168,255,83,0.4)] transition-all cursor-pointer"
+              className="group flex items-center gap-2 px-5 py-3 bg-[#a8ff53] hover:bg-[#b8ff70] text-[#121317] font-semibold text-[14.5px] rounded-sm shadow-[inset_0_0_0_1px_rgba(168,255,83,0.4)] transition-all cursor-pointer"
             >
               <span>Upload PDF & Study</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Multi-Column Links Area */}
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-14">
+      <div className="max-w-300 mx-auto px-4 sm:px-6 py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           
           {/* Col 1: Brand & Bio */}
@@ -50,7 +50,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
               </span>
             </div>
 
-            <p className="text-[13px] text-[#878c99] max-w-[280px] leading-[1.6]">
+            <p className="text-[13px] text-[#878c99] max-w-70 leading-[1.6]">
               Personalized AI study companion for students. Grounded in your uploaded course materials with zero hallucination.
             </p>
           </div>

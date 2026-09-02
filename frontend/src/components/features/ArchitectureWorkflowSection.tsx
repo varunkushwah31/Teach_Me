@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { ArrowRight, BookOpen, HelpCircle, Layers, Volume2, X } from 'lucide-react';
+import {
+  ArrowRightIcon,
+  BookOpenIcon,
+  QuestionIcon,
+  StackIcon,
+  SpeakerHighIcon,
+  XIcon
+} from '@phosphor-icons/react';
 
 interface ArchitectureWorkflowSectionProps {
   onOpenStudio?: (tab?: string) => void;
@@ -83,15 +90,30 @@ const CARDS: WorkflowCardData[] = [
   }
 ];
 
+function getStudioTabForDiagram(diagramType: WorkflowCardData['diagramType']): string {
+  switch (diagramType) {
+    case 'tutor':
+      return 'chat';
+    case 'quiz':
+      return 'quiz';
+    case 'flashcard':
+      return 'flashcards';
+    case 'podcast':
+      return 'podcast';
+    default:
+      return 'chat';
+  }
+}
+
 export const ArchitectureWorkflowSection: React.FC<ArchitectureWorkflowSectionProps> = ({ onOpenStudio }) => {
   const [selectedCard, setSelectedCard] = useState<WorkflowCardData | null>(null);
 
   return (
     <section id="how-it-works" className="py-24 border-t border-[#272a2e] bg-[#1c1e21] relative overflow-hidden font-['Geist']">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="mb-14 max-w-[700px]">
+        <div className="mb-14 max-w-175">
           <div className="inline-flex items-center gap-1.5 text-[#a8ff53] font-['Geist_Mono'] text-[13px] font-medium mb-3">
             <span>Pedagogical Architecture</span>
           </div>
@@ -108,19 +130,20 @@ export const ArchitectureWorkflowSection: React.FC<ArchitectureWorkflowSectionPr
         {/* 4 Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {CARDS.map((card) => (
-            <div
+            <button
               key={card.id}
+              type="button"
               onClick={() => setSelectedCard(card)}
-              className="bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-[4px] p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl cursor-pointer group"
+              className="text-left w-full bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-sm p-6 flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl cursor-pointer group"
             >
               <div>
                 {/* Header row */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    {card.diagramType === 'tutor' && <BookOpen className="w-4 h-4 text-[#a8ff53]" />}
-                    {card.diagramType === 'quiz' && <HelpCircle className="w-4 h-4 text-[#fa3abf]" />}
-                    {card.diagramType === 'flashcard' && <Layers className="w-4 h-4 text-[#9c9af2]" />}
-                    {card.diagramType === 'podcast' && <Volume2 className="w-4 h-4 text-[#d9f07c]" />}
+                    {card.diagramType === 'tutor' && <BookOpenIcon className="w-4 h-4 text-[#a8ff53]" />}
+                    {card.diagramType === 'quiz' && <QuestionIcon className="w-4 h-4 text-[#fa3abf]" />}
+                    {card.diagramType === 'flashcard' && <StackIcon className="w-4 h-4 text-[#9c9af2]" />}
+                    {card.diagramType === 'podcast' && <SpeakerHighIcon className="w-4 h-4 text-[#d9f07c]" />}
                     <h3 className="font-['Satoshi'] font-semibold text-[18px] text-[#e5e7eb] group-hover:text-[#a8ff53] transition-colors">
                       {card.title}
                     </h3>
@@ -135,7 +158,7 @@ export const ArchitectureWorkflowSection: React.FC<ArchitectureWorkflowSectionPr
                 </p>
 
                 {/* Visual Mini-Flow Container */}
-                <div className="bg-[#1c1e21] border border-[#272a2e] rounded-[4px] p-4 font-['Geist_Mono'] text-[12px] text-[#d7d9dd] space-y-2">
+                <div className="bg-[#1c1e21] border border-[#272a2e] rounded-sm p-4 font-['Geist_Mono'] text-[12px] text-[#d7d9dd] space-y-2">
                   <div className="flex items-center justify-between text-[11px] text-[#878c99]">
                     <span>Workflow Step</span>
                     <span className="text-[#a8ff53]">Active Pipeline</span>
@@ -152,9 +175,9 @@ export const ArchitectureWorkflowSection: React.FC<ArchitectureWorkflowSectionPr
               {/* Bottom Action Link */}
               <div className="pt-4 mt-5 border-t border-[#272a2e]/60 flex items-center justify-between text-[13px] text-[#878c99] group-hover:text-[#a8ff53] transition-colors">
                 <span>Inspect learning methodology</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                <ArrowRightIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
 
@@ -163,7 +186,7 @@ export const ArchitectureWorkflowSection: React.FC<ArchitectureWorkflowSectionPr
       {/* Modal Inspector for Cards */}
       {selectedCard && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#121317] border border-[#3b3e45] rounded-[4px] max-w-[650px] w-full p-6 shadow-2xl space-y-5">
+          <div className="bg-[#121317] border border-[#3b3e45] rounded-sm max-w-162.5 w-full p-6 shadow-2xl space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-[#272a2e]">
               <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 bg-[#1c1e21] border border-[#272a2e] text-[#a8ff53] text-[12px] font-['Geist_Mono'] rounded">
@@ -174,10 +197,11 @@ export const ArchitectureWorkflowSection: React.FC<ArchitectureWorkflowSectionPr
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedCard(null)}
                 className="p-1 text-[#878c99] hover:text-[#e5e7eb] rounded hover:bg-[#272a2e] cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <XIcon className="w-5 h-5" />
               </button>
             </div>
 
@@ -195,8 +219,8 @@ export const ArchitectureWorkflowSection: React.FC<ArchitectureWorkflowSectionPr
                 Key Learning Benefits
               </h4>
               <ul className="space-y-1.5 text-[13.5px] text-[#878c99]">
-                {selectedCard.details.map((detail, idx) => (
-                  <li key={idx} className="flex items-center gap-2">
+                {selectedCard.details.map((detail) => (
+                  <li key={detail} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#a8ff53]" />
                     <span>{detail}</span>
                   </li>
@@ -206,14 +230,16 @@ export const ArchitectureWorkflowSection: React.FC<ArchitectureWorkflowSectionPr
 
             <div className="pt-3 border-t border-[#272a2e] flex items-center justify-end gap-3">
               <button
+                type="button"
                 onClick={() => setSelectedCard(null)}
                 className="px-4 py-2 bg-[#1c1e21] hover:bg-[#272a2e] text-[#d7d9dd] text-[13px] rounded cursor-pointer"
               >
                 Close
               </button>
               <button
+                type="button"
                 onClick={() => {
-                  const targetTab = selectedCard.diagramType === 'tutor' ? 'chat' : selectedCard.diagramType === 'quiz' ? 'quiz' : selectedCard.diagramType === 'flashcard' ? 'flashcards' : 'podcast';
+                  const targetTab = getStudioTabForDiagram(selectedCard.diagramType);
                   setSelectedCard(null);
                   onOpenStudio?.(targetTab);
                 }}

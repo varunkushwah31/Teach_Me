@@ -1,6 +1,5 @@
-# Optimized Dockerfile for TeachMe Backend (Spring Boot) - Render Deployment
-# Build Backend with Maven
-FROM maven:3.9.9-eclipse-temurin-21 AS backend-builder
+# Optimized Multi-Stage Dockerfile for TeachMe Backend (Spring Boot with Java 25) - Render Deployment
+FROM eclipse-temurin:25-jdk-noble AS backend-builder
 
 WORKDIR /app
 
@@ -10,32 +9,29 @@ COPY mvnw.cmd .
 COPY .mvn .mvn
 COPY pom.xml .
 
+RUN chmod +x mvnw && sed -i 's/\r$//' mvnw
+
 # Download dependencies (cached layer)
-RUN --mount=type=cache,target=/root/.m2 \
-    ./mvnw dependency:go-offline -B
+RUN ./mvnw dependency:go-offline -B || true
 
-# Copy source and build
+# Copy source and build package
 COPY src ./src
-RUN --mount=type=cache,target=/root/.m2 \
-    ./mvnw package -DskipTests -B
+RUN ./mvnw clean package -DskipTests -B
 
-# Final Runtime Image
-FROM eclipse-temurin:21-jre-alpine
+# Final Runtime Image (Java 25 JRE)
+FROM eclipse-temurin:25-jre-noble
 
 WORKDIR /app
 
-# Install curl for health checks
-RUN apk add --no-cache curl
+# Install curl for Render health checks and create non-root user
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -g 1001 appgroup && \
+    useradd -u 1001 -g appgroup -s /bin/sh appuser
 
-# Create non-root user
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
-
-# Copy built JAR from backend builder
-COPY --from=backend-builder /app/target/*.jar app.jar
-
-# Change ownership
-RUN chown -R appuser:appgroup /app
+# Copy built JAR from backend builder with correct ownership
+COPY --chown=appuser:appgroup --from=backend-builder /app/target/*.jar app.jar
 
 USER appuser
 

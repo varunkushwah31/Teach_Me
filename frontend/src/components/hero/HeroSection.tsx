@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import {
-  ArrowRight,
-  Bot,
-  Sparkles,
-  Layers,
-  ChevronRight,
-  Volume2,
-  Copy,
-  Check,
-  Play,
-  Upload,
-  BookOpen,
-  HelpCircle,
-  Brain
-} from 'lucide-react';
+  ArrowRightIcon,
+  RobotIcon,
+  SparkleIcon,
+  StackIcon,
+  CaretRightIcon,
+  SpeakerHighIcon,
+  CopyIcon,
+  CheckIcon,
+  PlayIcon,
+  UploadSimpleIcon,
+  BookOpenIcon,
+  QuestionIcon,
+  BrainIcon,
+  KeyIcon
+} from '@phosphor-icons/react';
 
 interface HeroSectionProps {
   onOpenStudio?: (initialTab?: string) => void;
+  onOpenApiKeySettings?: () => void;
 }
 
 interface FeatureTab {
@@ -34,7 +36,7 @@ const FEATURE_TABS: FeatureTab[] = [
   {
     id: 'pdf-rag',
     label: 'PDF Ingestion & RAG',
-    icon: <BookOpen className="w-3.5 h-3.5" />,
+    icon: <BookOpenIcon className="w-3.5 h-3.5" />,
     iconColor: '#a8ff53',
     subject: 'Molecular Biology & Genetics',
     title: 'Instant Semantic Chunking & Vector Search over Course Textbooks',
@@ -48,7 +50,7 @@ const FEATURE_TABS: FeatureTab[] = [
   {
     id: 'tutor-qa',
     label: 'AI Tutor Q&A',
-    icon: <Bot className="w-3.5 h-3.5" />,
+    icon: <RobotIcon className="w-3.5 h-3.5" />,
     iconColor: '#9c9af2',
     subject: 'Organic Chemistry II',
     title: 'Plain-English Explanations with Verifiable Textbook Page Citations',
@@ -64,7 +66,7 @@ Citations:
   {
     id: 'practice-quizzes',
     label: 'Practice Quizzes',
-    icon: <HelpCircle className="w-3.5 h-3.5" />,
+    icon: <QuestionIcon className="w-3.5 h-3.5" />,
     iconColor: '#fa3abf',
     subject: 'Algorithms & Data Structures',
     title: 'Bloom-Aligned 5-Question Multiple Choice Diagnostic Assessments',
@@ -83,7 +85,7 @@ Rationale: Cites Introduction to Algorithms (CLRS), Chapter 24, p. 658.`
   {
     id: 'sm2-flashcards',
     label: 'SM-2 Flashcards',
-    icon: <Layers className="w-3.5 h-3.5" />,
+    icon: <StackIcon className="w-3.5 h-3.5" />,
     iconColor: '#afec73',
     subject: 'Cognitive Neuroscience',
     title: 'Adaptive Spaced Repetition Memory with 1-Click Anki Sync',
@@ -99,7 +101,7 @@ Recall Quality Grade: [0: Blackout] [1: Hard] [2: Moderate] [3: Good] [4: Easy] 
   {
     id: 'summaries',
     label: 'Chapter Summaries',
-    icon: <Sparkles className="w-3.5 h-3.5" />,
+    icon: <SparkleIcon className="w-3.5 h-3.5" />,
     iconColor: '#d9f07c',
     subject: 'Constitutional Law',
     title: '1-Click Map-Reduce Summaries for 100+ Page Case Books',
@@ -117,7 +119,7 @@ Key Case Precedents: Brown v. Board (1954), Loving v. Virginia (1967), Obergefel
   {
     id: 'podcasts',
     label: 'AI Audio Podcasts',
-    icon: <Volume2 className="w-3.5 h-3.5" />,
+    icon: <SpeakerHighIcon className="w-3.5 h-3.5" />,
     iconColor: '#7655fd',
     subject: 'Astrophysics & Relativity',
     title: 'NotebookLM-Style 2-Speaker AI Study Podcast Episodes',
@@ -131,7 +133,24 @@ Duration: 8 mins • Hosts: Alex & Maya
   }
 ];
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio }) => {
+function mapTabToStudioTab(tabId: string): string {
+  switch (tabId) {
+    case 'pdf-rag':
+      return 'documents';
+    case 'practice-quizzes':
+      return 'quiz';
+    case 'sm2-flashcards':
+      return 'flashcards';
+    case 'summaries':
+      return 'summarizer';
+    case 'podcasts':
+      return 'podcast';
+    default:
+      return 'chat';
+  }
+}
+
+export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio, onOpenApiKeySettings }) => {
   const [activeTabId, setActiveTabId] = useState('pdf-rag');
   const [copied, setCopied] = useState(false);
 
@@ -146,10 +165,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio }) => {
   return (
     <section className="relative pt-32 pb-20 overflow-hidden font-['Geist']">
       {/* Background ambient lighting */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[800px] h-[360px] bg-[#a8ff53]/5 blur-[120px] pointer-events-none rounded-full" />
-      <div className="absolute top-40 left-1/3 w-[500px] h-[250px] bg-[#7655fd]/5 blur-[140px] pointer-events-none rounded-full" />
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-200 h-90 bg-[#a8ff53]/5 blur-[120px] pointer-events-none rounded-full" />
+      <div className="absolute top-40 left-1/3 w-125 h-62.5 bg-[#7655fd]/5 blur-[140px] pointer-events-none rounded-full" />
 
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
+      <div className="max-w-300 mx-auto px-4 sm:px-6 relative z-10">
         
         {/* Top Announcement Pill */}
         <div className="flex justify-center mb-6">
@@ -159,22 +178,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio }) => {
           >
             <span className="w-2 h-2 rounded-full bg-[#a8ff53] animate-pulse" />
             <span>Upload your course PDF to generate practice quizzes & flashcards</span>
-            <ChevronRight className="w-3.5 h-3.5 text-[#878c99] transition-transform group-hover:translate-x-0.5" />
+            <CaretRightIcon className="w-3.5 h-3.5 text-[#878c99] transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
 
         {/* Billboard Headline */}
-        <div className="text-center max-w-[960px] mx-auto mb-6">
+        <div className="text-center max-w-240 mx-auto mb-6">
           <h1 className="font-['Satoshi'] font-bold text-[38px] sm:text-[52px] md:text-[62px] leading-[1.08] tracking-[-0.02em] text-[#e5e7eb]">
             Turn Any Textbook or PDF into Your{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e5e7eb] via-[#d7d9dd] to-[#a8ff53]">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-[#e5e7eb] via-[#d7d9dd] to-[#a8ff53]">
               Personal AI Tutor
             </span>
           </h1>
         </div>
 
         {/* Subtitle */}
-        <div className="text-center max-w-[700px] mx-auto mb-9">
+        <div className="text-center max-w-175 mx-auto mb-9">
           <p className="font-normal text-[16px] sm:text-[18px] leading-[1.58] text-[#878c99]">
             Upload your course materials. TeachMe uses PgVector and Ollama (or your own API keys) to explain concepts step-by-step, generate diagnostic quizzes, build SM-2 flashcards, and synthesize audio study podcasts.
           </p>
@@ -184,31 +203,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio }) => {
         <div className="flex flex-wrap items-center justify-center gap-3.5 mb-14">
           <button
             onClick={() => onOpenStudio?.('documents')}
-            className="group flex items-center gap-2 px-5 py-3 bg-[#a8ff53] hover:bg-[#b8ff70] active:scale-[0.98] text-[#121317] font-medium text-[15px] rounded-[4px] shadow-[inset_0_0_0_1px_rgba(168,255,83,0.4),0_0_25px_rgba(168,255,83,0.18)] transition-all cursor-pointer"
+            className="group flex items-center gap-2 px-5 py-3 bg-[#a8ff53] hover:bg-[#b8ff70] active:scale-[0.98] text-[#121317] font-medium text-[15px] rounded-sm shadow-[inset_0_0_0_1px_rgba(168,255,83,0.4),0_0_25px_rgba(168,255,83,0.18)] transition-all cursor-pointer"
           >
-            <Upload className="w-4 h-4 text-[#121317]" />
+            <UploadSimpleIcon className="w-4 h-4 text-[#121317]" />
             <span>Upload PDF & Start Studying</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </button>
 
           <button
             onClick={() => onOpenStudio?.('chat')}
-            className="flex items-center gap-2 px-4 py-3 bg-[#121317] hover:bg-[#15171c] active:bg-[#1a1d22] border border-[#272a2e] hover:border-[#3b3e45] text-[#d7d9dd] text-[14.5px] rounded-[4px] transition-all cursor-pointer"
+            className="flex items-center gap-2 px-4 py-3 bg-[#121317] hover:bg-[#15171c] border border-[#272a2e] hover:border-[#3b3e45] text-[#d7d9dd] text-[14.5px] rounded-sm transition-all cursor-pointer"
           >
-            <Brain className="w-4 h-4 text-[#a8ff53]" />
+            <BrainIcon className="w-4 h-4 text-[#a8ff53]" />
             <span>Try Interactive Demo</span>
+          </button>
+
+          <button
+            onClick={() => {
+              if (onOpenApiKeySettings) {
+                onOpenApiKeySettings();
+              } else {
+                onOpenStudio?.('settings');
+              }
+            }}
+            className="flex items-center gap-2 px-4 py-3 hover:bg-[#15171c] active:bg-[#1a1d22] border border-[#272a2e] hover:border-[#a8ff53]/50 text-[#d7d9dd] text-[14.5px] rounded-sm transition-all cursor-pointer group"
+          >
+            <KeyIcon className="w-4 h-4 text-[#a8ff53] group-hover:rotate-12 transition-transform" weight="bold" />
+            <span>Add Custom API Key</span>
           </button>
         </div>
 
         {/* 6 Study Feature Tabs Bar — Single Clean Row */}
-        <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap mb-5 max-w-[1050px] mx-auto">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap mb-5 max-w-262.5 mx-auto">
           {FEATURE_TABS.map((tab) => {
             const isActive = activeTabId === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTabId(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-[4px] text-[13px] font-medium transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-sm text-[13px] font-medium transition-all cursor-pointer ${
                   isActive
                     ? 'bg-[#121317] border border-[#a8ff53] text-[#e5e7eb] shadow-[0_0_15px_rgba(168,255,83,0.12)]'
                     : 'bg-[#121317]/60 border border-[#272a2e] text-[#878c99] hover:text-[#d7d9dd] hover:border-[#3b3e45]'
@@ -222,7 +255,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio }) => {
         </div>
 
         {/* Interactive Subject Preview Terminal */}
-        <div className="bg-[#121317] border border-[#272a2e] rounded-[4px] shadow-2xl overflow-hidden max-w-[1050px] mx-auto">
+        <div className="bg-[#121317] border border-[#272a2e] rounded-sm shadow-2xl overflow-hidden max-w-262.5 mx-auto">
           
           {/* Terminal Title Bar */}
           <div className="px-4 py-3 bg-[#15171c] border-b border-[#272a2e] flex items-center justify-between">
@@ -246,7 +279,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio }) => {
                 className="p-1.5 text-[#878c99] hover:text-[#e5e7eb] rounded hover:bg-[#272a2e] transition-colors cursor-pointer"
                 title="Copy sample content"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-[#a8ff53]" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <CheckIcon className="w-3.5 h-3.5 text-[#a8ff53]" /> : <CopyIcon className="w-3.5 h-3.5" />}
               </button>
             </div>
           </div>
@@ -283,10 +316,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio }) => {
                   <span>Ready to study</span>
                 </div>
                 <button
-                  onClick={() => onOpenStudio?.(activeTab.id === 'pdf-rag' ? 'documents' : activeTab.id === 'practice-quizzes' ? 'quiz' : activeTab.id === 'sm2-flashcards' ? 'flashcards' : activeTab.id === 'summaries' ? 'summarizer' : activeTab.id === 'podcasts' ? 'podcast' : 'chat')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#272a2e] hover:bg-[#3b3e45] text-[#a8ff53] text-[12.5px] font-medium rounded-[4px] transition-colors cursor-pointer"
+                  onClick={() => onOpenStudio?.(mapTabToStudioTab(activeTab.id))}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#272a2e] hover:bg-[#3b3e45] text-[#a8ff53] text-[12.5px] font-medium rounded-sm transition-colors cursor-pointer"
                 >
-                  <Play className="w-3 h-3 fill-current" />
+                  <PlayIcon className="w-3 h-3 fill-current" />
                   <span>Try in Studio</span>
                 </button>
               </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Users, ArrowRight, FolderSync } from 'lucide-react';
-import { TeachMeAPI } from '../../services/teachMeService';
-import type { GroupWorkspaceDTO } from '../../types/backend';
+import { UsersIcon, ArrowRightIcon, ArrowsClockwiseIcon } from '@phosphor-icons/react';
+import { TeachMeAPI } from '@/services/teachMeService.ts';
+import type { GroupWorkspaceDTO } from '@/types/backend.ts';
 
 interface GroupWorkspaceSectionProps {
   onOpenStudio?: (tab?: string) => void;
@@ -36,19 +36,19 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
 
   return (
     <section id="workspaces" className="py-24 border-t border-[#272a2e] bg-[#1c1e21]">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+      <div className="max-w-300 mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
             <div className="inline-flex items-center gap-1.5 text-[#e888f8] font-['Geist_Mono'] text-[13px] font-medium mb-3">
-              <Users className="w-3.5 h-3.5" />
+              <UsersIcon className="w-3.5 h-3.5" />
               <span>Multiplayer Study Rooms</span>
             </div>
             <h2 className="font-['Satoshi'] font-semibold text-[32px] sm:text-[40px] text-[#e5e7eb] mb-3">
               Collaborative Group Workspaces & Shared Vectors
             </h2>
-            <p className="font-['Geist'] text-[15px] sm:text-[16px] text-[#878c99] max-w-[620px] leading-[1.56]">
+            <p className="font-['Geist'] text-[15px] sm:text-[16px] text-[#878c99] max-w-155 leading-[1.56]">
               Share document vector indices with your study cohort. Real-time multiplayer annotations, shared quiz battles, and instant Anki deck distribution.
             </p>
           </div>
@@ -58,7 +58,7 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
             className="group mt-4 md:mt-0 inline-flex items-center gap-1.5 text-[14px] font-['Geist'] text-[#a8ff53] hover:underline cursor-pointer"
           >
             <span>Create Workspace</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
 
@@ -67,7 +67,7 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
           {workspaces.map((ws) => (
             <div
               key={ws.id}
-              className="bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-[4px] p-6 flex flex-col justify-between transition-all space-y-5"
+              className="bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] rounded-sm p-6 flex flex-col justify-between transition-all space-y-5"
             >
               <div>
                 <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#272a2e]">
@@ -109,7 +109,7 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
                   onClick={() => TeachMeAPI.export.downloadAnki(ws.name)}
                   className="flex items-center gap-1.5 text-[12px] text-[#d7d9dd] hover:text-[#a8ff53] transition-colors cursor-pointer"
                 >
-                  <FolderSync className="w-3.5 h-3.5" />
+                  <ArrowsClockwiseIcon className="w-3.5 h-3.5" />
                   <span>Sync Anki Deck</span>
                 </button>
               </div>

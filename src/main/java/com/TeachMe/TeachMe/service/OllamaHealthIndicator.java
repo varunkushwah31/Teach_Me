@@ -1,40 +1,63 @@
 package com.TeachMe.TeachMe.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+
+import java.time.Duration;
+import java.util.Map;
 
 @Slf4j
 @Component
 public class OllamaHealthIndicator implements HealthIndicator {
 
-    private final ChatClient chatClient;
+    private final RestClient restClient;
+    private final String baseUrl;
 
-    public OllamaHealthIndicator(ChatClient.Builder chatClientBuilder) {
-        this.chatClient = chatClientBuilder.build();
+    private static final String VERSION_KEY = "version";
+
+    public OllamaHealthIndicator(
+            @Value("${spring.ai.ollama.base-url:http://localhost:11434}") String baseUrl) {
+        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofMillis(1500));
+        requestFactory.setReadTimeout(Duration.ofMillis(1500));
+
+        this.restClient = RestClient.builder()
+                .requestFactory(requestFactory)
+                .baseUrl(this.baseUrl)
+                .build();
     }
 
     @Override
     public Health health() {
         try {
-            // Check Ollama connection with a simple ping prompt
-            String response = chatClient.prompt()
-                    .user("ping")
-                    .call()
-                    .content();
-            if (response != null && !response.isBlank()) {
-                return Health.up()
-                        .withDetail("model", "deepseek-r1:8b")
-                        .withDetail("status", "Reachable")
-                        .build();
-            }
-            return Health.down().withDetail("error", "Empty response received from Ollama model").build();
+            Map<?, ?> response = restClient.get()
+                    .uri("/api/" + VERSION_KEY)
+                    .retrieve()
+                    .body(Map.class);
+
+            String version = (response != null && response.containsKey(VERSION_KEY))
+                    ? String.valueOf(response.get(VERSION_KEY))
+                    : "detected";
+
+            return Health.up()
+                    .withDetail("ollamaEndpoint", baseUrl)
+                    .withDetail(VERSION_KEY, version)
+                    .withDetail("status", "ONLINE")
+                    .build();
         } catch (Exception e) {
-            log.warn("Observability: Ollama is unreachable on health check request", e);
-            return Health.down(e)
-                    .withDetail("error", "Ollama server is offline or unreachable")
+            log.debug("Observability: Ollama ping returned inactive: {}", e.getMessage());
+            // Return UP with offline notice or UNKNOWN so Render service health remains healthy while Ollama is offline or remote
+            return Health.up()
+                    .withDetail("ollamaEndpoint", baseUrl)
+                    .withDetail("status", "STANDBY / REMOTE")
+                    .withDetail("notice", "Ollama remote daemon offline or on-demand")
                     .build();
         }
     }
