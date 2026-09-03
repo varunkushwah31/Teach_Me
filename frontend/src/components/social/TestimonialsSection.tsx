@@ -42,10 +42,10 @@ export const TestimonialsSection: React.FC = () => {
         
         {/* Section Header */}
         <div className="mb-14 text-center">
-          <h2 className="font-['Satoshi'] font-semibold text-[32px] sm:text-[38px] text-[#e5e7eb] mb-3">
+          <h2 className="font-sans font-semibold text-[32px] sm:text-[38px] text-[#e5e7eb] mb-3 tracking-tight">
             Loved by developers
           </h2>
-          <p className="font-['Geist'] text-[16px] text-[#878c99] max-w-150 mx-auto leading-normal">
+          <p className="font-sans text-[16px] text-[#878c99] max-w-150 mx-auto leading-normal">
             Engineers and educators around the world rely on TeachMe for mission-critical learning intelligence.
           </p>
         </div>
@@ -55,11 +55,11 @@ export const TestimonialsSection: React.FC = () => {
           {TESTIMONIALS.map((t) => (
             <div
               key={t.author}
-              className="bg-[#1c1e21] border border-[#272a2e] hover:border-[#3b3e45] rounded-sm p-6 sm:p-7 flex flex-col justify-between transition-colors duration-200"
+              className="bg-[#1c1e21] border border-[#272a2e] hover:border-[#3b3e45] rounded-xl p-6 sm:p-7 flex flex-col justify-between transition-colors duration-200"
             >
               <div>
                 {/* Quote Text */}
-                <p className="font-['Geist'] font-normal text-[15px] sm:text-[16px] leading-[1.56] text-[#e5e7eb] mb-6">
+                <p className="font-sans font-normal text-[15px] sm:text-[16px] leading-[1.56] text-[#e5e7eb] mb-6">
                   "{t.quote}"
                 </p>
               </div>
@@ -68,16 +68,16 @@ export const TestimonialsSection: React.FC = () => {
               <div className="pt-4 border-t border-[#272a2e] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center font-['Geist_Mono'] text-[12px] font-bold text-[#121317]"
+                    className="w-8 h-8 rounded-full flex items-center justify-center font-mono text-[12px] font-bold text-[#121317]"
                     style={{ backgroundColor: t.avatarColor }}
                   >
                     {t.author.charAt(0)}
                   </div>
                   <div>
-                    <div className="font-['Geist'] font-medium text-[14px] text-[#d7d9dd]">
+                    <div className="font-sans font-medium text-[14px] text-[#d7d9dd]">
                       {t.author}
                     </div>
-                    <div className="font-['Geist'] text-[12px] text-[#878c99]">
+                    <div className="font-sans text-[12px] text-[#878c99]">
                       {t.role} • {t.company}
                     </div>
                   </div>
@@ -85,7 +85,7 @@ export const TestimonialsSection: React.FC = () => {
 
                 <a
                   href="#testimonials"
-                  className="flex items-center gap-1 text-[13px] font-['Geist'] text-[#878c99] hover:text-[#e5e7eb] transition-colors"
+                  className="flex items-center gap-1 text-[13px] font-sans text-[#878c99] hover:text-[#e5e7eb] transition-colors"
                 >
                   <span>Read story</span>
                   <span className="text-[#fa3abf]">→</span>

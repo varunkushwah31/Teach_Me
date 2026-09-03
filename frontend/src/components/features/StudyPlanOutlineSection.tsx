@@ -4,7 +4,8 @@ import {
   CheckCircleIcon,
   DownloadSimpleIcon,
   ClockIcon,
-  ArrowRightIcon
+  CheckSquareIcon,
+  SquareIcon
 } from '@phosphor-icons/react';
 import { TeachMeAPI } from '@/services/teachMeService.ts';
 import type { StudyPlanDTO, NoteOutlineDTO } from '@/types/backend.ts';
@@ -47,12 +48,32 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
       },
       {
         day: 5,
-        focusTopic: 'Comprehensive Final Diagnostic & Exam Readiness',
+        focusTopic: 'Comprehensive Diagnostic & Exam Readiness',
         estimatedHours: 3,
         tasks: ['Calculate AI Exam Readiness score', 'Target review gaps identified by AI tutor', 'Pass final 50-question simulation quiz']
       }
     ]
   });
+
+  // Interactive completed tasks state
+  const [completedTasks, setCompletedTasks] = useState<Record<string, boolean>>({
+    '1-0': true,
+    '1-1': true,
+    '1-2': false,
+    '2-0': false
+  });
+
+  const totalTasks = studyPlan.schedule.reduce((acc, d) => acc + d.tasks.length, 0);
+  const completedCount = Object.values(completedTasks).filter(Boolean).length;
+  const progressPercent = Math.round((completedCount / totalTasks) * 100);
+
+  const toggleTask = (dayIdx: number, taskIdx: number) => {
+    const key = `${dayIdx}-${taskIdx}`;
+    setCompletedTasks(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   const [outline] = useState<NoteOutlineDTO>({
     documentId: 101,
@@ -90,41 +111,41 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
   });
 
   return (
-    <section id="study-plans" className="py-24 border-t border-[#272a2e] bg-[#1c1e21] font-['Geist']">
-      <div className="max-w-300 mx-auto px-4 sm:px-6">
+    <section id="study-plans" className="py-24 border-t border-[#2e3238] bg-[#1c1e21] font-['Inter']">
+      <div className="max-w-310 mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-[#d9f07c] font-['Geist_Mono'] text-[13px] font-medium mb-3">
-              <CalendarIcon className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 text-[#d9f07c] font-mono text-[13px] font-semibold mb-3">
+              <CalendarIcon className="w-4 h-4" />
               <span>Personalized Study Roadmaps</span>
             </div>
-            <h2 className="font-['Satoshi'] font-bold text-[32px] sm:text-[38px] text-[#e5e7eb] mb-3">
+            <h2 className="font-bold text-[32px] sm:text-[40px] text-[#f3f4f6] mb-3 tracking-tight">
               Day-by-Day Study Plans & Cornell Lecture Outlines
             </h2>
-            <p className="text-[15px] sm:text-[16px] text-[#878c99] max-w-155 leading-[1.58]">
-              TeachMe synthesizes your course syllabus and textbook chapters into daily milestone schedules, key formulas, and Cornell lecture notes.
+            <p className="text-[16px] text-[#b5b8c0] max-w-160 leading-[1.6]">
+              TeachMe parses your uploaded course syllabus into daily milestone goals with an interactive checklist, formula cheatsheet, and Cornell lecture notes.
             </p>
           </div>
 
           <div className="flex items-center gap-2 mt-4 md:mt-0">
             <button
               onClick={() => setActiveView('plan')}
-              className={`px-3 py-1.5 rounded-sm text-[13px] transition-colors cursor-pointer ${
+              className={`px-4 py-2 rounded text-[13.5px] transition-colors cursor-pointer font-medium card-hover-lift ${
                 activeView === 'plan'
-                  ? 'bg-[#272a2e] text-[#a8ff53] font-medium border border-[#3b3e45]'
-                  : 'text-[#878c99] hover:text-[#e5e7eb]'
+                  ? 'bg-[#272a2e] text-[#a8ff53] border-2 border-[#a8ff53]/80 shadow-[0_0_12px_rgba(168,255,83,0.15)]'
+                  : 'text-[#a0a4af] hover:text-[#f3f4f6] bg-[#121317] border border-[#2e3238]'
               }`}
             >
-              5-Day Study Plan
+              5-Day Study Roadmap
             </button>
             <button
               onClick={() => setActiveView('outline')}
-              className={`px-3 py-1.5 rounded-sm text-[13px] transition-colors cursor-pointer ${
+              className={`px-4 py-2 rounded text-[13.5px] transition-colors cursor-pointer font-medium card-hover-lift ${
                 activeView === 'outline'
-                  ? 'bg-[#272a2e] text-[#a8ff53] font-medium border border-[#3b3e45]'
-                  : 'text-[#878c99] hover:text-[#e5e7eb]'
+                  ? 'bg-[#272a2e] text-[#a8ff53] border-2 border-[#a8ff53]/80 shadow-[0_0_12px_rgba(168,255,83,0.15)]'
+                  : 'text-[#a0a4af] hover:text-[#f3f4f6] bg-[#121317] border border-[#2e3238]'
               }`}
             >
               Cornell Notes & Formulas
@@ -133,28 +154,34 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
         </div>
 
         {/* Content Box */}
-        <div className="bg-[#121317] border border-[#272a2e] rounded-sm p-6 sm:p-8 shadow-2xl">
+        <div className="bg-[#121317] border border-[#2e3238] rounded p-6 sm:p-8 shadow-2xl">
           
           {/* VIEW 1: Day-by-Day Study Plan */}
           {activeView === 'plan' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#272a2e] gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#2e3238] gap-3">
                 <div>
-                  <h3 className="font-['Satoshi'] font-semibold text-[20px] text-[#e5e7eb]">
+                  <h3 className="font-bold text-[20px] text-[#f3f4f6]">
                     {studyPlan.planTitle}
                   </h3>
-                  <span className="text-[12px] text-[#878c99] font-['Geist_Mono']">
-                    Generated from your uploaded course notes • 5 Days • 11.0 Total Study Hours
+                  <span className="text-[12.5px] text-[#a0a4af] font-mono">
+                    Generated from course notes • 5 Days • 11.0 Total Hours
                   </span>
                 </div>
 
-                <button
-                  onClick={() => onOpenStudio?.('readiness')}
-                  className="inline-flex items-center gap-1.5 text-[13px] text-[#a8ff53] hover:underline cursor-pointer"
-                >
-                  <span>Check Exam Readiness</span>
-                  <ArrowRightIcon className="w-3.5 h-3.5" />
-                </button>
+                {/* Progress bar */}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="text-[12px] font-mono text-[#a0a4af]">Roadmap Progress:</div>
+                    <div className="text-[15px] font-mono font-bold text-[#a8ff53]">{progressPercent}% ({completedCount}/{totalTasks} tasks)</div>
+                  </div>
+                  <div className="w-28 h-2.5 bg-[#1c1e21] rounded-full overflow-hidden border border-[#2e3238]">
+                    <div
+                      style={{ width: `${progressPercent}%` }}
+                      className="h-full bg-[#a8ff53] transition-all duration-300 rounded-full"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Day Cards Grid */}
@@ -162,35 +189,58 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
                 {studyPlan.schedule.map((day) => (
                   <div
                     key={day.day}
-                    className="p-4 bg-[#1c1e21] border border-[#272a2e] hover:border-[#3b3e45] rounded-sm flex flex-col justify-between space-y-3"
+                    className="p-4 bg-[#1c1e21] border border-[#2e3238] hover:border-[#424750] rounded flex flex-col justify-between space-y-3 transition-colors shadow-lg"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="px-2 py-0.5 rounded bg-[#121317] border border-[#272a2e] text-[11px] font-['Geist_Mono'] text-[#a8ff53]">
+                        <span className="px-2 py-0.5 rounded bg-[#121317] border border-[#2e3238] text-[11px] font-mono text-[#a8ff53] font-semibold">
                           Day {day.day}
                         </span>
-                        <span className="text-[11px] text-[#878c99] flex items-center gap-1">
-                          <ClockIcon className="w-3 h-3" /> {day.estimatedHours}h
+                        <span className="text-[11.5px] text-[#a0a4af] flex items-center gap-1 font-mono">
+                          <ClockIcon className="w-3.5 h-3.5" /> {day.estimatedHours}h
                         </span>
                       </div>
 
-                      <div className="font-medium text-[13px] text-[#e5e7eb] mb-2 leading-[1.4]">
+                      <div className="font-semibold text-[13.5px] text-[#f3f4f6] mb-3 leading-[1.35]">
                         {day.focusTopic}
                       </div>
 
-                      <ul className="space-y-1.5 text-[12px] text-[#878c99]">
-                        {day.tasks.map((task) => (
-                          <li key={task} className="flex items-start gap-1.5">
-                            <span className="text-[#a8ff53] mt-0.5">•</span>
-                            <span>{task}</span>
-                          </li>
-                        ))}
+                      <ul className="space-y-2 text-[12px]">
+                        {day.tasks.map((task, taskIdx) => {
+                          const isDone = Boolean(completedTasks[`${day.day}-${taskIdx}`]);
+                          return (
+                            <li
+                              key={task}
+                              onClick={() => toggleTask(day.day, taskIdx)}
+                              className="flex items-start gap-2 cursor-pointer group"
+                            >
+                              <span className="mt-0.5 shrink-0">
+                                {isDone ? (
+                                  <CheckSquareIcon className="w-3.5 h-3.5 text-[#a8ff53]" weight="fill" />
+                                ) : (
+                                  <SquareIcon className="w-3.5 h-3.5 text-[#a0a4af] group-hover:text-[#f3f4f6]" />
+                                )}
+                              </span>
+                              <span className={isDone ? 'line-through text-[#6b7280]' : 'text-[#d7d9dd] group-hover:text-[#f3f4f6]'}>
+                                {task}
+                              </span>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
 
-                    <div className="pt-2 border-t border-[#272a2e]/60 text-[11px] text-[#afec73] flex items-center gap-1">
-                      <CheckCircleIcon className="w-3 h-3" />
-                      <span>Milestone Check</span>
+                    <div className="pt-2.5 border-t border-[#2e3238] text-[11px] text-[#a8ff53] flex items-center justify-between font-mono">
+                      <span className="flex items-center gap-1">
+                        <CheckCircleIcon className="w-3.5 h-3.5" />
+                        <span>Milestone</span>
+                      </span>
+                      <button
+                        onClick={() => onOpenStudio?.('quiz')}
+                        className="text-[11px] hover:underline text-[#a8ff53] cursor-pointer"
+                      >
+                        Quiz →
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -200,22 +250,22 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
 
           {/* VIEW 2: Cornell Note Outlines & Formula Cheatsheet */}
           {activeView === 'outline' && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#272a2e] gap-2">
+            <div className="space-y-6 animate-fade-in">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#2e3238] gap-3">
                 <div>
-                  <h3 className="font-['Satoshi'] font-semibold text-[20px] text-[#e5e7eb]">
+                  <h3 className="font-bold text-[20px] text-[#f3f4f6]">
                     {outline.title}
                   </h3>
-                  <span className="text-[12px] text-[#878c99] font-['Geist_Mono']">
+                  <span className="text-[12.5px] text-[#a0a4af] font-mono">
                     Structured Cornell Format with Reaction Equations & Key Formulas
                   </span>
                 </div>
 
                 <button
                   onClick={() => TeachMeAPI.export.downloadMarkdownOutline(outline)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#a8ff53] text-[#121317] font-medium text-[12px] rounded hover:bg-[#b8ff70] cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#a8ff53] text-[#121317] font-semibold text-[13px] rounded hover:bg-[#baff6b] transition-all cursor-pointer shadow-[0_0_12px_rgba(168,255,83,0.2)]"
                 >
-                  <DownloadSimpleIcon className="w-3.5 h-3.5" />
+                  <DownloadSimpleIcon className="w-4 h-4" weight="bold" />
                   <span>Download .MD Notes</span>
                 </button>
               </div>
@@ -223,24 +273,26 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
               {/* Outline Sections */}
               <div className="space-y-4">
                 {outline.sections.map((sec) => (
-                  <div key={sec.heading} className="p-4 bg-[#1c1e21] border border-[#272a2e] rounded-sm space-y-3">
+                  <div key={sec.heading} className="p-4 bg-[#1c1e21] border border-[#2e3238] rounded space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-[15px] text-[#e5e7eb]">
+                      <h4 className="font-semibold text-[15px] text-[#f3f4f6]">
                         {sec.heading}
                       </h4>
-                      <span className="text-[11px] font-['Geist_Mono'] text-[#9c9af2]">Core Concept</span>
+                      <span className="text-[11px] font-mono text-[#9c9af2] bg-[#9c9af2]/10 px-2 py-0.5 rounded border border-[#9c9af2]/20">
+                        Core Concept
+                      </span>
                     </div>
 
-                    <ul className="list-disc list-inside text-[13px] text-[#878c99] space-y-1">
+                    <ul className="list-disc list-inside text-[13.5px] text-[#b5b8c0] space-y-1.5 leading-[1.6]">
                       {sec.keyPoints.map((pt) => (
                         <li key={pt}>{pt}</li>
                       ))}
                     </ul>
 
                     {sec.formulas && (
-                      <div className="p-3 bg-[#121317] border border-[#272a2e] rounded font-['Geist_Mono'] text-[12px] text-[#a8ff53]">
+                      <div className="p-3 bg-[#121317] border border-[#2e3238] rounded font-mono text-[12.5px] text-[#a8ff53]">
                         {sec.formulas.map((f) => (
-                          <div key={f}>Reaction Equation: {f}</div>
+                          <div key={f}>Formula / Reaction: {f}</div>
                         ))}
                       </div>
                     )}
@@ -256,3 +308,4 @@ export const StudyPlanOutlineSection: React.FC<StudyPlanOutlineSectionProps> = (
     </section>
   );
 };
+

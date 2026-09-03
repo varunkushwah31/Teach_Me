@@ -14,35 +14,35 @@ export const StatsSection: React.FC = () => {
         </div>
 
         {/* Social Proof Quote */}
-        <p className="font-['Geist'] text-[18px] text-[#e5e7eb] max-w-135 mx-auto mb-14 leading-normal">
+        <p className="font-sans text-[18px] text-[#e5e7eb] max-w-135 mx-auto mb-14 leading-normal">
           We transparently build TeachMe in the open. Loved by students, researchers, and engineers everywhere.
         </p>
 
         {/* 3 Metric Figures */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-200 mx-auto pt-6 border-t border-[#272a2e]">
           <div>
-            <div className="font-['Satoshi'] font-semibold text-[44px] text-[#e5e7eb] mb-1">
+            <div className="font-sans font-bold tracking-tight text-[44px] text-[#e5e7eb] mb-1">
               15M+
             </div>
-            <div className="font-['Geist_Mono'] text-[13px] text-[#878c99]">
+            <div className="font-mono text-[13px] text-[#878c99]">
               Chunks Vectorized
             </div>
           </div>
 
           <div>
-            <div className="font-['Satoshi'] font-semibold text-[44px] text-[#a8ff53] mb-1">
+            <div className="font-sans font-bold tracking-tight text-[44px] text-[#a8ff53] mb-1">
               Apache 2.0
             </div>
-            <div className="font-['Geist_Mono'] text-[13px] text-[#878c99]">
+            <div className="font-mono text-[13px] text-[#878c99]">
               Open Source License
             </div>
           </div>
 
           <div>
-            <div className="font-['Satoshi'] font-semibold text-[44px] text-[#9c9af2] mb-1">
+            <div className="font-sans font-bold tracking-tight text-[44px] text-[#9c9af2] mb-1">
               &lt; 50ms
             </div>
-            <div className="font-['Geist_Mono'] text-[13px] text-[#878c99]">
+            <div className="font-mono text-[13px] text-[#878c99]">
               PgVector Search Latency
             </div>
           </div>

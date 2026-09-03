@@ -36,32 +36,42 @@ export interface ChatHistoryDTO {
 
 export interface DocumentHistoryDTO {
   id: number;
-  filename: string;
+  filename?: string;
+  fileName?: string;
   fileSize: number;
-  category: string;
-  chatId: string;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  fileType?: string;
+  category?: string;
+  chatId?: string;
+  description?: string | null;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | string;
   createdAt: string;
+  updatedAt?: string;
+  errorMessage?: string | null;
   chunkCount?: number;
 }
 
 export interface PaginatedResponse<T> {
   content: T[];
-  pageNumber: number;
-  pageSize: number;
-  totalElements: number;
-  totalPages: number;
-  last: boolean;
+  pageNumber?: number;
+  pageSize?: number;
+  totalElements?: number;
+  totalPages?: number;
+  last?: boolean;
 }
 
 export interface DocumentAnalyticsDTO {
   documentId: number;
-  filename: string;
+  filename?: string;
+  documentName?: string;
   totalWords: number;
-  estimatedReadingMinutes: number;
-  readabilityGrade: string;
-  topKeywords: string[];
-  chunksCount: number;
+  estimatedReadingMinutes?: number;
+  estimatedReadingTimeMinutes?: number;
+  readabilityGrade?: string;
+  readabilityGradeLevel?: string;
+  topKeywords?: string[];
+  topExtractedKeywords?: string[];
+  chunksCount?: number;
+  chunkCount?: number;
 }
 
 export interface QuizQuestionDTO {

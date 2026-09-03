@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from "url"
+import { fileURLToPath, URL } from "node:url"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
@@ -15,7 +15,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: process.env.VITE_BACKEND_URL || "http://localhost:8080",
+        target: process.env.VITE_BACKEND_URL || "http://localhost:8081",
         changeOrigin: true,
         secure: false,
       },

@@ -71,17 +71,17 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-[#121317] border border-[#272a2e] rounded-lg shadow-2xl overflow-hidden font-['Geist'] text-[#e5e7eb]">
+      <div className="relative w-full max-w-xl bg-[#13151b] border border-white/10 rounded-2xl shadow-2xl overflow-hidden font-sans text-[#e5e7eb]">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#272a2e] bg-[#15171c]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#15171c]">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-[#a8ff53]/10 text-[#a8ff53] rounded border border-[#a8ff53]/20">
+            <div className="p-2 bg-lime-400/10 text-lime-400 rounded-lg border border-lime-400/20">
               <KeyIcon className="w-5 h-5" weight="bold" />
             </div>
             <div>
-              <h2 className="text-[17px] font-['Satoshi'] font-bold text-[#e5e7eb]">AI Providers & Custom API Keys</h2>
-              <p className="text-[12px] text-[#878c99]">Bring your own API key or use 100% Free Local Ollama</p>
+              <h2 className="text-[17px] font-sans font-bold text-white tracking-tight">AI Providers & Custom API Keys</h2>
+              <p className="text-[12px] text-zinc-400">Bring your own API key or use 100% Free Local Ollama</p>
             </div>
           </div>
           <button
