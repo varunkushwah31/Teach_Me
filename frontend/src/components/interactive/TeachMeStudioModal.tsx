@@ -21,7 +21,8 @@ import {
   CalendarIcon,
   TrophyIcon,
   MagnifyingGlassIcon,
-  UsersIcon
+  UsersIcon,
+  TrashIcon
 } from '@phosphor-icons/react';
 import { TeachMeAPI } from '@/services/teachMeService.ts';
 import {
@@ -99,6 +100,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
   const [selectedDocId, setSelectedDocId] = useState<number>(101);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [deletingDocId, setDeletingDocId] = useState<number | null>(null);
   const [analytics, setAnalytics] = useState<DocumentAnalyticsDTO | null>(null);
   const [knowledgeGraph, setKnowledgeGraph] = useState<KnowledgeGraphDTO | null>(null);
 
@@ -274,6 +276,44 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
       setIsUploading(false);
       setUploadStatus(`"${file.name}" added to course library.`);
       setTimeout(() => setUploadStatus(null), 4000);
+    }
+  };
+
+  const handleDeleteDocument = async (docId: number, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const docToDelete = documents.find(d => d.id === docId);
+    const docTitle = docToDelete?.fileName || docToDelete?.filename || 'this document';
+
+    if (!window.confirm(`Are you sure you want to delete "${docTitle}"? All vector embeddings, summaries, and quizzes for this document will be permanently removed.`)) {
+      return;
+    }
+
+    try {
+      setDeletingDocId(docId);
+      await TeachMeAPI.documents.deleteDocument(docId);
+
+      const remaining = documents.filter(d => d.id !== docId);
+      setDocuments(remaining);
+
+      if (selectedDocId === docId) {
+        if (remaining.length > 0) {
+          setSelectedDocId(remaining[0].id);
+        } else {
+          setSelectedDocId(0);
+          setAnalytics(null);
+          setKnowledgeGraph(null);
+          setSummaryData(null);
+        }
+      }
+
+      setUploadStatus(`Document "${docTitle}" deleted successfully.`);
+      setTimeout(() => setUploadStatus(null), 3000);
+    } catch (err: unknown) {
+      console.error('Failed to delete document:', err);
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
+      alert(`Failed to delete document: ${errorMsg}`);
+    } finally {
+      setDeletingDocId(null);
     }
   };
 
@@ -481,6 +521,9 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 onChange={(e) => setSelectedDocId(Number(e.target.value))}
                 className="px-2.5 py-1 bg-[#1c1e21] border border-[#272a2e] rounded text-[12px] text-[#e5e7eb] max-w-60 focus:outline-none"
               >
+                {documents.length === 0 && (
+                  <option value={0}>No documents uploaded</option>
+                )}
                 {documents.map(d => (
                   <option key={d.id} value={d.id}>{d.filename}</option>
                 ))}
@@ -661,54 +704,73 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   </div>
 
                   <div className="divide-y divide-[#2e3238]">
-                    {documents.map((doc) => {
-                      const isSelected = selectedDocId === doc.id;
-                      const displayName = doc.fileName || doc.filename || 'Course_Document.pdf';
-                      const isCompleted = doc.status === 'COMPLETED';
-                      const isProcessing = doc.status === 'PROCESSING' || doc.status === 'PENDING';
-                      const isFailed = doc.status === 'FAILED';
+                    {documents.length === 0 ? (
+                      <div className="p-8 text-center text-[#878c99] font-mono text-[13px]">
+                        No course materials uploaded yet. Upload a PDF above to begin studying!
+                      </div>
+                    ) : (
+                      documents.map((doc) => {
+                        const isSelected = selectedDocId === doc.id;
+                        const displayName = doc.fileName || doc.filename || 'Course_Document.pdf';
+                        const isCompleted = doc.status === 'COMPLETED';
+                        const isProcessing = doc.status === 'PROCESSING' || doc.status === 'PENDING';
+                        const isFailed = doc.status === 'FAILED';
 
-                      return (
-                        <div
-                          key={doc.id}
-                          onClick={() => setSelectedDocId(doc.id)}
-                          className={`p-4 flex items-center justify-between cursor-pointer transition-colors ${
-                            isSelected ? 'bg-[#1c1e21] border-l-4 border-[#a8ff53]' : 'hover:bg-[#1c1e21]/50'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <FileTextIcon className="w-5 h-5 text-[#a8ff53] shrink-0" />
-                            <div>
-                              <div className="font-semibold text-[14.5px] text-[#f3f4f6]">
-                                {displayName}
-                              </div>
-                              <div className="text-[12px] text-[#a0a4af] font-mono">
-                                {(doc.fileSize / (1024 * 1024)).toFixed(2)} MB • {doc.chunkCount ?? (isCompleted ? Math.max(1, Math.round(doc.fileSize / 15000)) : 0)} PgVector Chunks
-                              </div>
-                              {doc.errorMessage && (
-                                <div className="text-[11px] text-[#f43f5e] font-mono mt-0.5 truncate max-w-100">
-                                  {doc.errorMessage}
+                        return (
+                          <div
+                            key={doc.id}
+                            onClick={() => setSelectedDocId(doc.id)}
+                            className={`p-4 flex items-center justify-between cursor-pointer transition-colors ${
+                              isSelected ? 'bg-[#1c1e21] border-l-4 border-[#a8ff53]' : 'hover:bg-[#1c1e21]/50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <FileTextIcon className="w-5 h-5 text-[#a8ff53] shrink-0" />
+                              <div>
+                                <div className="font-semibold text-[14.5px] text-[#f3f4f6]">
+                                  {displayName}
                                 </div>
-                              )}
+                                <div className="text-[12px] text-[#a0a4af] font-mono">
+                                  {(doc.fileSize / (1024 * 1024)).toFixed(2)} MB • {doc.chunkCount ?? (isCompleted ? Math.max(1, Math.round(doc.fileSize / 15000)) : 0)} PgVector Chunks
+                                </div>
+                                {doc.errorMessage && (
+                                  <div className="text-[11px] text-[#f43f5e] font-mono mt-0.5 truncate max-w-100">
+                                    {doc.errorMessage}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold border ${
+                                isCompleted
+                                  ? 'bg-[#a8ff53]/10 text-[#a8ff53] border-[#a8ff53]/30'
+                                  : isProcessing
+                                  ? 'bg-[#d9f07c]/10 text-[#d9f07c] border-[#d9f07c]/30 animate-pulse'
+                                  : isFailed
+                                  ? 'bg-[#f43f5e]/10 text-[#f43f5e] border-[#f43f5e]/30'
+                                  : 'bg-[#121317] text-[#a0a4af] border-[#2e3238]'
+                              }`}>
+                                {doc.status}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={(e) => handleDeleteDocument(doc.id, e)}
+                                disabled={deletingDocId === doc.id}
+                                title={`Delete "${displayName}"`}
+                                className="p-1.5 text-[#878c99] hover:text-[#f43f5e] hover:bg-[#f43f5e]/15 rounded transition-all cursor-pointer disabled:opacity-40"
+                              >
+                                {deletingDocId === doc.id ? (
+                                  <ArrowsClockwiseIcon className="w-4 h-4 animate-spin text-[#f43f5e]" />
+                                ) : (
+                                  <TrashIcon className="w-4 h-4" />
+                                )}
+                              </button>
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold border ${
-                              isCompleted
-                                ? 'bg-[#a8ff53]/10 text-[#a8ff53] border-[#a8ff53]/30'
-                                : isProcessing
-                                ? 'bg-[#d9f07c]/10 text-[#d9f07c] border-[#d9f07c]/30 animate-pulse'
-                                : isFailed
-                                ? 'bg-[#f43f5e]/10 text-[#f43f5e] border-[#f43f5e]/30'
-                                : 'bg-[#121317] text-[#a0a4af] border-[#2e3238]'
-                            }`}>
-                              {doc.status}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </div>
 

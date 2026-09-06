@@ -1,24 +1,24 @@
 import {API_BASE_URL, apiRequest, clearAuthToken, getAuthToken, setAuthToken} from './apiClient';
 import {getStoredAIConfig} from './aiConfigService';
 import type {
-  AuthResponse,
-  ChatHistoryDTO,
-  CitationDTO,
-  DocumentAnalyticsDTO,
-  DocumentHistoryDTO,
-  DocumentSummaryDTO,
-  ExamReadinessDTO,
-  FlashcardDTO,
-  GroupWorkspaceDTO,
-  KnowledgeGraphDTO,
-  NoteOutlineDTO,
-  OllamaModelInfo,
-  PaginatedResponse,
-  PodcastScriptDTO,
-  QuizDTO,
-  QuizResponseDTO,
-  SearchResultChunkDTO,
-  StudyPlanDTO
+    AuthResponse,
+    ChatHistoryDTO,
+    CitationDTO,
+    DocumentAnalyticsDTO,
+    DocumentHistoryDTO,
+    DocumentSummaryDTO,
+    ExamReadinessDTO,
+    FlashcardDTO,
+    GroupWorkspaceDTO,
+    KnowledgeGraphDTO,
+    NoteOutlineDTO,
+    OllamaModelInfo,
+    PaginatedResponse,
+    PodcastScriptDTO,
+    QuizDTO,
+    QuizResponseDTO,
+    SearchResultChunkDTO,
+    StudyPlanDTO
 } from '../types/backend';
 
 function generateSecureRandomId(max = 1000): number {
@@ -110,11 +110,10 @@ export const TeachMeAPI = {
       formData.append('chatId', chatId);
 
       try {
-        const res = await apiRequest<{ message: string; jobId: string }>('/documents/upload', {
-          method: 'POST',
-          body: formData,
+          return await apiRequest<{ message: string; jobId: string }>('/documents/upload', {
+            method: 'POST',
+            body: formData,
         });
-        return res;
       } catch (err: unknown) {
         console.warn('Backend upload fell back to client ingestion:', err);
         localEntry.status = 'COMPLETED';
@@ -130,6 +129,23 @@ export const TeachMeAPI = {
         return await apiRequest<{ jobId: string; status: string }>(`/documents/status/${jobId}`);
       } catch {
         return { jobId, status: 'COMPLETED' };
+      }
+    },
+
+    deleteDocument: async (documentId: number): Promise<{ message: string; documentId: number }> => {
+      // Remove from client in-memory cache
+      TeachMeAPI._userUploadedDocs = TeachMeAPI._userUploadedDocs.filter(d => d.id !== documentId);
+
+      try {
+          return await apiRequest<{ message: string; documentId: number }>(`/documents/${documentId}`, {
+            method: 'DELETE',
+        });
+      } catch (err: unknown) {
+        console.warn(`Backend delete for document ${documentId} fell back to client state update:`, err);
+        return {
+          message: 'Document deleted from workspace',
+          documentId,
+        };
       }
     },
 

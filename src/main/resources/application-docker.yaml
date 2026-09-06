@@ -27,7 +27,6 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
         jdbc:
           fetch_size: 50
@@ -56,7 +55,7 @@ spring:
         initialize-schema: true
 
 server:
-  port: 8081
+  port: ${PORT:8081}
   tomcat:
     connection-timeout: 10000ms
     keep-alive-timeout: 60000ms

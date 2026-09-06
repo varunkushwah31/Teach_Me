@@ -7,9 +7,11 @@ import com.TeachMe.TeachMe.service.DocumentIngestionService;
 import com.TeachMe.TeachMe.service.JobStatusManager;
 import com.TeachMe.TeachMe.service.QuizGenerationService;
 import com.TeachMe.TeachMe.dto.QuizDTO;
+import com.TeachMe.TeachMe.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -100,6 +102,36 @@ public class DocumentController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(ERROR_KEY, "Failed to generate quiz: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{documentId}")
+    @Operation(summary = "Delete uploaded document", description = "Permanently deletes an uploaded document, associated pgvector embeddings, and related study materials, validating user ownership.")
+    @ApiResponse(responseCode = "200", description = "Document deleted successfully")
+    @ApiResponse(responseCode = "403", description = "Access denied: Document not owned by user")
+    @ApiResponse(responseCode = "404", description = "Document not found")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    public ResponseEntity<Map<String, Object>> deleteDocument(@PathVariable Long documentId) {
+        try {
+            Long userId = authService.getAuthenticatedUserId();
+            User currentUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found in repository"));
+
+            ingestionService.deleteDocument(documentId, currentUser);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Document deleted successfully",
+                    "documentId", documentId
+            ));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(ERROR_KEY, e.getMessage()));
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(ERROR_KEY, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(ERROR_KEY, "Failed to delete document: " + e.getMessage()));
         }
     }
 }

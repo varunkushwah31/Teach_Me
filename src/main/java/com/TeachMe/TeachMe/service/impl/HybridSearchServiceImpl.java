@@ -12,6 +12,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -40,6 +41,7 @@ public class HybridSearchServiceImpl implements HybridSearchService {
 
     @Override
     @EventListener(ApplicationReadyEvent.class)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void ensureHnswIndex() {
         try {
             log.info("Ensuring HNSW index idx_vector_store_hnsw exists on vector_store...");
@@ -80,7 +82,7 @@ public class HybridSearchServiceImpl implements HybridSearchService {
         org.springframework.ai.vectorstore.filter.Filter.Expression filterExp;
         if (documentIds != null && !documentIds.isEmpty()) {
             if (documentIds.size() == 1) {
-                filterExp = b.and(baseGroup, b.eq("dbDocumentId", documentIds.get(0))).build();
+                filterExp = b.and(baseGroup, b.eq("dbDocumentId", documentIds.getFirst())).build();
             } else {
                 filterExp = b.and(baseGroup, b.in("dbDocumentId", documentIds.toArray())).build();
             }
@@ -164,14 +166,14 @@ public class HybridSearchServiceImpl implements HybridSearchService {
         for (int rank = 0; rank < vectorResults.size(); rank++) {
             Document doc = vectorResults.get(rank);
             String docId = doc.getId();
-            rrfScores.merge(docId, 1.0 / (k + rank + 1), (v1, v2) -> v1 + v2);
+            rrfScores.merge(docId, 1.0 / (k + rank + 1), Double::sum);
             documentMap.put(docId, doc);
         }
 
         for (int rank = 0; rank < fullTextResults.size(); rank++) {
             Document doc = fullTextResults.get(rank);
             String docId = doc.getId();
-            rrfScores.merge(docId, 1.0 / (k + rank + 1), (v1, v2) -> v1 + v2);
+            rrfScores.merge(docId, 1.0 / (k + rank + 1), Double::sum);
             documentMap.putIfAbsent(docId, doc);
         }
 

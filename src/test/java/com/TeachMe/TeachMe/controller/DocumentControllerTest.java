@@ -18,8 +18,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import com.TeachMe.TeachMe.exception.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -92,5 +99,37 @@ class DocumentControllerTest {
                         .param("chatId", "session-123")
                         .param("category", "computer-science"))
                 .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    void shouldDeleteDocumentSuccessfully() throws Exception {
+        when(authService.getAuthenticatedUserId()).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+        doNothing().when(ingestionService).deleteDocument(eq(101L), any(User.class));
+
+        mockMvc.perform(delete("/api/documents/101"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturn404WhenDocumentNotFoundForDeletion() throws Exception {
+        when(authService.getAuthenticatedUserId()).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+        doThrow(new ResourceNotFoundException("Document not found with ID: 999"))
+                .when(ingestionService).deleteDocument(eq(999L), any(User.class));
+
+        mockMvc.perform(delete("/api/documents/999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn403WhenUserDoesNotOwnDocumentForDeletion() throws Exception {
+        when(authService.getAuthenticatedUserId()).thenReturn(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+        doThrow(new AccessDeniedException("Access denied"))
+                .when(ingestionService).deleteDocument(eq(102L), any(User.class));
+
+        mockMvc.perform(delete("/api/documents/102"))
+                .andExpect(status().isForbidden());
     }
 }

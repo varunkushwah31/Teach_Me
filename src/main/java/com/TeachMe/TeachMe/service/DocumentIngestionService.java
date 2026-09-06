@@ -6,4 +6,5 @@ public interface DocumentIngestionService {
     void healStuckDocuments();
     void ingestPdfAsync(byte[] fileBytes, String originalFilename, Long fileSize,
                         String category, String chatId, String jobId, User currentUser);
+    void deleteDocument(Long documentId, User currentUser);
 }
