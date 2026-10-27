@@ -39,12 +39,12 @@ interface FeatureTab {
 const FEATURE_TABS: FeatureTab[] = [
   {
     id: 'pdf-rag',
-    label: 'PDF Ingestion & RAG',
+    label: 'College Notes Ingestion & RAG',
     icon: <BookOpenIcon className="w-3.5 h-3.5" />,
     iconColor: '#a8ff53',
-    subject: 'Molecular Biology & Genetics',
-    title: 'Instant Semantic Chunking & PgVector Search over Textbooks',
-    description: 'Upload 100+ page textbook PDFs. TeachMe breaks chapters into 512-token semantic chunks in PgVector, enabling sub-50ms conceptual retrieval for every question you ask.',
+    subject: 'Molecular Biology & Genetics (BIO101)',
+    title: 'Instant Semantic Chunking & PgVector Search over College Notes',
+    description: 'Upload 100+ page lecture slide and textbook PDFs. TeachMe breaks chapters into 512-token semantic chunks in PgVector, enabling sub-50ms conceptual retrieval for every question you ask.',
     badge: 'PgVector HNSW',
     preview: `// Ingestion Pipeline: Cellular_Respiration_Ch4.pdf
 [Ingestion Engine] File Size: 4.8 MB • 64 Pages Analyzed
@@ -54,11 +54,11 @@ const FEATURE_TABS: FeatureTab[] = [
   },
   {
     id: 'tutor-qa',
-    label: 'AI Tutor Q&A',
+    label: 'College Notes RAG Chatbot',
     icon: <RobotIcon className="w-3.5 h-3.5" />,
     iconColor: '#9c9af2',
-    subject: 'Organic Chemistry II',
-    title: 'Plain-English Explanations with Verifiable Chapter Footnotes',
+    subject: 'Organic Chemistry II (CHEM201)',
+    title: 'Grounded Explanations with Verifiable Chapter & Page Footnotes',
     description: 'Ask complex follow-up questions on confusing lecture slides. TeachMe gives step-by-step analogies and cites the exact chapter and page numbers from your uploaded document.',
     badge: 'Verifiable Citations',
     preview: `Student: "Why does SN2 inversion of configuration occur at chiral centers?"
@@ -71,10 +71,10 @@ Citations:
   },
   {
     id: 'practice-quizzes',
-    label: 'Diagnostic Quizzes',
+    label: 'Exam Diagnostic Quizzes',
     icon: <QuestionIcon className="w-3.5 h-3.5" />,
     iconColor: '#fa3abf',
-    subject: 'Algorithms & Data Structures',
+    subject: 'Algorithms & Data Structures (CS102)',
     title: 'Bloom-Aligned 5-Question Diagnostic Multiple Choice Tests',
     description: 'Test your understanding before exam day. TeachMe drafts challenging diagnostic multiple-choice questions directly from your notes with instant grading and detailed answer rationales.',
     badge: 'Bloom Taxonomy',
@@ -83,7 +83,7 @@ Pass Score Target: 80% • 5 Multiple Choice Questions
 
 Question 1: What is the time complexity of Dijkstra's algorithm using a Min-Heap for a graph G=(V, E)?
 [A] O(V^2)
-[B] O((V + E) log V)  ✓ (Correct! Extract-min takes O(log V) per vertex and edge relaxation)
+[B] O((V + E) log V)  (Correct! Extract-min takes O(log V) per vertex and edge relaxation)
 [C] O(V * E)
 [D] O(E log E)
 
@@ -91,10 +91,10 @@ Rationale: Cites Introduction to Algorithms (CLRS), Chapter 24, p. 658.`
   },
   {
     id: 'sm2-flashcards',
-    label: 'SM-2 Flashcards',
+    label: 'Course SM-2 Flashcards',
     icon: <StackIcon className="w-3.5 h-3.5" />,
     iconColor: '#afec73',
-    subject: 'Cognitive Neuroscience',
+    subject: 'Cognitive Neuroscience (NEUR301)',
     title: 'Adaptive Spaced Repetition Memory with 1-Click Anki Sync',
     description: 'Never forget key formulas or definitions. TeachMe turns your highlighted study concepts into SM-2 flashcard decks that adapt review intervals based on how easily you recall each item.',
     badge: 'SM-2 Algorithm',
@@ -111,7 +111,7 @@ Recall Quality: [0: Blackout] [1: Hard] [2: Moderate] [3: Good] [4: Easy] [5: Pe
     label: 'Map-Reduce Summaries',
     icon: <SparkleIcon className="w-3.5 h-3.5" />,
     iconColor: '#d9f07c',
-    subject: 'Constitutional Law',
+    subject: 'Constitutional Law (LAW101)',
     title: '1-Click Map-Reduce Summaries for 100+ Page Case Books',
     description: 'Stop drowning in hundreds of reading pages. TeachMe summarizes lengthy course chapters into structured 300-word briefs retaining all legal precedents, dates, and core doctrines.',
     badge: 'Map-Reduce Pipeline',
@@ -127,10 +127,10 @@ Key Case Precedents: Brown v. Board (1954), Loving v. Virginia (1967), Obergefel
   },
   {
     id: 'podcasts',
-    label: '2-Speaker Podcasts',
+    label: '2-Speaker Review Podcasts',
     icon: <SpeakerHighIcon className="w-3.5 h-3.5" />,
     iconColor: '#7655fd',
-    subject: 'Astrophysics & Relativity',
+    subject: 'Astrophysics & Relativity (PHYS202)',
     title: 'NotebookLM-Style 2-Speaker AI Study Podcast Episodes',
     description: 'Commute and study at the same time. TeachMe converts textbook chapters into engaging conversational study episodes between Alex and Maya with real browser voice audio narration.',
     badge: 'TTS Dialogue Engine',
@@ -188,7 +188,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio, onOpenAp
             className="group inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[#2e3238] hover:border-[#a8ff53]/50 bg-[#121317]/90 text-[#e5e7eb] text-[13px] transition-all hover:bg-[#15171c] hover:shadow-[0_0_20px_rgba(168,255,83,0.15)] cursor-pointer card-hover-lift"
           >
             <span className="w-2 h-2 rounded-full bg-[#a8ff53] animate-pulse" />
-            <span className="font-medium">Transform any course PDF into active recall quizzes & flashcards</span>
+            <span className="font-medium">College Notes PDF Chatbot with RAG & Verifiable Citations</span>
             <CaretRightIcon className="w-3.5 h-3.5 text-[#a0a4af] transition-transform group-hover:translate-x-1 group-hover:text-[#a8ff53]" />
           </button>
         </div>
@@ -196,9 +196,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio, onOpenAp
         {/* Billboard Headline */}
         <div className="text-center max-w-240 mx-auto mb-6">
           <h1 className="font-bold text-[38px] sm:text-[54px] md:text-[64px] leading-[1.08] tracking-tight text-[#f3f4f6]">
-            Turn Any Textbook or PDF into Your{' '}
+            College Notes PDF Chatbot with{' '}
             <span className="text-transparent bg-clip-text bg-linear-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#a8ff53]">
-              Personal AI Tutor
+              RAG & Citations
             </span>
           </h1>
         </div>
@@ -206,7 +206,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio, onOpenAp
         {/* Subtitle with improved readability */}
         <div className="text-center max-w-180 mx-auto mb-8">
           <p className="font-normal text-[16px] sm:text-[18px] leading-[1.6] text-[#b5b8c0]">
-            Upload your syllabus or lecture slides. TeachMe uses <span className="text-[#f3f4f6] font-medium">PostgreSQL PgVector</span> and <span className="text-[#a8ff53] font-medium">Local Ollama</span> (or your custom API keys) to deliver step-by-step answers, diagnostic quizzes, SM-2 flashcards, and 2-speaker audio podcasts.
+            Upload your college lecture notes, syllabi, and textbook PDFs. TeachMe uses <span className="text-[#f3f4f6] font-medium">PostgreSQL PgVector</span> and <span className="text-[#a8ff53] font-medium">Spring AI</span> to deliver instant grounded answers with exact chapter and page citations, auto-generated exam quizzes, and SM-2 flashcards.
           </p>
         </div>
 
@@ -217,7 +217,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio, onOpenAp
             className="group flex items-center gap-2.5 px-6 py-3.5 bg-[#a8ff53] hover:bg-[#baff6b] active:scale-[0.98] text-[#121317] font-semibold text-[15px] rounded shadow-[0_0_25px_rgba(168,255,83,0.25)] transition-all cursor-pointer"
           >
             <UploadSimpleIcon className="w-4 h-4 text-[#121317]" weight="bold" />
-            <span>Upload PDF & Study Now</span>
+            <span>Upload Notes PDF</span>
             <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" weight="bold" />
           </button>
 
@@ -226,7 +226,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio, onOpenAp
             className="flex items-center gap-2 px-5 py-3.5 bg-[#121317] hover:bg-[#191c22] border border-[#2e3238] hover:border-[#a8ff53]/40 text-[#f3f4f6] text-[14.5px] font-medium rounded transition-all cursor-pointer shadow-lg"
           >
             <BrainIcon className="w-4 h-4 text-[#a8ff53]" />
-            <span>Launch AI Studio</span>
+            <span>Open Notes Chatbot</span>
           </button>
 
           <button
@@ -239,123 +239,115 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio, onOpenAp
             }}
             className="flex items-center gap-2 px-4 py-3.5 hover:bg-[#15171c] active:bg-[#1a1d22] border border-[#2e3238] hover:border-[#9c9af2]/60 text-[#d7d9dd] text-[14px] rounded transition-all cursor-pointer group"
           >
-            <KeyIcon className="w-4 h-4 text-[#9c9af2] group-hover:rotate-12 transition-transform" weight="bold" />
-            <span>AI Config & Keys</span>
+            <KeyIcon className="w-4 h-4 text-[#9c9af2] group-hover:scale-110 transition-transform" />
+            <span>AI Provider Settings</span>
           </button>
         </div>
 
-        {/* Feature Highlights Strip (3 Pills) */}
-        <div className="flex items-center justify-center gap-4 sm:gap-8 flex-wrap mb-10 text-[13px] text-[#a0a4af]">
-          <div className="flex items-center gap-1.5">
+        {/* Trust Badges Bar */}
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-[12.5px] text-[#b5b8c0] mb-12">
+          <div className="flex items-center gap-2">
+            <ShieldCheckIcon className="w-4 h-4 text-[#a8ff53]" weight="fill" />
+            <span>100% Private Local Ollama Option</span>
+          </div>
+          <div className="flex items-center gap-2">
             <LightningIcon className="w-4 h-4 text-[#a8ff53]" weight="fill" />
-            <span>Sub-50ms Vector Retrieval</span>
+            <span>Sub-50ms PgVector Cosine Retrieval</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <ShieldCheckIcon className="w-4 h-4 text-[#9c9af2]" weight="fill" />
-            <span>100% Private Local Ollama</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <SparkleIcon className="w-4 h-4 text-[#fa3abf]" weight="fill" />
-            <span>Zero Hallucination Citations</span>
+          <div className="flex items-center gap-2">
+            <FilePdfIcon className="w-4 h-4 text-[#a8ff53]" weight="fill" />
+            <span>Verifiable Page & Chapter Footnotes</span>
           </div>
         </div>
 
-        {/* 6 Study Feature Tabs Bar — Lively interactive pills */}
-        <div className="flex items-center justify-center gap-2 flex-wrap mb-4 max-w-280 mx-auto">
-          {FEATURE_TABS.map((tab) => {
-            const isActive = activeTabId === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTabId(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded text-[13.5px] font-medium transition-all cursor-pointer card-hover-lift ${
-                  isActive
-                    ? 'bg-[#121317] border-2 border-[#a8ff53] text-[#f3f4f6] shadow-[0_0_20px_rgba(168,255,83,0.18)]'
-                    : 'bg-[#121317]/70 border border-[#2e3238] text-[#a0a4af] hover:text-[#f3f4f6] hover:border-[#424750]'
-                }`}
-              >
-                <span style={{ color: tab.iconColor }}>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Interactive Subject Preview Terminal with Smooth Tab Transition */}
-        <div className="bg-[#121317] border border-[#2e3238] rounded shadow-2xl overflow-hidden max-w-280 mx-auto animate-slide-up">
+        {/* Interactive Interactive Preview Terminal */}
+        <div className="bg-[#121317] border border-[#2e3238] rounded shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden">
           
-          {/* Terminal Title Bar */}
-          <div className="px-4 py-3 bg-[#15171c] border-b border-[#2e3238] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#d9f07c]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#a8ff53]" />
-              </div>
-              <span className="text-[#a0a4af] font-mono text-[12px] border-l border-[#2e3238] pl-3">
-                session: {activeTab.subject}
-              </span>
+          {/* Top Engine Selector Strip */}
+          <div className="flex items-center justify-between border-b border-[#2e3238] bg-[#15171c] px-4 py-2.5 overflow-x-auto scrollbar-none gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              {FEATURE_TABS.map((tab) => {
+                const isSelected = tab.id === activeTabId;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTabId(tab.id)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded text-[12.5px] font-medium transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#1c1e21] text-[#f3f4f6] border border-[#424750] shadow-sm'
+                        : 'text-[#878c99] hover:text-[#d7d9dd] hover:bg-[#1c1e21]/50'
+                    }`}
+                  >
+                    <span style={{ color: tab.iconColor }}>{tab.icon}</span>
+                    <span className="whitespace-nowrap">{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] px-2 py-0.5 bg-[#1c1e21] text-[#a8ff53] font-mono rounded border border-[#2e3238]">
-                {activeTab.badge}
-              </span>
-              <button
-                onClick={() => handleCopy(activeTab.preview)}
-                className="p-1.5 text-[#a0a4af] hover:text-[#f3f4f6] rounded hover:bg-[#272a2e] transition-colors cursor-pointer"
-                title="Copy sample content"
-              >
-                {copied ? <CheckIcon className="w-3.5 h-3.5 text-[#a8ff53]" weight="bold" /> : <CopyIcon className="w-3.5 h-3.5" />}
-              </button>
-            </div>
+            <button
+              onClick={() => onOpenStudio?.(mapTabToStudioTab(activeTabId))}
+              className="hidden sm:inline-flex items-center gap-1.5 text-[12px] font-mono text-[#a8ff53] hover:underline cursor-pointer shrink-0"
+            >
+              <span>Test in Studio</span>
+              <ArrowRightIcon className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          {/* Terminal Content Split: Feature Details + Real Study Sample */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#2e3238]">
+          {/* Terminal Content Grid */}
+          <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
-            {/* Left Narrative Pane */}
-            <div className="lg:col-span-5 p-6 flex flex-col justify-between space-y-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="w-2 h-2 rounded-full animate-ping"
-                    style={{ backgroundColor: activeTab.iconColor }}
-                  />
-                  <span className="text-[11.5px] font-mono text-[#a0a4af] uppercase tracking-wider">
-                    {activeTab.subject}
-                  </span>
-                </div>
-                
-                <h3 className="font-semibold text-[20px] leading-[1.3] text-[#f3f4f6]">
-                  {activeTab.title}
-                </h3>
-
-                <p className="text-[14px] leading-[1.65] text-[#b5b8c0]">
-                  {activeTab.description}
-                </p>
+            {/* Left Column: Feature Context & Explanations */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded bg-[#1c1e21] border border-[#2e3238] text-[11px] font-mono text-[#a8ff53]">
+                  {activeTab.badge}
+                </span>
+                <span className="text-[12px] font-mono text-[#878c99]">
+                  {activeTab.subject}
+                </span>
               </div>
 
-              {/* Action Buttons & Dropzone trigger */}
-              <div className="pt-4 border-t border-[#2e3238] flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[12px] font-mono text-[#a0a4af]">
-                  <FilePdfIcon className="w-4 h-4 text-[#a8ff53]" />
-                  <span>PDF Ready</span>
-                </div>
+              <h2 className="font-bold text-[22px] sm:text-[24px] text-[#f3f4f6] leading-[1.25]">
+                {activeTab.title}
+              </h2>
+
+              <p className="text-[14px] leading-[1.65] text-[#b5b8c0]">
+                {activeTab.description}
+              </p>
+
+              <div className="pt-2 flex items-center gap-3">
                 <button
-                  onClick={() => onOpenStudio?.(mapTabToStudioTab(activeTab.id))}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#272a2e] hover:bg-[#343840] text-[#a8ff53] text-[13px] font-medium rounded transition-all cursor-pointer hover:shadow-[0_0_12px_rgba(168,255,83,0.15)]"
+                  onClick={() => onOpenStudio?.(mapTabToStudioTab(activeTabId))}
+                  className="px-4 py-2 bg-[#272a2e] hover:bg-[#34383d] text-[#f3f4f6] text-[13px] font-semibold rounded transition-colors cursor-pointer flex items-center gap-2 border border-[#424750]"
                 >
-                  <PlayIcon className="w-3 h-3 fill-current" />
-                  <span>Try in Studio</span>
+                  <PlayIcon className="w-3.5 h-3.5 fill-current text-[#a8ff53]" />
+                  <span>Interactive Live Demo</span>
                 </button>
               </div>
             </div>
 
-            {/* Right Realistic Study Preview Pane */}
-            <div className="lg:col-span-7 bg-[#121317] p-5 overflow-x-auto font-mono text-[13px] leading-[1.7]">
-              <pre className="text-[#e5e7eb] whitespace-pre-wrap">
-                <code>{activeTab.preview}</code>
+            {/* Right Column: Code & Execution Output Terminal */}
+            <div className="lg:col-span-7 bg-[#1c1e21] border border-[#2e3238] rounded p-4 font-mono text-[12.5px] text-[#e5e7eb] relative group">
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#272a2e]">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#eab308]/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]/80" />
+                  <span className="ml-2 text-[11px] text-[#878c99]">teachme-terminal-preview</span>
+                </div>
+
+                <button
+                  onClick={() => handleCopy(activeTab.preview)}
+                  className="p-1 text-[#878c99] hover:text-[#f3f4f6] rounded hover:bg-[#272a2e] transition-colors cursor-pointer"
+                  title="Copy terminal contents"
+                >
+                  {copied ? <CheckIcon className="w-3.5 h-3.5 text-[#a8ff53]" /> : <CopyIcon className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              <pre className="whitespace-pre-wrap leading-[1.7] text-[#d7d9dd] overflow-x-auto selection:bg-[#a8ff53] selection:text-[#121317]">
+                {activeTab.preview}
               </pre>
             </div>
 
@@ -366,4 +358,3 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStudio, onOpenAp
     </section>
   );
 };
-

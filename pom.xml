@@ -13,7 +13,7 @@
 	<artifactId>TeachMe</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>TeachMe</name>
-	<description>Local AI Document Analyzer</description>
+	<description>College Notes PDF Chatbot with RAG</description>
 
 	<properties>
 		<java.version>25</java.version>

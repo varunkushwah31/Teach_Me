@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,6 +20,15 @@ public class GroupWorkspaceController {
 
     private final GroupWorkspaceService groupWorkspaceService;
     private final AuthService authService;
+
+    @GetMapping
+    @Operation(summary = "List Group Workspaces", description = "Retrieves all study workspaces for the authenticated user")
+    @ApiResponse(responseCode = "200", description = "Workspaces retrieved successfully")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    public ResponseEntity<List<Map<String, Object>>> getWorkspaces() {
+        Long userId = authService.getAuthenticatedUserId();
+        return ResponseEntity.ok(groupWorkspaceService.getWorkspaces(userId));
+    }
 
     @PostMapping("/create")
     @Operation(summary = "Create Group Workspace", description = "Creates a new shared study workspace for collaborating on course documents")

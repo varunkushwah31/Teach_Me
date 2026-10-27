@@ -1,4 +1,4 @@
-# 🤖 AGENTS.md — AI Engineering Guidelines & Skill Index
+# AGENTS.md - AI Engineering Guidelines & Skill Index
 
 Welcome! This document defines the architectural standards, behavioral protocols, and skill integration workflows for any automated coding agent or AI assistant contributing to this repository. 
 
@@ -6,16 +6,16 @@ Whenever you are tasked with creating, refactoring, securing, or documenting cod
 
 ---
 
-## 🏗️ 1. Core Behavioral Guidelines
+## 1. Core Behavioral Guidelines
 
 * **Prioritize Local Skills:** Before generating standard boilerplate or generic Spring Boot code, check `.agents/skills/` for specialized patterns, templates, and best practices.
-* **Modern Spring Boot Practices:** Always favor constructor injection (via Lombok `@RequiredArgsConstructor` where applicable), immutability (`final` fields, Java Records for DTOs), and layered architecture (Controller $\rightarrow$ Service $\rightarrow$ Repository).
+* **Modern Spring Boot Practices:** Always favor constructor injection (via Lombok `@RequiredArgsConstructor` where applicable), immutability (`final` fields, Java Records for DTOs), and layered architecture (Controller -> Service -> Repository).
 * **Zero Hallucination of Dependencies:** Check `pom.xml` or `build.gradle` before importing libraries. If a skill recommends an Starter module (e.g., Spring Security, Actuator, Spring AI), ensure it is properly declared in the build configuration before writing implementation code.
 * **Security & Observability by Default:** Never expose endpoints without considering authentication/authorization rules or proper logging/monitoring metrics.
 
 ---
 
-## 🧰 2. Installed Skill Registry (`.agents/skills`)
+## 2. Installed Skill Registry (`.agents/skills`)
 
 You have access to **8 specialized skills** installed locally via symlink/universal scope. When triggered by a specific task, read the corresponding skill documentation inside the directory (e.g., `SKILL.md`, `README.md`, or pattern rules) before executing the request.
 
@@ -32,7 +32,7 @@ You have access to **8 specialized skills** installed locally via symlink/univer
 
 ---
 
-## ⚙️ 3. Task-to-Skill Workflow Routing
+## 3. Task-to-Skill Workflow Routing
 
 When executing a prompt, map your reasoning to the appropriate skill domain:
 
@@ -40,7 +40,7 @@ When executing a prompt, map your reasoning to the appropriate skill domain:
 1. **Activate:** `java-springboot` + `springboot-patterns`
 2. **Execution Rules:**
    * Keep controllers lightweight; delegate all business logic to the service layer.
-   * Use DTOs for client-facing API requests/responses—**never** expose database entities directly over REST.
+   * Use DTOs for client-facing API requests/responses - **never** expose database entities directly over REST.
    * Implement robust exception handling using a global `@ControllerAdvice`.
 
 ### B. Security Implementation (AuthN / AuthZ)
@@ -64,6 +64,6 @@ When executing a prompt, map your reasoning to the appropriate skill domain:
 
 ---
 
-## 📋 4. How Agents Should Load Skills
+## 4. How Agents Should Load Skills
 
-When evaluating a user prompt, adhere to the following execution sequence:
+When evaluating a user prompt, adhere to the standard execution sequence defined by the relevant skill.

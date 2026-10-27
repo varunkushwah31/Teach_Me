@@ -1,13 +1,11 @@
 package com.TeachMe.TeachMe.service.impl;
 
+import com.TeachMe.TeachMe.dto.ai.AiProviderConfigDTO;
 import com.TeachMe.TeachMe.entity.Chat;
 import com.TeachMe.TeachMe.repository.ChatRepository;
 import com.TeachMe.TeachMe.repository.DocumentRepository;
 import com.TeachMe.TeachMe.repository.UserRepository;
-import com.TeachMe.TeachMe.service.CitationService;
-import com.TeachMe.TeachMe.service.HybridSearchService;
-import com.TeachMe.TeachMe.service.RagChatService;
-import com.TeachMe.TeachMe.service.ReRankingService;
+import com.TeachMe.TeachMe.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -37,6 +35,7 @@ public class RagChatServiceImpl implements RagChatService {
     private final HybridSearchService hybridSearchService;
     private final ReRankingService reRankingService;
     private final CitationService citationService;
+    private final ExternalAiService externalAiService;
 
     private static final String SYSTEM_INSTRUCTION_TEMPLATE = """
             You are an expert academic tutor. Answer the user's question using ONLY the provided context below.
@@ -57,7 +56,8 @@ public class RagChatServiceImpl implements RagChatService {
                               DocumentRepository documentRepository,
                               HybridSearchService hybridSearchService,
                               ReRankingService reRankingService,
-                              CitationService citationService) {
+                              CitationService citationService,
+                              ExternalAiService externalAiService) {
         this.mainChatClient = chatClientBuilder
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
@@ -69,22 +69,34 @@ public class RagChatServiceImpl implements RagChatService {
         this.hybridSearchService = hybridSearchService;
         this.reRankingService = reRankingService;
         this.citationService = citationService;
+        this.externalAiService = externalAiService;
     }
 
     @Override
     @Timed("rag.chat.ask")
     public Flux<String> askQuestionStream(String question, String chatId, Long userId) {
-        return askQuestionStream(question, chatId, userId, List.of());
+        return askQuestionStream(question, chatId, userId, List.of(), null);
     }
 
     @Override
     @Timed("rag.chat.ask.filtered")
     public Flux<String> askQuestionStream(String question, String chatId, Long userId, List<Long> documentIds) {
+        return askQuestionStream(question, chatId, userId, documentIds, null);
+    }
+
+    @Override
+    @Timed("rag.chat.ask.external")
+    public Flux<String> askQuestionStream(String question, String chatId, Long userId, List<Long> documentIds, AiProviderConfigDTO aiConfig) {
         return Mono.fromCallable(() -> userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found")))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(currentUser -> {
-                    log.info("Session {}: question='{}' userId={} docFilterCount={}", chatId, question, userId, documentIds != null ? documentIds.size() : 0);
+                    AiProviderConfigDTO effectiveConfig = externalAiService.resolveConfig(aiConfig);
+                    boolean useExternal = effectiveConfig.isExternal() || effectiveConfig.hasCustomKey() || externalAiService.isExternalConfigured();
+
+                    log.info("Session {}: question='{}' userId={} docFilterCount={} provider={} model={}",
+                            chatId, question, userId, documentIds != null ? documentIds.size() : 0,
+                            effectiveConfig.resolvedProvider(), effectiveConfig.model());
 
                     String optimizedQuery = optimizeSearchQuery(question, chatId);
                     List<Document> similarDocuments = hybridSearchService.hybridSearch(optimizedQuery, currentUser.getId(), chatId, documentIds, 8);
@@ -96,12 +108,19 @@ public class RagChatServiceImpl implements RagChatService {
 
                     com.TeachMe.TeachMe.entity.Document documentAssoc = extractDocumentAssociation(reRankedDocuments);
 
-                    return mainChatClient.prompt()
-                            .system(systemInstruction)
-                            .user(question)
-                            .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
-                            .stream()
-                            .content()
+                    Flux<String> tokenFlux;
+                    if (useExternal) {
+                        tokenFlux = externalAiService.streamChat(systemInstruction, question, effectiveConfig);
+                    } else {
+                        tokenFlux = mainChatClient.prompt()
+                                .system(systemInstruction)
+                                .user(question)
+                                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, chatId))
+                                .stream()
+                                .content();
+                    }
+
+                    return tokenFlux
                             .doOnNext(aiResponseBuffer::append)
                             .publishOn(Schedulers.boundedElastic())
                             .doFinally(signalType -> {
@@ -130,71 +149,61 @@ public class RagChatServiceImpl implements RagChatService {
         StringBuilder contextBuilder = new StringBuilder();
         for (int i = 0; i < documents.size(); i++) {
             Document doc = documents.get(i);
-            Object parentContentObj = doc.getMetadata().get("parentContent");
-            String contentToUse = (parentContentObj != null && !parentContentObj.toString().isBlank())
-                    ? parentContentObj.toString()
-                    : doc.getText();
-            contextBuilder.append("[").append(i + 1).append("] ").append(contentToUse).append("\n\n");
+            String docName = doc.getMetadata().getOrDefault("documentName", "Unknown Document").toString();
+            String page = doc.getMetadata().getOrDefault("page", "1").toString();
+            contextBuilder.append(String.format("[%d] (Source: %s, Page: %s)\n%s\n\n",
+                    i + 1, docName, page, doc.getText()));
         }
         return contextBuilder.toString();
     }
 
     private com.TeachMe.TeachMe.entity.Document extractDocumentAssociation(List<Document> documents) {
-        if (documents == null || documents.isEmpty()) {
-            return null;
+        for (Document doc : documents) {
+            Object docIdObj = doc.getMetadata().get("documentId");
+            if (docIdObj != null) {
+                try {
+                    Long docId = Long.valueOf(docIdObj.toString());
+                    return documentRepository.findById(docId).orElse(null);
+                } catch (Exception ignored) {
+                }
+            }
         }
-        Object dbDocIdObj = documents.get(0).getMetadata().get("dbDocumentId");
-        if (dbDocIdObj == null) {
-            return null;
-        }
-        try {
-            Long docId = Long.valueOf(dbDocIdObj.toString());
-            return documentRepository.findById(docId).orElse(null);
-        } catch (Exception e) {
-            log.warn("Failed to parse dbDocumentId from chunk metadata", e);
-            return null;
-        }
+        return null;
     }
 
-    private String optimizeSearchQuery(String originalQuestion, String chatId) {
+    private String optimizeSearchQuery(String originalQuery, String chatId) {
         List<Message> history = chatMemory.get(chatId);
-        if (history.isEmpty()) {
-            return originalQuestion;
+        if (history == null || history.isEmpty()) {
+            return originalQuery;
         }
 
-        String historyText = history.stream()
-                .skip(Math.max(0, history.size() - 5))
-                .map(m -> m.getMessageType().name() + ": " + m.getText())
+        String conversationContext = history.stream()
+                .map(msg -> msg.getMessageType() + ": " + msg.getText())
                 .collect(Collectors.joining("\n"));
 
-        String systemPrompt = """
-                You are an expert search query rewriter.
-                Analyze the Conversation History and the New Question.
-                If the New Question contains pronouns, rewrite it into a single, standalone search query.
-                If the New Question is already specific, return it exactly as is.
-                """;
+        String rewritePrompt = """
+                Given the following conversation history and a follow-up question, rewrite the follow-up question
+                to be a standalone query that captures the full academic context.
+                Do not answer the question, only rewrite it.
+                Return only the rewritten query without any explanation.
 
-        String userPrompt = "Conversation History:\n" + historyText
-                + "\n\nNew Question: " + originalQuestion;
+                History:
+                %s
+
+                Follow-up Question: %s
+                Rewritten Query:
+                """.formatted(conversationContext, originalQuery);
 
         try {
             String rewritten = rewriteClient.prompt()
-                    .system(systemPrompt)
-                    .user(userPrompt)
+                    .user(rewritePrompt)
                     .call()
                     .content();
-            return cleanDeepSeekTags(rewritten, originalQuestion);
+            log.debug("Rewritten query for session {}: '{}'", chatId, rewritten);
+            return (rewritten != null && !rewritten.trim().isEmpty()) ? rewritten.trim() : originalQuery;
         } catch (Exception e) {
-            log.warn("Query rewriting failed, using original", e);
-            return originalQuestion;
+            log.warn("Query rewrite failed, falling back to original query: {}", e.getMessage());
+            return originalQuery;
         }
-    }
-
-    private String cleanDeepSeekTags(String response, String fallback) {
-        if (response == null || response.isBlank()) return fallback;
-        if (response.contains("</think>")) {
-            response = response.substring(response.indexOf("</think>") + 8);
-        }
-        return response.trim();
     }
 }

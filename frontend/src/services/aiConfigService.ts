@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './apiClient';
+
 export type AIProvider = 'ollama' | 'openai' | 'anthropic' | 'gemini' | 'groq' | 'deepseek' | 'openrouter';
 
 export interface AIProviderConfig {
@@ -147,6 +149,20 @@ function validateAnthropicKey(apiKey: string): { success: boolean; message: stri
 }
 
 export async function validateProviderKey(provider: AIProvider, apiKey: string, baseUrl?: string): Promise<{ success: boolean; message: string; latencyMs?: number }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/ai/test-connection`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider, apiKey, baseUrl })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return { success: data.success, message: data.message, latencyMs: data.latencyMs };
+    }
+  } catch {
+    // Fallback to client-side heuristics if backend is unreachable
+  }
+
   if (provider === 'ollama') {
     return validateOllama(baseUrl);
   }

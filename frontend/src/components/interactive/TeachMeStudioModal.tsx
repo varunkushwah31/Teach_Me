@@ -108,7 +108,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string; citations?: string[] }>>([
     {
       role: 'assistant',
-      text: 'Hello! I am your TeachMe AI Study Tutor. Ask me any question about your uploaded textbook, lecture slides, or exam notes!',
+      text: 'Hello! I am your TeachMe College Notes RAG Tutor. Ask me any question about your uploaded lecture slides, textbook chapters, or exam notes, and I will answer with verifiable page citations!',
       citations: ['Cellular_Respiration_Ch4.pdf (p. 94, Cosine: 0.97)']
     }
   ]);
@@ -508,7 +508,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
               </svg>
             </div>
             <span className="font-bold text-[17px] text-[#e5e7eb] tracking-tight">
-              TeachMe Study Workspace
+              TeachMe — College Notes PDF Chatbot (RAG)
             </span>
           </div>
 
@@ -552,15 +552,15 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             
             <div className="space-y-4">
               
-              {/* CATEGORY 1: Study & Vector RAG */}
+              {/* CATEGORY 1: College Notes & RAG */}
               <div className="space-y-1">
                 <div className="px-2.5 py-1 text-[11px] font-mono font-semibold uppercase tracking-wider text-[#a0a4af]">
-                  Study & Vector RAG
+                  College Notes & RAG
                 </div>
                 {[
-                  { id: 'documents', label: 'Documents & RAG', icon: <FileTextIcon className="w-4 h-4 text-[#a8ff53]" /> },
-                  { id: 'chat', label: 'AI Tutor Q&A Stream', icon: <RobotIcon className="w-4 h-4 text-[#a8ff53]" /> },
-                  { id: 'search', label: 'Hybrid Vector Search', icon: <MagnifyingGlassIcon className="w-4 h-4 text-[#9c9af2]" /> },
+                  { id: 'documents', label: 'Course Notes & PDFs', icon: <FileTextIcon className="w-4 h-4 text-[#a8ff53]" /> },
+                  { id: 'chat', label: 'Notes RAG Chatbot', icon: <RobotIcon className="w-4 h-4 text-[#a8ff53]" /> },
+                  { id: 'search', label: 'PgVector Hybrid Search', icon: <MagnifyingGlassIcon className="w-4 h-4 text-[#9c9af2]" /> },
                   { id: 'knowledge', label: 'Concept Knowledge Graph', icon: <ShareNetworkIcon className="w-4 h-4 text-[#fa3abf]" /> }
                 ].map(tab => {
                   const isActive = activeTab === tab.id;
@@ -587,8 +587,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   Active Recall & Testing
                 </div>
                 {[
-                  { id: 'quiz', label: 'Diagnostic Auto-Quiz', icon: <QuestionIcon className="w-4 h-4 text-[#fa3abf]" /> },
-                  { id: 'flashcards', label: 'SM-2 Spaced Flashcards', icon: <StackIcon className="w-4 h-4 text-[#9c9af2]" /> },
+                  { id: 'quiz', label: 'Exam Diagnostic Quiz', icon: <QuestionIcon className="w-4 h-4 text-[#fa3abf]" /> },
+                  { id: 'flashcards', label: 'SM-2 Course Flashcards', icon: <StackIcon className="w-4 h-4 text-[#9c9af2]" /> },
                   { id: 'readiness', label: 'AI Exam Readiness', icon: <TrophyIcon className="w-4 h-4 text-[#d9f07c]" /> }
                 ].map(tab => {
                   const isActive = activeTab === tab.id;
@@ -615,8 +615,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   Synthesize & Plan
                 </div>
                 {[
-                  { id: 'summarizer', label: 'Chapter Summarizer', icon: <SparkleIcon className="w-4 h-4 text-[#d9f07c]" /> },
-                  { id: 'podcast', label: '2-Speaker AI Podcast', icon: <SpeakerHighIcon className="w-4 h-4 text-[#afec73]" /> },
+                  { id: 'summarizer', label: 'Map-Reduce Chapter Brief', icon: <SparkleIcon className="w-4 h-4 text-[#d9f07c]" /> },
+                  { id: 'podcast', label: '2-Speaker Review Podcast', icon: <SpeakerHighIcon className="w-4 h-4 text-[#afec73]" /> },
                   { id: 'study-plan', label: '5-Day Study Roadmap', icon: <CalendarIcon className="w-4 h-4 text-[#a8ff53]" /> },
                   { id: 'outline', label: 'Cornell Notes & Formulas', icon: <BookOpenIcon className="w-4 h-4 text-[#9c9af2]" /> },
                   { id: 'workspaces', label: 'Study Workspaces', icon: <UsersIcon className="w-4 h-4 text-[#fa3abf]" /> }
@@ -812,6 +812,18 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 2: AI Tutor Chat */}
             {activeTab === 'chat' && (
               <div className="h-full flex flex-col justify-between max-w-240 mx-auto animate-fade-in">
+                {/* Active Document RAG Context Indicator */}
+                <div className="mb-3 px-3.5 py-2 bg-[#15171c] border border-[#2e3238] rounded flex items-center justify-between text-[12px] font-mono">
+                  <div className="flex items-center gap-2 text-[#a8ff53]">
+                    <BookOpenIcon className="w-3.5 h-3.5" />
+                    <span>RAG Document: <strong>{documents.find(d => d.id === selectedDocId)?.filename || 'Course Document'}</strong></span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[#878c99]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#a8ff53] animate-pulse" />
+                    <span>PgVector Retrieval Active</span>
+                  </div>
+                </div>
+
                 <div className="space-y-4 overflow-y-auto pr-2 pb-4 flex-1">
                   {messages.map((msg, idx) => (
                     <div
@@ -826,7 +838,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         }`}
                       >
                         <div className="flex items-center justify-between text-[11px] text-[#a0a4af] mb-1.5 font-mono">
-                          <span className="font-semibold text-[#a8ff53]">{msg.role === 'user' ? 'Student' : '✦ TeachMe AI Tutor'}</span>
+                          <span className="font-semibold text-[#a8ff53]">{msg.role === 'user' ? 'Student' : 'TeachMe College AI Tutor'}</span>
                           {msg.role === 'assistant' && <span className="text-[#a0a4af]">POST /api/chat/ask/stream</span>}
                         </div>
                         <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -849,6 +861,25 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   )}
                 </div>
 
+                {/* Quick College Question Prompts */}
+                <div className="flex flex-wrap gap-1.5 pb-2.5">
+                  {[
+                    'Summarize key exam formulas and theorems',
+                    'What are likely midterm/final exam questions?',
+                    'Explain the most challenging concept step-by-step',
+                    'Provide a study checklist with page citations'
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setChatInput(preset)}
+                      className="text-[11.5px] px-2.5 py-1 rounded-full bg-[#1c1e21] border border-[#2e3238] hover:border-[#a8ff53]/50 text-[#b5b8c0] hover:text-[#a8ff53] transition-colors cursor-pointer"
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Chat Input Bar */}
                 <div className="pt-3 border-t border-[#2e3238] flex items-center gap-2">
                   <input
@@ -856,7 +887,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                    placeholder="Ask a question about your uploaded course materials..."
+                    placeholder="Ask a question about your uploaded college notes, slides, or textbook..."
                     className="flex-1 px-4 py-2.5 bg-[#15171c] border border-[#2e3238] rounded text-[14px] text-[#f3f4f6] focus:outline-none"
                   />
                   <button

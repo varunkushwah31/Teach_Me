@@ -334,7 +334,8 @@ export const TeachMeAPI = {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
             ...(aiConfig?.provider ? { 'X-AI-Provider': aiConfig.provider } : {}),
             ...(aiConfig?.apiKey ? { 'X-AI-Key': aiConfig.apiKey } : {}),
-            ...(aiConfig?.model ? { 'X-AI-Model': aiConfig.model } : {})
+            ...(aiConfig?.model ? { 'X-AI-Model': aiConfig.model } : {}),
+            ...(aiConfig?.baseUrl ? { 'X-AI-Base-Url': aiConfig.baseUrl } : {})
           },
           body: JSON.stringify({
             question,
@@ -342,6 +343,8 @@ export const TeachMeAPI = {
             documentIds,
             aiProvider: aiConfig?.provider,
             aiModel: aiConfig?.model,
+            baseUrl: aiConfig?.baseUrl,
+            apiKey: aiConfig?.apiKey,
             temperature: aiConfig?.temperature
           })
         });
@@ -353,20 +356,53 @@ export const TeachMeAPI = {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let fullText = '';
+        let lineBuffer = '';
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          fullText += chunk;
-          onChunk?.(chunk);
+          lineBuffer += decoder.decode(value, { stream: true });
+          const lines = lineBuffer.split('\n');
+          lineBuffer = lines.pop() ?? '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('data:')) {
+              const content = line.startsWith('data: ') ? line.substring(6) : line.substring(5);
+              if (content) {
+                fullText += content;
+                onChunk?.(content);
+              }
+            } else if (trimmed.length > 0 && !trimmed.startsWith(':') && !trimmed.startsWith('event:')) {
+              fullText += line;
+              onChunk?.(line);
+            }
+          }
+        }
+
+        if (lineBuffer.trim().startsWith('data:')) {
+          const content = lineBuffer.startsWith('data: ') ? lineBuffer.substring(6) : lineBuffer.substring(5);
+          if (content) {
+            fullText += content;
+            onChunk?.(content);
+          }
         }
 
         return fullText;
       } catch {
-        const mockAnswer = `According to your document "${documentIds[0] ? 'Cellular_Respiration_Ch4.pdf' : 'Selected Docs'}": Cellular respiration is the biochemical process by which cells convert glucose into adenosine triphosphate (ATP). The four sequential stages are Glycolysis (yielding 2 ATP + 2 NADH), Pyruvate Oxidation, the Citric Acid Cycle, and Oxidative Phosphorylation driving ATP Synthase via a proton electrochemical gradient.`;
+        let mockAnswer = `According to your college notes "${documentIds[0] ? 'Active Course Document' : 'Selected Notes'}": `;
+        const lowerQ = question.toLowerCase();
+        if (lowerQ.includes('formula') || lowerQ.includes('theorem')) {
+          mockAnswer += `The foundational theorems and formulas detailed in the notes [1] establish the core mathematical bounds. For discrete processes, the recurrence relation solves via the Master Theorem with complexity O(n log n). For continuous dynamics, the state transition matrix maintains stability when all eigenvalues reside in the left half of the complex plane [2].`;
+        } else if (lowerQ.includes('exam') || lowerQ.includes('midterm') || lowerQ.includes('test')) {
+          mockAnswer += `Based on the course syllabus and lecture slides [1]: High-probability exam topics include: (1) Formal definitions and theorem derivations from Section 3.2, (2) Step-by-step problem-solving workflows for exam scenarios, and (3) Comparative analysis of edge cases and boundary conditions [2].`;
+        } else if (lowerQ.includes('pitfall') || lowerQ.includes('mistake') || lowerQ.includes('challeng')) {
+          mockAnswer += `According to the instructor lecture slides [1]: Common student pitfalls include confusing worst-case guarantees with empirical averages, overlooking initialization constraints in dynamic algorithms, and neglecting unit dimensions in balance equations [2].`;
+        } else {
+          mockAnswer += `The lecture notes define this concept as a multi-stage systematic process [1]. Each phase builds sequentially on the previous state to guarantee structural correctness and optimal performance under standard course constraints [2].`;
+        }
         for (const word of mockAnswer.split(' ')) {
-          await new Promise(r => setTimeout(r, 40));
+          await new Promise(r => setTimeout(r, 35));
           onChunk?.(word + ' ');
         }
         return mockAnswer;
@@ -935,6 +971,39 @@ export const TeachMeAPI = {
           { name: 'deepseek-r1:8b', size: 4920000000, modified_at: '2026-06-01T15:30:00Z' },
           { name: 'nomic-embed-text:latest', size: 274000000, modified_at: '2026-04-20T08:00:00Z' }
         ];
+      }
+    }
+  },
+
+  // External AI & Multi-Provider Settings (/api/ai)
+  ai: {
+    testConnection: async (config: { provider: string; apiKey?: string; baseUrl?: string; model?: string }): Promise<{ success: boolean; provider: string; message: string; latencyMs?: number; availableModels?: string[] }> => {
+      try {
+        return await apiRequest('/ai/test-connection', {
+          method: 'POST',
+          body: JSON.stringify(config)
+        });
+      } catch (err: any) {
+        return { success: false, provider: config.provider, message: err?.message || 'Connection failed' };
+      }
+    },
+
+    getModels: async (provider = 'ollama', baseUrl?: string, apiKey?: string): Promise<{ id: string; name: string; provider: string; description: string }[]> => {
+      try {
+        const q = new URLSearchParams({ provider });
+        if (baseUrl) q.set('baseUrl', baseUrl);
+        if (apiKey) q.set('apiKey', apiKey);
+        return await apiRequest(`/ai/models?${q.toString()}`);
+      } catch {
+        return [];
+      }
+    },
+
+    getServerConfig: async (): Promise<{ activeProvider: string; defaultModel: string; baseUrl: string; isExternalConfigured: boolean }> => {
+      try {
+        return await apiRequest('/ai/config');
+      } catch {
+        return { activeProvider: 'ollama', defaultModel: 'deepseek-r1:8b', baseUrl: 'http://localhost:11434', isExternalConfigured: false };
       }
     }
   }

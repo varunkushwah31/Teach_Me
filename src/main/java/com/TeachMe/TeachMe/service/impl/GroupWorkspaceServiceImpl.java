@@ -12,6 +12,31 @@ import java.util.Map;
 public class GroupWorkspaceServiceImpl implements GroupWorkspaceService {
 
     @Override
+    public List<Map<String, Object>> getWorkspaces(Long userId) {
+        log.info("Fetching study workspaces for user ID {}", userId);
+        return List.of(
+                Map.of(
+                        "workspaceId", 1L,
+                        "name", "CS301 Study Group",
+                        "description", "Operating Systems & Concurrency review",
+                        "ownerUserId", userId,
+                        "members", List.of("student@teachme.ai", "study_partner@college.edu"),
+                        "sharedDocumentCount", 2,
+                        "createdAt", java.time.LocalDateTime.now().minusDays(3).toString()
+                ),
+                Map.of(
+                        "workspaceId", 2L,
+                        "name", "Midterm Prep Room",
+                        "description", "Algorithm design & dynamic programming",
+                        "ownerUserId", userId,
+                        "members", List.of("student@teachme.ai", "peer@college.edu"),
+                        "sharedDocumentCount", 1,
+                        "createdAt", java.time.LocalDateTime.now().minusDays(1).toString()
+                )
+        );
+    }
+
+    @Override
     public Map<String, Object> createWorkspace(String name, String description, Long ownerUserId) {
         log.info("Creating group study workspace '{}' for user ID {}", name, ownerUserId);
 
@@ -20,7 +45,7 @@ public class GroupWorkspaceServiceImpl implements GroupWorkspaceService {
                 "name", name,
                 "description", description,
                 "ownerUserId", ownerUserId,
-                "members", List.of("student@teachme.ai", "classmate@mit.edu"),
+                "members", List.of("student@teachme.ai", "classmate@college.edu"),
                 "sharedDocumentCount", 0,
                 "createdAt", java.time.LocalDateTime.now().toString()
         );

@@ -69,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth, onOpen
                 TeachMe
               </span>
               <span className="px-1.5 py-0.2 rounded bg-[#272a2e] text-[#a8ff53] text-[10px] font-mono font-semibold">
-                STUDY AI
+                COLLEGE RAG
               </span>
             </div>
           </a>
@@ -81,19 +81,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth, onOpen
             onClick={() => onOpenStudio?.('documents')}
             className="text-[#d7d9dd] hover:text-[#a8ff53] transition-colors whitespace-nowrap cursor-pointer font-medium"
           >
-            Upload PDF
+            Upload Notes PDF
           </button>
           <button
             onClick={() => onOpenStudio?.('chat')}
             className="text-[#d7d9dd] hover:text-[#a8ff53] transition-colors whitespace-nowrap cursor-pointer font-medium"
           >
-            AI Tutor Q&A
+            Notes Chatbot (RAG)
           </button>
           <button
             onClick={() => onOpenStudio?.('quiz')}
             className="text-[#d7d9dd] hover:text-[#a8ff53] transition-colors whitespace-nowrap cursor-pointer font-medium"
           >
-            Practice Quizzes
+            Exam Quizzes
           </button>
           <button
             onClick={() => onOpenStudio?.('flashcards')}
@@ -147,10 +147,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth, onOpen
           )}
 
           <button
-            onClick={() => onOpenStudio?.('documents')}
+            onClick={() => onOpenStudio?.('chat')}
             className="group flex items-center gap-1.5 px-3.5 py-1.5 bg-[#a8ff53] hover:bg-[#b8ff70] active:scale-[0.98] text-[#121317] font-semibold text-[13px] rounded-sm shadow-[inset_0_0_0_1px_rgba(168,255,83,0.3)] transition-all whitespace-nowrap cursor-pointer"
           >
-            <span>Start Studying</span>
+            <span>Start Notes Chat</span>
             <ArrowRightIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
@@ -158,10 +158,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth, onOpen
         {/* Mobile menu button */}
         <div className="flex lg:hidden items-center gap-2">
           <button
-            onClick={() => onOpenStudio?.('documents')}
+            onClick={() => onOpenStudio?.('chat')}
             className="px-2.5 py-1 bg-[#a8ff53] text-[#121317] font-semibold text-[12px] rounded-sm"
           >
-            Study Now
+            Notes Chat
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -173,38 +173,38 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth, onOpen
 
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer without emojis */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-[#121317] border-b border-[#272a2e] px-4 py-4 space-y-2.5 text-[14px]">
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('documents'); }}
             className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
-            📄 Upload Course PDF
+            Upload College Notes PDF
           </button>
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('chat'); }}
             className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
-            💬 AI Tutor Q&A
+            College Notes RAG Chat
           </button>
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('quiz'); }}
             className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
-            📝 Practice Quizzes
+            Exam Practice Quizzes
           </button>
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('flashcards'); }}
             className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
-            🧠 SM-2 Spaced Flashcards
+            SM-2 Course Flashcards
           </button>
           <button
             onClick={() => { setMobileMenuOpen(false); onOpenStudio?.('podcast'); }}
             className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 cursor-pointer"
           >
-            🎙️ Audio Podcasts
+            Audio Study Podcasts
           </button>
           <button
             onClick={() => {
@@ -214,7 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth, onOpen
             }}
             className="block w-full text-left text-[#d7d9dd] hover:text-[#a8ff53] py-1 font-mono text-[13px] cursor-pointer"
           >
-            🔑 AI Provider & API Keys ({aiConfig.provider})
+            AI Provider and API Keys ({aiConfig.provider})
           </button>
         </div>
       )}
