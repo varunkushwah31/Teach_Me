@@ -43,10 +43,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in select-none">
-      <div className="w-full max-w-sm bg-gradient-to-b from-[#12131e] to-[#0d0e16] border border-[#1f2133] rounded-3xl p-6 shadow-2xl relative animate-scale-in">
+      <div className="w-full max-w-sm bg-[#0e1017] border border-[#1f2133] rounded-3xl p-6 shadow-2xl relative animate-scale-in">
         <div className="flex items-center justify-between pb-4 border-b border-[#1b1d2e]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-900 to-indigo-800 border border-purple-500/50 text-purple-200 flex items-center justify-center font-bold text-sm shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-950/70 border border-indigo-500/40 text-indigo-200 flex items-center justify-center font-bold text-sm shadow-xs">
               {userProfile.avatarInitial || 'B'}
             </div>
             <div>
@@ -54,7 +54,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 <span>Account Profile</span>
                 <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-400" />
               </h2>
-              <p className="text-[11px] text-zinc-400">Credentials and workspace session</p>
+              <p className="text-xs text-zinc-400">Credentials and workspace session</p>
             </div>
           </div>
           <button
@@ -74,7 +74,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full bg-[#151624] border border-[#222438] focus:border-purple-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 outline-none transition-colors"
+              className="w-full bg-[#121420] border border-[#1f2234] focus:border-indigo-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 outline-none transition-colors"
             />
           </div>
 
@@ -86,7 +86,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full bg-[#151624] border border-[#222438] focus:border-purple-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 outline-none transition-colors"
+              className="w-full bg-[#121420] border border-[#1f2234] focus:border-indigo-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 outline-none transition-colors"
             />
           </div>
 
@@ -99,7 +99,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Leave blank to keep unchanged"
-              className="w-full bg-[#151624] border border-[#222438] focus:border-purple-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 placeholder-zinc-600 outline-none transition-colors font-mono"
+              className="w-full bg-[#121420] border border-[#1f2234] focus:border-indigo-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 placeholder-zinc-600 outline-none transition-colors font-mono"
             />
           </div>
 
@@ -122,7 +122,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md active:scale-95"
+              className="px-5 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 shadow-xs border border-indigo-400/30 transition-all cursor-pointer active:scale-95"
             >
               Update
             </button>

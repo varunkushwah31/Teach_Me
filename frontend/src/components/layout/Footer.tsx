@@ -41,7 +41,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
           <div className="col-span-2 md:col-span-1 space-y-3">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-[#a8ff53]">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-[#a8ff53]" aria-hidden="true">
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
               </div>

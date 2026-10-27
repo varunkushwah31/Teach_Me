@@ -49,18 +49,18 @@ const NewTemplateModalContent: React.FC<{ onClose: () => void; initialPrompt: st
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in select-none">
-      <div className="w-full max-w-lg bg-gradient-to-b from-[#12131e] to-[#0d0e16] border border-[#1f2133] rounded-3xl p-6 sm:p-7 shadow-2xl relative animate-scale-in">
+      <div className="w-full max-w-lg bg-[#0e1017] border border-[#1f2133] rounded-3xl p-6 sm:p-7 shadow-2xl relative animate-scale-in">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[#1b1d2e]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-purple-950/70 border border-purple-500/40 text-purple-300 flex items-center justify-center shadow-sm">
-              <BookmarkSimpleIcon className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-indigo-950/70 border border-indigo-500/40 text-indigo-300 flex items-center justify-center shadow-xs">
+              <BookmarkSimpleIcon className="w-5 h-5" weight="duotone" />
             </div>
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <span>Create Prompt Template</span>
+                <span>Create Prompt Blueprint</span>
               </h2>
-              <p className="text-xs text-zinc-400">Save prompt to your reusable templates library</p>
+              <p className="text-xs text-zinc-400">Save prompt to your reusable blueprint library</p>
             </div>
           </div>
           <button
@@ -75,7 +75,7 @@ const NewTemplateModalContent: React.FC<{ onClose: () => void; initialPrompt: st
         <form onSubmit={handleSubmit} className="space-y-4 pt-5">
           <div>
             <label className="block text-xs font-semibold text-zinc-200 mb-1.5">
-              Template Title
+              Blueprint Title
             </label>
             <input
               type="text"
@@ -83,7 +83,7 @@ const NewTemplateModalContent: React.FC<{ onClose: () => void; initialPrompt: st
               onChange={e => setTitle(e.target.value)}
               placeholder="e.g. Socratic Algorithm Mentor"
               required
-              className="w-full bg-[#151624] border border-[#222438] focus:border-purple-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-colors"
+              className="w-full bg-[#121420] border border-[#1f2234] focus:border-indigo-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-colors"
             />
           </div>
 
@@ -95,7 +95,7 @@ const NewTemplateModalContent: React.FC<{ onClose: () => void; initialPrompt: st
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="w-full bg-[#151624] border border-[#222438] focus:border-purple-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 outline-none transition-colors"
+                className="w-full bg-[#121420] border border-[#1f2234] focus:border-indigo-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 outline-none transition-colors"
               >
                 <option value="Education">Education</option>
                 <option value="Engineering">Engineering</option>
@@ -114,7 +114,7 @@ const NewTemplateModalContent: React.FC<{ onClose: () => void; initialPrompt: st
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 placeholder="Brief summary of capability"
-                className="w-full bg-[#151624] border border-[#222438] focus:border-purple-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-colors"
+                className="w-full bg-[#121420] border border-[#1f2234] focus:border-indigo-500/80 rounded-xl px-3.5 py-2.5 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-colors"
               />
             </div>
           </div>
@@ -129,7 +129,7 @@ const NewTemplateModalContent: React.FC<{ onClose: () => void; initialPrompt: st
               rows={5}
               placeholder="Write the full template prompt text..."
               required
-              className="w-full bg-[#151624] border border-[#222438] focus:border-purple-500/80 rounded-xl p-3 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-colors resize-none font-mono leading-relaxed"
+              className="w-full bg-[#121420] border border-[#1f2234] focus:border-indigo-500/80 rounded-xl p-3 text-xs text-zinc-100 placeholder-zinc-500 outline-none transition-colors resize-none font-mono leading-relaxed"
             />
           </div>
 
@@ -145,9 +145,9 @@ const NewTemplateModalContent: React.FC<{ onClose: () => void; initialPrompt: st
             <button
               type="submit"
               disabled={!title.trim() || !prompt.trim()}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)] transition-all disabled:opacity-40 cursor-pointer active:scale-95"
+              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs border border-indigo-400/30 transition-all disabled:opacity-40 cursor-pointer active:scale-95"
             >
-              Save Template
+              Save Blueprint
             </button>
           </div>
         </form>

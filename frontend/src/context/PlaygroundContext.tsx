@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import type {
   ChatMessage,
   ChatSession,
@@ -72,6 +72,16 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return chats[0]?.id || 'chat-demo-1';
   });
 
+  const [viewMode, setViewMode] = useState<'landing' | 'app'>(() => {
+    try {
+      const saved = localStorage.getItem('fox_view_mode');
+      if (saved === 'landing' || saved === 'app') return saved;
+    } catch {
+      // Fallback
+    }
+    return 'landing';
+  });
+
   const [activeTab, setActiveTab] = useState<'playground' | 'templates' | 'knowledge' | 'settings'>('playground');
   
   const [activeModel, setActiveModel] = useState<string>(() => {
@@ -121,6 +131,14 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   });
 
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('fox_view_mode', viewMode);
+    } catch (e) {
+      console.warn('Failed to save view mode', e);
+    }
+  }, [viewMode]);
 
   useEffect(() => {
     try {
@@ -242,7 +260,7 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const runPrompt = useCallback(async (overridePrompt?: string) => {
-    const textToRun = (overridePrompt !== undefined ? overridePrompt : promptInput).trim();
+    const textToRun = (overridePrompt ?? promptInput).trim();
     if (!textToRun || isStreaming) return;
 
     let targetChatId = currentChatId;
@@ -270,17 +288,15 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     };
 
     setChats(prev => prev.map(c => {
-      if (c.id === targetChatId) {
-        const isFirstMessage = c.messages.length === 0;
-        const newTitle = isFirstMessage ? (textToRun.slice(0, 24) || 'New Conversation') : c.title;
-        return {
-          ...c,
-          title: newTitle,
-          messages: [...c.messages, userMessage, assistantMessage],
-          updatedAt: new Date().toISOString()
-        };
-      }
-      return c;
+      if (c.id !== targetChatId) return c;
+      const isFirstMessage = c.messages.length === 0;
+      const newTitle = isFirstMessage ? (textToRun.slice(0, 24) || 'New Conversation') : c.title;
+      return {
+        ...c,
+        title: newTitle,
+        messages: [...c.messages, userMessage, assistantMessage],
+        updatedAt: new Date().toISOString()
+      };
     }));
 
     setPromptInput('');
@@ -294,16 +310,11 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         docIds,
         (token: string) => {
           setChats(prev => prev.map(c => {
-            if (c.id === targetChatId) {
-              const updatedMsgs = c.messages.map(m => {
-                if (m.id === assistantMsgId) {
-                  return { ...m, content: m.content + token };
-                }
-                return m;
-              });
-              return { ...c, messages: updatedMsgs };
-            }
-            return c;
+            if (c.id !== targetChatId) return c;
+            return {
+              ...c,
+              messages: c.messages.map(m => (m.id === assistantMsgId ? { ...m, content: m.content + token } : m))
+            };
           }));
         }
       );
@@ -323,16 +334,11 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         `Let me know if you would like to adjust parameters or explore subtopics in more detail.`;
 
       setChats(prev => prev.map(c => {
-        if (c.id === targetChatId) {
-          const updatedMsgs = c.messages.map(m => {
-            if (m.id === assistantMsgId) {
-              return { ...m, content: fallbackResponse };
-            }
-            return m;
-          });
-          return { ...c, messages: updatedMsgs };
-        }
-        return c;
+        if (c.id !== targetChatId) return c;
+        return {
+          ...c,
+          messages: c.messages.map(m => (m.id === assistantMsgId ? { ...m, content: fallbackResponse } : m))
+        };
       }));
     } finally {
       setIsStreaming(false);
@@ -358,44 +364,82 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setActiveTab('playground');
   }, []);
 
+  const contextValue = useMemo(() => ({
+    chats,
+    currentChatId,
+    currentChat,
+    activeTab,
+    activeModel,
+    selectedModelOption,
+    parameters,
+    templates,
+    promptInput,
+    isStreaming,
+    isSidebarOpen,
+    isParametersOpen,
+    userProfile,
+    activeDocId,
+    viewMode,
+    setViewMode,
+    setActiveTab,
+    setActiveModel,
+    setPromptInput,
+    setIsSidebarOpen,
+    setIsParametersOpen,
+    setUserProfile,
+    setActiveDocId,
+    updateParameters,
+    resetParameters,
+    createNewChat,
+    selectChat,
+    deleteChat,
+    renameChat,
+    clearCurrentChat,
+    runPrompt,
+    stopStreaming,
+    saveAsTemplate,
+    deleteTemplate,
+    applyTemplate
+  }), [
+    chats,
+    currentChatId,
+    currentChat,
+    activeTab,
+    activeModel,
+    selectedModelOption,
+    parameters,
+    templates,
+    promptInput,
+    isStreaming,
+    isSidebarOpen,
+    isParametersOpen,
+    userProfile,
+    activeDocId,
+    viewMode,
+    setViewMode,
+    setActiveTab,
+    setActiveModel,
+    setPromptInput,
+    setIsSidebarOpen,
+    setIsParametersOpen,
+    setUserProfile,
+    setActiveDocId,
+    updateParameters,
+    resetParameters,
+    createNewChat,
+    selectChat,
+    deleteChat,
+    renameChat,
+    clearCurrentChat,
+    runPrompt,
+    stopStreaming,
+    saveAsTemplate,
+    deleteTemplate,
+    applyTemplate
+  ]);
+
   return (
-    <PlaygroundContext.Provider
-      value={{
-        chats,
-        currentChatId,
-        currentChat,
-        activeTab,
-        activeModel,
-        selectedModelOption,
-        parameters,
-        templates,
-        promptInput,
-        isStreaming,
-        isSidebarOpen,
-        isParametersOpen,
-        userProfile,
-        activeDocId,
-        setActiveTab,
-        setActiveModel,
-        setPromptInput,
-        setIsSidebarOpen,
-        setIsParametersOpen,
-        setUserProfile,
-        setActiveDocId,
-        updateParameters,
-        resetParameters,
-        createNewChat,
-        selectChat,
-        deleteChat,
-        renameChat,
-        clearCurrentChat,
-        runPrompt,
-        stopStreaming,
-        saveAsTemplate,
-        deleteTemplate,
-        applyTemplate
-      }}
-    >
+    <PlaygroundContext.Provider value={contextValue}>
       {children}
     </PlaygroundContext.Provider>
   );

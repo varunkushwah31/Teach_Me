@@ -16,7 +16,6 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -391,7 +390,7 @@ public class ExternalAiServiceImpl implements ExternalAiService {
     private AiConnectionTestResultDTO testOllamaConnection(String baseUrl, long start) {
         String cleanUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
         try {
-            String json = webClient.get()
+            webClient.get()
                     .uri(cleanUrl + "/api/version")
                     .retrieve()
                     .bodyToMono(String.class)

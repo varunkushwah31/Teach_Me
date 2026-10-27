@@ -374,7 +374,7 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                 </div>
 
                 {quizSubmitted && (
-                  <div className="p-3.5 bg-[#121317] border-l-4 border-[#a8ff53] rounded text-[13px] text-[#b5b8c0] animate-slide-up space-y-1">
+                  <div className="p-3.5 bg-[#121317] border border-[#a8ff53]/30 rounded-xl text-[13px] text-[#b5b8c0] animate-slide-up space-y-1">
                     <span className="text-[#a8ff53] font-semibold font-mono">Pedagogical Explanation:</span>
                     <p>{SAMPLE_QUIZ.explanation}</p>
                   </div>

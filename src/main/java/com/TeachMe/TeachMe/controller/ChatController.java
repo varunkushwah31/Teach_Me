@@ -42,11 +42,22 @@ public class ChatController {
             return Flux.just("Error: Question cannot be empty.");
         }
 
-        String provider = payload.get("aiProvider") != null ? payload.get("aiProvider").toString()
-                : (payload.get("provider") != null ? payload.get("provider").toString() : headerProvider);
+        String provider = headerProvider;
+        if (payload.get("aiProvider") != null) {
+            provider = payload.get("aiProvider").toString();
+        } else if (payload.get("provider") != null) {
+            provider = payload.get("provider").toString();
+        }
+
         String apiKey = payload.get("apiKey") != null ? payload.get("apiKey").toString() : headerApiKey;
-        String model = payload.get("aiModel") != null ? payload.get("aiModel").toString()
-                : (payload.get("model") != null ? payload.get("model").toString() : headerModel);
+
+        String model = headerModel;
+        if (payload.get("aiModel") != null) {
+            model = payload.get("aiModel").toString();
+        } else if (payload.get("model") != null) {
+            model = payload.get("model").toString();
+        }
+
         String baseUrl = payload.get("baseUrl") != null ? payload.get("baseUrl").toString() : headerBaseUrl;
 
         Double temperature = null;
@@ -54,6 +65,7 @@ public class ChatController {
             try {
                 temperature = Double.valueOf(payload.get("temperature").toString());
             } catch (Exception _) {
+                // Ignore parse errors and retain null/default temperature
             }
         }
 

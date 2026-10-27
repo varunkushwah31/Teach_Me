@@ -7,8 +7,7 @@ import {
   BookOpenIcon,
   CodeIcon,
   CpuIcon,
-  ArrowRightIcon,
-  XIcon
+  ArrowRightIcon
 } from '@phosphor-icons/react';
 import { usePlayground } from '../../context/usePlayground';
 import { MarkdownMessage } from './MarkdownMessage';
@@ -45,7 +44,7 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({ onOpenSaveTempla
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
       if (!isStreaming && promptInput.trim()) {
-        runPrompt();
+        void runPrompt();
       }
     }
   };
@@ -80,55 +79,51 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({ onOpenSaveTempla
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#08090d] bg-grid-subtle relative overflow-hidden select-none">
-      {/* Ambient Radial Lighting */}
-      <div className="absolute inset-0 ambient-glow-purple pointer-events-none" />
-
+    <div className="flex-1 flex flex-col h-full bg-[#08090d] relative overflow-hidden select-none">
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-8 lg:px-12 py-6 space-y-6 relative z-10">
         {!hasMessages ? (
-          /* Empty State */
+          /* Empty State: Studio Canvas */
           <div className="h-full min-h-[460px] flex flex-col items-center justify-center text-center px-4 animate-fade-in max-w-3xl mx-auto">
-            {/* Ambient Glowing Logo Badge */}
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-violet-500 p-0.5 shadow-[0_0_30px_rgba(139,92,246,0.35)] mb-4">
-              <div className="w-full h-full bg-[#0c0d14] rounded-[14px] flex items-center justify-center">
-                <SparkleIcon className="w-6 h-6 text-purple-400" weight="fill" />
-              </div>
+            {/* Studio Badge with Integrated Icon Flow */}
+            <div className="flex items-center gap-2 mb-3">
+              <SparkleIcon className="w-5 h-5 text-indigo-400" weight="duotone" />
+              <span className="text-xs font-mono font-bold text-indigo-300 uppercase tracking-wider">
+                Prompt Studio Canvas
+              </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-              How can I help you today?
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-tight">
+              Hardware-Speed AI Reasoning.
             </h1>
-            <p className="text-zinc-400 text-xs sm:text-sm mt-2 max-w-md leading-relaxed">
-              Enter a prompt below and press <span className="keycap text-[10px]">Ctrl+Enter</span> or click <span className="font-semibold text-purple-300">Run</span> to get started.
+            <p className="text-zinc-400 text-xs sm:text-sm mt-2 max-w-[55ch] leading-relaxed mx-auto">
+              Synthesize prompts across {selectedModelOption.name}, stream tokens with zero-latency Server-Sent Events, or index reference documents via PgVector.
             </p>
 
             {/* Quick Starter Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8 w-full text-left">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-8 w-full text-left">
               {quickPrompts.map((item, idx) => {
                 const IconComponent = item.icon;
                 return (
                   <button
                     key={idx}
-                    onClick={() => runPrompt(item.prompt)}
-                    className="p-3.5 rounded-2xl bg-[#11121b]/80 hover:bg-[#181927] border border-[#1e202f] hover:border-purple-500/50 text-left transition-all duration-200 group shadow-sm hover:shadow-[0_8px_20px_rgba(0,0,0,0.4)] cursor-pointer card-shine"
+                    onClick={() => void runPrompt(item.prompt)}
+                    className="p-4 rounded-xl bg-[#0e1017] hover:bg-[#141622] border border-[#1c1f2e] hover:border-indigo-500/40 text-left transition-all duration-200 group shadow-xs hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)] cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
-                          <IconComponent className="w-3.5 h-3.5" />
-                        </div>
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-purple-300">
+                        <IconComponent className="w-4 h-4 text-indigo-400" weight="duotone" />
+                        <span className="text-xs font-mono uppercase tracking-wider text-indigo-300 font-semibold">
                           {item.category}
                         </span>
                       </div>
-                      <ArrowRightIcon className="w-3.5 h-3.5 text-zinc-600 group-hover:text-purple-300 group-hover:translate-x-1 transition-all" />
+                      <ArrowRightIcon className="w-3.5 h-3.5 text-zinc-500 group-hover:text-indigo-300 group-hover:translate-x-1 transition-all" />
                     </div>
 
                     <div className="text-xs font-bold text-zinc-100 group-hover:text-white transition-colors">
                       {item.title}
                     </div>
-                    <div className="text-[11px] text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
+                    <div className="text-xs text-zinc-400 line-clamp-2 mt-1 leading-relaxed">
                       {item.prompt}
                     </div>
                   </button>
@@ -146,26 +141,26 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({ onOpenSaveTempla
                 <div key={msg.id} className="space-y-1.5 animate-slide-up">
                   {/* Timestamp & Model Tag */}
                   <div
-                    className={`text-[10px] font-mono text-zinc-500 px-2 flex items-center gap-1.5 ${
+                    className={`text-xs font-mono text-zinc-400 px-1 flex items-center gap-2 ${
                       isUser ? 'justify-end' : 'justify-start'
                     }`}
                   >
                     {!isUser && (
-                      <span className="font-semibold text-purple-300 px-1.5 py-0.2 rounded bg-purple-950/60 border border-purple-500/30">
+                      <span className="font-semibold text-indigo-300 px-2 py-0.5 rounded bg-indigo-950/70 border border-indigo-500/30">
                         {msg.model || selectedModelOption.name.toLowerCase()}
                       </span>
                     )}
                     <span>{msg.timestamp}</span>
                   </div>
 
-                  {/* Message Bubble Container */}
+                  {/* Message Frame Container */}
                   <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
                     {isUser ? (
-                      <div className="bg-gradient-to-b from-[#1c1d2c] to-[#161724] border border-[#2a2c40] text-zinc-100 rounded-2xl rounded-tr-xs px-4 py-3 max-w-[82%] text-sm leading-relaxed shadow-md font-sans">
+                      <div className="bg-[#121420] border border-[#212436] text-zinc-100 rounded-xl px-4 py-3 max-w-[85%] text-xs sm:text-sm leading-relaxed shadow-xs font-sans">
                         {msg.content}
                       </div>
                     ) : (
-                      <div className="bg-gradient-to-b from-[#11121a] to-[#0c0d14] border border-[#1c1e2c] rounded-2xl rounded-tl-xs p-5 sm:p-6 text-zinc-200 w-full max-w-3xl shadow-xl leading-relaxed relative">
+                      <div className="bg-[#0e1017] border border-[#1c1f2e] rounded-xl p-5 sm:p-6 text-zinc-200 w-full max-w-3xl shadow-sm leading-relaxed relative">
                         <MarkdownMessage content={msg.content} />
                       </div>
                     )}
@@ -176,10 +171,9 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({ onOpenSaveTempla
 
             {/* Live Streaming Indicator */}
             {isStreaming && (
-              <div className="flex items-center gap-2 text-xs font-mono text-purple-300 px-2 py-1 animate-fade-in">
-                <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
-                <span className="w-2 h-2 rounded-full bg-purple-400" />
-                <span>Thinking & generating tokens...</span>
+              <div className="flex items-center gap-2 text-xs font-mono text-indigo-300 px-2 py-1 animate-fade-in">
+                <span className="w-2 h-2 rounded-full bg-indigo-400" />
+                <span>Streaming tokens from model gateway...</span>
               </div>
             )}
 
@@ -189,94 +183,76 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({ onOpenSaveTempla
       </div>
 
       {/* Floating Bottom Input Area */}
-      <div className="p-4 sm:px-8 pb-3 bg-gradient-to-t from-[#08090d] via-[#08090d]/90 to-transparent relative z-20">
+      <div className="p-4 sm:px-8 pb-4 bg-gradient-to-t from-[#08090d] via-[#08090d]/95 to-transparent relative z-20">
         <div className="max-w-4xl mx-auto">
           {/* Main Input Box Card */}
-          <div className="bg-[#10111a]/95 backdrop-blur-md border border-[#1e202f] hover:border-zinc-700 focus-within:border-purple-500/70 focus-within:ring-2 focus-within:ring-purple-500/20 rounded-2xl p-3 shadow-2xl transition-all duration-300">
+          <div className="bg-[#0e1017] border border-[#1c1f2e] focus-within:border-indigo-500/70 focus-within:ring-1 focus-within:ring-indigo-500/30 rounded-2xl p-3 shadow-lg transition-all duration-200">
             <textarea
               ref={textareaRef}
               value={promptInput}
               onChange={e => setPromptInput(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={3}
-              placeholder="Write your prompt here... (Ctrl+Enter to run)"
-              className="w-full bg-transparent text-zinc-100 placeholder-zinc-500 text-sm outline-none resize-none leading-relaxed px-1 font-sans"
+              placeholder="Write prompt instructions or question here... (Ctrl+Enter to run)"
+              className="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-400 outline-none resize-none font-sans leading-relaxed selection:bg-indigo-500/30"
             />
 
-            {/* Action Buttons Bar inside Box */}
-            <div className="flex items-center justify-between pt-2.5 border-t border-[#1a1b28] mt-1.5">
-              {/* Left Details */}
-              <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+            {/* Bottom Controls Bar */}
+            <div className="flex items-center justify-between pt-2 border-t border-[#171926] mt-1 text-xs">
+              <div className="flex items-center gap-2 text-zinc-400">
                 {activeDocId ? (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-indigo-950/70 text-indigo-300 border border-indigo-500/30 font-mono text-xs">
+                    <BookOpenIcon className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Doc Attached</span>
+                  </span>
+                ) : (
                   <button
                     onClick={() => setActiveTab('knowledge')}
-                    className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-950/60 text-purple-300 border border-purple-500/30 hover:bg-purple-900/40 transition-colors cursor-pointer text-xs"
+                    className="inline-flex items-center gap-1 text-zinc-400 hover:text-indigo-300 transition-colors cursor-pointer text-xs"
                   >
-                    <BookOpenIcon className="w-3.5 h-3.5 text-purple-400" />
-                    <span>RAG Document Active</span>
+                    <BookOpenIcon className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Attach Knowledge Doc</span>
                   </button>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-zinc-500">{promptInput.length} chars</span>
-                    {promptInput && (
-                      <button
-                        onClick={() => setPromptInput('')}
-                        className="text-zinc-500 hover:text-zinc-300 p-0.5 cursor-pointer"
-                        title="Clear input"
-                      >
-                        <XIcon className="w-3 h-3" />
-                      </button>
-                    )}
-                  </div>
                 )}
-              </div>
 
-              {/* Right Action Controls */}
-              <div className="flex items-center gap-2">
-                {/* Save Prompt as Template Button */}
+                <span className="text-zinc-600 hidden sm:inline">•</span>
+
                 <button
                   onClick={onOpenSaveTemplate}
                   disabled={!promptInput.trim()}
-                  className="flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg hover:bg-zinc-800/60 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer active:scale-95"
-                  title="Save prompt to reusable templates"
+                  className="inline-flex items-center gap-1 text-zinc-400 hover:text-indigo-300 transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer text-xs"
+                  title="Save current prompt as Blueprint"
                 >
                   <BookmarkSimpleIcon className="w-3.5 h-3.5" />
-                  <span>Save</span>
+                  <span className="hidden sm:inline">Save Blueprint</span>
                 </button>
+              </div>
 
-                {/* Keyboard Hint */}
-                <span className="hidden sm:inline-flex keycap">
-                  Ctrl+Enter
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-zinc-400 font-mono hidden sm:inline">
+                  <span className="keycap text-xs">Ctrl+Enter</span>
                 </span>
 
-                {/* Run / Stop Button */}
                 {isStreaming ? (
                   <button
                     onClick={stopStreaming}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30 transition-all active:scale-95 cursor-pointer"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold transition-all shadow-xs cursor-pointer active:scale-95"
                   >
                     <StopIcon className="w-3.5 h-3.5" weight="fill" />
                     <span>Stop</span>
                   </button>
                 ) : (
                   <button
-                    onClick={() => runPrompt()}
+                    onClick={() => void runPrompt()}
                     disabled={!promptInput.trim()}
-                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)] transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white font-bold transition-all shadow-xs cursor-pointer active:scale-95 group"
                   >
-                    <ArrowUpIcon className="w-3.5 h-3.5" weight="bold" />
                     <span>Run</span>
+                    <ArrowUpIcon className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" weight="bold" />
                   </button>
                 )}
               </div>
             </div>
-          </div>
-
-          {/* Subtitle Disclaimer */}
-          <div className="text-center mt-2.5">
-            <span className="text-[11px] text-zinc-500 font-mono">
-              AI response are mock data for demonstration purpose.
-            </span>
           </div>
         </div>
       </div>

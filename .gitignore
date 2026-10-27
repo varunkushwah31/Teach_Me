@@ -38,3 +38,15 @@ AGENTS.md
 /postgres-data/
 .neon
 node_modules/
+.agent/*
+.agents/**
+.claude/*
+.claude/**
+.codex/**
+.cursor/**
+.gemini/**
+.groq/**
+.ollama/**
+.openai/**
+.opencode/**
+.paragon/**

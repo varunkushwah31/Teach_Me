@@ -34,6 +34,8 @@ export interface ChatHistoryDTO {
   citations?: CitationDTO[];
 }
 
+export type DocumentProcessingStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | (string & {});
+
 export interface DocumentHistoryDTO {
   id: number;
   filename?: string;
@@ -43,7 +45,7 @@ export interface DocumentHistoryDTO {
   category?: string;
   chatId?: string;
   description?: string | null;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | string;
+  status: DocumentProcessingStatus;
   createdAt: string;
   updatedAt?: string;
   errorMessage?: string | null;

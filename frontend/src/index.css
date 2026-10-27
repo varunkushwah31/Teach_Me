@@ -3,58 +3,53 @@
 
 @layer base {
   :root {
-    --background: #090a0f;
-    --foreground: #f4f4f7;
-    --card: #111219;
-    --card-foreground: #f4f4f7;
-    --popover: #111219;
-    --popover-foreground: #f4f4f7;
-    --primary: #8b5cf6;
+    --background: #08090d;
+    --foreground: #f4f5f9;
+    --card: #0e1017;
+    --card-foreground: #f4f5f9;
+    --popover: #141622;
+    --popover-foreground: #f4f5f9;
+    --primary: #6366f1;
     --primary-foreground: #ffffff;
-    --secondary: #171823;
-    --secondary-foreground: #e4e4e9;
-    --muted: #1a1b26;
-    --muted-foreground: #9ca0b0;
-    --accent: #7c3aed;
+    --secondary: #141622;
+    --secondary-foreground: #e2e4ea;
+    --muted: #161824;
+    --muted-foreground: #9da3b8;
+    --accent: #4f46e5;
     --accent-foreground: #ffffff;
     --destructive: #f43f5e;
     --destructive-foreground: #ffffff;
-    --border: #1a1b27;
-    --input: #141520;
-    --ring: #8b5cf6;
+    --border: #1c1f2e;
+    --input: #11131c;
+    --ring: #6366f1;
     --radius: 12px;
   }
 
   * {
-    border-color: #1a1b27;
+    border-color: #1c1f2e;
   }
 
   html, body {
-    background-color: #090a0f;
-    color: #f4f4f7;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #08090d;
+    color: #f4f5f9;
+    font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
-  code, pre, .font-mono {
-    font-family: 'JetBrains Mono Variable', 'JetBrains Mono', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
   }
-}
 
-/* Background Micro-Grid Pattern */
-.bg-grid-subtle {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-}
+  p {
+    text-wrap: pretty;
+  }
 
-/* Ambient Radial Glow */
-.ambient-glow-purple {
-  background: radial-gradient(ellipse 700px 350px at 50% 25%, rgba(124, 58, 237, 0.09), transparent 75%);
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  }
 }
 
 /* Custom Sleek Scrollbars */
@@ -91,16 +86,16 @@ input[type="range"].fox-slider::-webkit-slider-thumb {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #a855f7;
+  background: #6366f1;
   border: 2px solid #ffffff;
   cursor: grab;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease;
 }
 
 input[type="range"].fox-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.85);
+  transform: scale(1.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
 }
 
 input[type="range"].fox-slider::-webkit-slider-thumb:active {
@@ -115,11 +110,11 @@ input[type="range"].fox-slider::-webkit-slider-thumb:active {
   align-items: center;
   justify-content: center;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  padding: 2px 5px;
+  font-size: 11px;
+  padding: 2px 6px;
   border-radius: 5px;
   background: #1e202d;
-  color: #9ca0b0;
+  color: #b5b8c0;
   border: 1px solid #2d3043;
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   user-select: none;

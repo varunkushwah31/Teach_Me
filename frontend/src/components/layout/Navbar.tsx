@@ -60,6 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenStudio, onOpenAuth, onOpen
               <svg
                 viewBox="0 0 24 24"
                 className="w-4 h-4 fill-[#a8ff53] transition-transform group-hover:scale-110"
+                aria-hidden="true"
               >
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>

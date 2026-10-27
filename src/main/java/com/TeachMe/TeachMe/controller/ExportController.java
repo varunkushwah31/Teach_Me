@@ -2,7 +2,6 @@ package com.TeachMe.TeachMe.controller;
 
 import com.TeachMe.TeachMe.dto.ChatHistoryDTO;
 import com.TeachMe.TeachMe.dto.DocumentHistoryDTO;
-import com.TeachMe.TeachMe.entity.Document;
 import com.TeachMe.TeachMe.service.AuthService;
 import com.TeachMe.TeachMe.service.ChatHistoryService;
 import com.TeachMe.TeachMe.service.DocumentHistoryService;

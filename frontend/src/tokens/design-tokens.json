@@ -1,5 +1,4 @@
 {
-  "$schema": "https://design-tokens.github.io/community-group/format/",
   "color": {
     "slate-canvas": {
       "$value": "#1c1e21",

@@ -16,10 +16,10 @@ export const ParametersPanel: React.FC = () => {
     setTimeout(() => setResetRotating(false), 500);
   };
 
-  // Helper to compute slider background fill
+  // Helper to compute slider background fill with Electric Indigo
   const getTrackFill = (val: number, min: number, max: number) => {
     const pct = ((val - min) / (max - min)) * 100;
-    return `linear-gradient(to right, #8b5cf6 0%, #a855f7 ${pct}%, #1e202d ${pct}%, #1e202d 100%)`;
+    return `linear-gradient(to right, #6366f1 0%, #4f46e5 ${pct}%, #1c1f2e ${pct}%, #1c1f2e 100%)`;
   };
 
   const systemPresets = [
@@ -29,11 +29,11 @@ export const ParametersPanel: React.FC = () => {
   ];
 
   return (
-    <aside className="w-80 bg-[#0c0d12] border-l border-[#171822] flex flex-col h-full select-none overflow-y-auto relative z-20">
+    <aside className="w-80 bg-[#0a0b10] border-l border-[#171822] flex flex-col h-full select-none overflow-y-auto relative z-20">
       {/* Header */}
       <div className="h-16 px-5 flex items-center justify-between border-b border-[#171822] flex-shrink-0">
         <div className="flex items-center gap-2">
-          <SlidersHorizontalIcon className="w-4 h-4 text-purple-400" />
+          <SlidersHorizontalIcon className="w-4 h-4 text-indigo-400" />
           <span className="font-semibold text-xs uppercase tracking-wider text-zinc-200">Model Parameters</span>
         </div>
         <button
@@ -42,19 +42,19 @@ export const ParametersPanel: React.FC = () => {
           title="Reset parameters to defaults"
         >
           <ArrowCounterClockwiseIcon
-            className={`w-3.5 h-3.5 transition-transform duration-500 ${resetRotating ? '-rotate-180 text-purple-400' : 'group-hover:-rotate-45'}`}
+            className={`w-3.5 h-3.5 transition-transform duration-500 ${resetRotating ? '-rotate-180 text-indigo-400' : 'group-hover:-rotate-45'}`}
           />
-          <span className="font-medium text-[11px]">Reset</span>
+          <span className="font-medium text-xs">Reset</span>
         </button>
       </div>
 
       {/* Sliders Container */}
       <div className="p-5 space-y-6 flex-1 text-xs">
         {/* 1. Temperature */}
-        <div className="space-y-2.5 p-3 rounded-xl bg-[#11121a] border border-[#1a1b28] shadow-sm">
+        <div className="space-y-3 p-3.5 rounded-xl bg-[#0e1017] border border-[#1c1f2e] shadow-xs">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-zinc-200">Temperature</span>
-            <span className="bg-[#241a3a] text-[#c084fc] border border-purple-500/40 px-2 py-0.5 rounded text-xs font-mono font-bold shadow-[0_0_8px_rgba(139,92,246,0.2)]">
+            <span className="bg-indigo-950/80 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded text-xs font-mono font-bold">
               {parameters.temperature.toFixed(1)}
             </span>
           </div>
@@ -70,7 +70,7 @@ export const ParametersPanel: React.FC = () => {
             className="w-full fox-slider cursor-pointer"
           />
 
-          <div className="flex justify-between text-[10px] font-mono text-zinc-500">
+          <div className="flex justify-between text-xs font-mono text-zinc-400">
             <span>0.0 (Deterministic)</span>
             <span>2.0 (Creative)</span>
           </div>
@@ -85,10 +85,10 @@ export const ParametersPanel: React.FC = () => {
               <button
                 key={p.label}
                 onClick={() => updateParameters({ temperature: p.val })}
-                className={`flex-1 py-1 rounded text-[10px] font-medium transition-all cursor-pointer ${
+                className={`flex-1 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                   Math.abs(parameters.temperature - p.val) < 0.05
-                    ? 'bg-purple-900/60 text-purple-200 border border-purple-500/50 shadow-xs'
-                    : 'bg-zinc-800/50 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                    ? 'bg-indigo-950/80 text-indigo-200 border border-indigo-500/50 shadow-xs'
+                    : 'bg-[#141624] text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1d30] border border-[#202336]'
                 }`}
               >
                 {p.label}
@@ -96,16 +96,16 @@ export const ParametersPanel: React.FC = () => {
             ))}
           </div>
 
-          <p className="text-[11px] text-zinc-400 leading-relaxed pt-1 border-t border-zinc-800/40">
-            Controls randomness: Lower values lead to focused, factual responses. Higher values introduce creative variability.
+          <p className="text-xs text-zinc-400 leading-relaxed pt-1 border-t border-[#1a1b28]">
+            Lower values generate deterministic, factual responses. Higher values permit exploratory synthesis.
           </p>
         </div>
 
         {/* 2. Max Tokens / Length */}
-        <div className="space-y-2.5 p-3 rounded-xl bg-[#11121a] border border-[#1a1b28] shadow-sm">
+        <div className="space-y-3 p-3.5 rounded-xl bg-[#0e1017] border border-[#1c1f2e] shadow-xs">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-zinc-200">Max Length</span>
-            <span className="bg-[#241a3a] text-[#c084fc] border border-purple-500/40 px-2 py-0.5 rounded text-xs font-mono font-bold shadow-[0_0_8px_rgba(139,92,246,0.2)]">
+            <span className="bg-indigo-950/80 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded text-xs font-mono font-bold">
               {parameters.maxTokens}
             </span>
           </div>
@@ -121,38 +121,42 @@ export const ParametersPanel: React.FC = () => {
             className="w-full fox-slider cursor-pointer"
           />
 
-          <div className="flex justify-between text-[10px] font-mono text-zinc-500">
+          <div className="flex justify-between text-xs font-mono text-zinc-400">
             <span>64 tokens</span>
             <span>4,096 tokens</span>
           </div>
 
           {/* Quick presets */}
           <div className="flex items-center gap-1.5 pt-1">
-            {[1024, 2048, 4096].map(val => (
+            {[
+              { val: 512, label: 'Short' },
+              { val: 2048, label: 'Standard' },
+              { val: 4096, label: 'Max' }
+            ].map(p => (
               <button
-                key={val}
-                onClick={() => updateParameters({ maxTokens: val })}
-                className={`flex-1 py-1 rounded text-[10px] font-mono font-medium transition-all cursor-pointer ${
-                  parameters.maxTokens === val
-                    ? 'bg-purple-900/60 text-purple-200 border border-purple-500/50 shadow-xs'
-                    : 'bg-zinc-800/50 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                key={p.label}
+                onClick={() => updateParameters({ maxTokens: p.val })}
+                className={`flex-1 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  parameters.maxTokens === p.val
+                    ? 'bg-indigo-950/80 text-indigo-200 border border-indigo-500/50 shadow-xs'
+                    : 'bg-[#141624] text-zinc-400 hover:text-zinc-200 hover:bg-[#1a1d30] border border-[#202336]'
                 }`}
               >
-                {val}
+                {p.label}
               </button>
             ))}
           </div>
 
-          <p className="text-[11px] text-zinc-400 leading-relaxed pt-1 border-t border-zinc-800/40">
-            Maximum token budget allocated for completion generation.
+          <p className="text-xs text-zinc-400 leading-relaxed pt-1 border-t border-[#1a1b28]">
+            Upper bound limit on generated completion tokens per inference call.
           </p>
         </div>
 
-        {/* 3. Top P */}
-        <div className="space-y-2.5 p-3 rounded-xl bg-[#11121a] border border-[#1a1b28] shadow-sm">
+        {/* 3. Top P (Nucleus Sampling) */}
+        <div className="space-y-3 p-3.5 rounded-xl bg-[#0e1017] border border-[#1c1f2e] shadow-xs">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-zinc-200">Top P</span>
-            <span className="bg-[#241a3a] text-[#c084fc] border border-purple-500/40 px-2 py-0.5 rounded text-xs font-mono font-bold">
+            <span className="bg-indigo-950/80 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded text-xs font-mono font-bold">
               {parameters.topP.toFixed(2)}
             </span>
           </div>
@@ -168,89 +172,69 @@ export const ParametersPanel: React.FC = () => {
             className="w-full fox-slider cursor-pointer"
           />
 
-          <div className="flex justify-between text-[10px] font-mono text-zinc-500">
-            <span>0.0</span>
-            <span>1.0</span>
+          <div className="flex justify-between text-xs font-mono text-zinc-400">
+            <span>0.0 (Narrow)</span>
+            <span>1.0 (Broad)</span>
           </div>
 
-          <p className="text-[11px] text-zinc-400 leading-relaxed">
-            Nucleus sampling: 0.5 considers tokens comprising the top 50% probability mass.
+          <p className="text-xs text-zinc-400 leading-relaxed pt-1 border-t border-[#1a1b28]">
+            Nucleus sampling cutoff: 0.1 considers only top 10% probability mass.
           </p>
         </div>
 
-        {/* 4. Frequency & Presence Penalty */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-2 p-3 rounded-xl bg-[#11121a] border border-[#1a1b28]">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-[11px] text-zinc-300">Freq. Penalty</span>
-              <span className="font-mono text-purple-300 font-bold text-[11px]">
-                {parameters.frequencyPenalty.toFixed(1)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="2"
-              step="0.1"
-              value={parameters.frequencyPenalty}
-              onChange={e => updateParameters({ frequencyPenalty: parseFloat(e.target.value) })}
-              style={{ background: getTrackFill(parameters.frequencyPenalty, 0, 2) }}
-              className="w-full fox-slider cursor-pointer"
-            />
-          </div>
-
-          <div className="space-y-2 p-3 rounded-xl bg-[#11121a] border border-[#1a1b28]">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-[11px] text-zinc-300">Pres. Penalty</span>
-              <span className="font-mono text-purple-300 font-bold text-[11px]">
-                {parameters.presencePenalty.toFixed(1)}
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="2"
-              step="0.1"
-              value={parameters.presencePenalty}
-              onChange={e => updateParameters({ presencePenalty: parseFloat(e.target.value) })}
-              style={{ background: getTrackFill(parameters.presencePenalty, 0, 2) }}
-              className="w-full fox-slider cursor-pointer"
-            />
-          </div>
-        </div>
-
-        {/* 5. System Instructions */}
-        <div className="space-y-2 p-3 rounded-xl bg-[#11121a] border border-[#1a1b28]">
+        {/* 4. Frequency Penalty */}
+        <div className="space-y-3 p-3.5 rounded-xl bg-[#0e1017] border border-[#1c1f2e] shadow-xs">
           <div className="flex items-center justify-between">
-            <label className="font-semibold text-zinc-200 flex items-center gap-1.5">
-              <SparkleIcon className="w-3.5 h-3.5 text-purple-400" />
-              <span>System Role</span>
-            </label>
-            <span className="text-[10px] font-mono text-zinc-500">
-              {parameters.systemPrompt.length} chars
+            <span className="font-semibold text-zinc-200">Frequency Penalty</span>
+            <span className="bg-indigo-950/80 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded text-xs font-mono font-bold">
+              {parameters.frequencyPenalty.toFixed(2)}
             </span>
           </div>
 
-          {/* Quick presets */}
-          <div className="flex flex-wrap gap-1">
-            {systemPresets.map(preset => (
+          <input
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            value={parameters.frequencyPenalty}
+            onChange={e => updateParameters({ frequencyPenalty: parseFloat(e.target.value) })}
+            style={{ background: getTrackFill(parameters.frequencyPenalty, 0, 2) }}
+            className="w-full fox-slider cursor-pointer"
+          />
+
+          <div className="flex justify-between text-xs font-mono text-zinc-400">
+            <span>0.0 (None)</span>
+            <span>2.0 (Strict)</span>
+          </div>
+
+          <p className="text-xs text-zinc-400 leading-relaxed pt-1 border-t border-[#1a1b28]">
+            Penalizes new tokens based on existing frequency in generated text to suppress repetition.
+          </p>
+        </div>
+
+        {/* 5. System Presets */}
+        <div className="space-y-2.5 pt-2">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-300 uppercase tracking-wider">
+            <SparkleIcon className="w-3.5 h-3.5 text-indigo-400" />
+            <span>System Persona Presets</span>
+          </div>
+
+          <div className="space-y-2">
+            {systemPresets.map((sp, idx) => (
               <button
-                key={preset.label}
-                onClick={() => updateParameters({ systemPrompt: preset.prompt })}
-                className="px-2 py-0.5 rounded bg-zinc-800/80 hover:bg-purple-950/60 hover:text-purple-300 border border-zinc-700/60 text-[10px] text-zinc-300 transition-colors cursor-pointer"
+                key={idx}
+                onClick={() => updateParameters({ systemPrompt: sp.prompt })}
+                className="w-full text-left p-3 rounded-xl bg-[#0e1017] hover:bg-[#141624] border border-[#1c1f2e] hover:border-indigo-500/40 transition-all cursor-pointer group"
               >
-                {preset.label}
+                <div className="font-bold text-zinc-200 group-hover:text-white text-xs">
+                  {sp.label}
+                </div>
+                <div className="text-xs text-zinc-400 line-clamp-2 mt-0.5 leading-relaxed">
+                  {sp.prompt}
+                </div>
               </button>
             ))}
           </div>
-
-          <textarea
-            value={parameters.systemPrompt}
-            onChange={e => updateParameters({ systemPrompt: e.target.value })}
-            rows={4}
-            className="w-full bg-[#161724] border border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-100 outline-none focus:border-purple-500/70 focus:ring-1 focus:ring-purple-500/30 transition-all resize-none leading-relaxed font-mono"
-            placeholder="Instruct the model on its identity, style, and constraints..."
-          />
         </div>
       </div>
     </aside>

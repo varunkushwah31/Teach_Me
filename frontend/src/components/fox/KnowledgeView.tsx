@@ -118,29 +118,37 @@ export const KnowledgeView: React.FC = () => {
         id: 1,
         title: 'Algorithmic Complexity & Asymptotics',
         description: 'Comprehensive evaluation of algorithm performance and recurrence bounds',
-        totalQuestions: 2,
+        totalQuestions: 3,
         passScore: 70,
         documentId: activeDocId || 101,
         questions: [
           {
             id: 1,
-            questionText: 'What is the average case time complexity of QuickSort?',
+            questionText: 'What is the tightest upper bound of MergeSort in the worst-case scenario?',
             questionOrder: 1,
-            options: ['O(N log N)', 'O(N^2)', 'O(log N)', 'O(1)'],
-            correctAnswerIndex: 0,
-            explanation: 'QuickSort partitions subarrays logarithmically on average, yielding O(N log N).'
+            options: ['O(n)', 'O(n log n)', 'O(n^2)', 'O(log n)'],
+            correctAnswerIndex: 1,
+            explanation: 'MergeSort recursively bisects the array in O(log n) levels, each requiring linear O(n) merge work.'
           },
           {
             id: 2,
-            questionText: 'Which data structure enforces strict FIFO ordering?',
+            questionText: 'Which theorem is commonly utilized to resolve recurrence relations of divide-and-conquer algorithms?',
             questionOrder: 2,
-            options: ['Stack', 'Queue', 'Priority Heap', 'Hash Set'],
-            correctAnswerIndex: 1,
-            explanation: 'A Queue enforces First-In, First-Out element processing.'
+            options: ['Master Theorem', 'Fermat Little Theorem', 'Bayes Theorem', 'Central Limit Theorem'],
+            correctAnswerIndex: 0,
+            explanation: 'The Master Theorem delivers asymptotic bounds for recurrences of the form T(n) = aT(n/b) + f(n).'
+          },
+          {
+            id: 3,
+            questionText: 'What distance metric is leveraged in PgVector for cosine similarity embeddings?',
+            questionOrder: 3,
+            options: ['Cosine Distance (<=>)', 'Euclidean Distance (<->)', 'Taxicab Distance', 'Hamming Distance'],
+            correctAnswerIndex: 0,
+            explanation: 'Cosine distance operator <=> computes 1 - cosine_similarity for normalized vector embeddings.'
           }
         ]
       });
-      setQuizAnswers([-1, -1]);
+      setQuizAnswers([-1, -1, -1]);
       setQuizResult(null);
       setActiveTool('quiz');
     } finally {
@@ -160,21 +168,30 @@ export const KnowledgeView: React.FC = () => {
       setFlashcards([
         {
           id: 1,
-          front: 'What is the Master Theorem for divide-and-conquer recurrences?',
-          back: 'A formula to compute asymptotic bounds T(n) = aT(n/b) + f(n) by comparing n^(log_b a) with f(n).',
+          front: 'What is the time complexity of building a Binary Heap from an unordered array of n elements?',
+          back: 'O(n) time complexity using Floyd bottom-up heap construction algorithm.',
           deckName: 'Algorithms',
           easeFactor: 2.5,
           interval: 1,
-          repetitionNumber: 1
+          repetitionNumber: 0
         },
         {
           id: 2,
-          front: 'Explain the difference between Mutex and Semaphore.',
-          back: 'A Mutex is a locking mechanism with ownership (1 thread). A Semaphore is a signaling mechanism with counter N.',
-          deckName: 'Systems',
+          front: 'How does an HNSW index optimize high-dimensional vector nearest-neighbor search?',
+          back: 'Hierarchical Navigable Small World graphs organize vector embeddings into multi-layered skip-list graphs for logarithmic traversal.',
+          deckName: 'Vector Databases',
           easeFactor: 2.5,
-          interval: 2,
-          repetitionNumber: 1
+          interval: 1,
+          repetitionNumber: 0
+        },
+        {
+          id: 3,
+          front: 'Define the critical section problem in concurrent systems.',
+          back: 'A design challenge ensuring mutual exclusion, progress, and bounded waiting when multiple threads access shared resources.',
+          deckName: 'Operating Systems',
+          easeFactor: 2.5,
+          interval: 1,
+          repetitionNumber: 0
         }
       ]);
       setCardIdx(0);
@@ -188,15 +205,18 @@ export const KnowledgeView: React.FC = () => {
   const handleGenerateSummary = async () => {
     setIsGenerating(true);
     try {
-      await TeachMeAPI.summary.generate(activeDocId || 101);
       const res = await TeachMeAPI.summary.get(activeDocId || 101);
       setSummaryText(res.executiveSummary);
       setActiveTool('summary');
     } catch {
       setSummaryText(
-        `# Executive Study Summary\n\n` +
-        `This document covers core algorithm analysis paradigms, asymptotic notations (Big-O, Big-Omega, Big-Theta), and recurrence relation solving.\n\n` +
-        `### Key Takeaways:\n` +
+        `# Executive Knowledge Brief: CS106B Algorithm Analysis\n\n` +
+        `### Core Architecture Concepts\n` +
+        `This document covers the formal foundational mathematics of asymptotic runtime analysis and recurrence solving:\n\n` +
+        `- **Big-O Notation**: Asymptotic upper bounds describing worst-case scaling behavior.\n` +
+        `- **Master Method**: Direct analytical framework for evaluating recurrence forms $T(n) = aT(n/b) + O(n^d)$.\n` +
+        `- **Cache Locality**: Algorithmic differences in CPU cache invalidation between sequential arrays and linked nodes.\n\n` +
+        `### Key Engineering Takeaways\n\n` +
         `1. **Divide and Conquer**: Subdivides problems into independent subproblems; complexity bounded by recurrence relations.\n` +
         `2. **Space-Time Trade-offs**: Dynamic programming trades auxiliary memory to prevent redundant re-evaluations.\n` +
         `3. **Empirical Benchmarks**: Algorithmic upper bounds determine scaling limits in production.`
@@ -208,14 +228,14 @@ export const KnowledgeView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#08090d] bg-grid-subtle overflow-y-auto px-6 md:px-12 py-8 select-none relative">
+    <div className="flex-1 flex flex-col h-full bg-[#08090d] overflow-y-auto px-6 md:px-12 py-8 select-none relative">
       <div className="max-w-6xl w-full mx-auto space-y-6 relative z-10 animate-fade-in">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-              Knowledge & Documents
-              <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-purple-950/80 text-purple-300 border border-purple-500/30">
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight flex items-center gap-3">
+              Knowledge &amp; PgVector Index
+              <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-500/30">
                 PgVector RAG
               </span>
             </h1>
@@ -224,7 +244,7 @@ export const KnowledgeView: React.FC = () => {
             </p>
           </div>
 
-          <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)] transition-all cursor-pointer active:scale-95 flex-shrink-0">
+          <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs border border-indigo-400/30 transition-all cursor-pointer active:scale-95 flex-shrink-0">
             <UploadSimpleIcon className="w-4 h-4" weight="bold" />
             <span>Upload Document</span>
             <input type="file" accept=".pdf,.txt,.md" onChange={handleFileUpload} className="hidden" />
@@ -232,19 +252,19 @@ export const KnowledgeView: React.FC = () => {
         </div>
 
         {uploadProgress && (
-          <div className="p-3.5 rounded-xl bg-purple-950/50 border border-purple-500/40 text-purple-200 text-xs flex items-center gap-2.5 shadow-sm animate-slide-up">
-            <CheckCircleIcon className="w-4 h-4 text-purple-400 flex-shrink-0" />
+          <div className="p-3.5 rounded-xl bg-indigo-950/60 border border-indigo-500/40 text-indigo-200 text-xs flex items-center gap-2.5 shadow-xs animate-slide-up">
+            <CheckCircleIcon className="w-4 h-4 text-emerald-400 flex-shrink-0" />
             <span>{uploadProgress}</span>
           </div>
         )}
 
         {/* Tab Buttons */}
-        <div className="flex items-center gap-2 border-b border-[#1a1b28] pb-3 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-[#1c1f2e] pb-3 overflow-x-auto">
           <button
             onClick={() => setActiveTool('docs')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
               activeTool === 'docs'
-                ? 'bg-purple-950/70 text-purple-200 border border-purple-500/50 shadow-sm'
+                ? 'bg-indigo-950/80 text-indigo-200 border border-indigo-500/50 shadow-xs'
                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#12131d] border border-transparent'
             }`}
           >
@@ -257,7 +277,7 @@ export const KnowledgeView: React.FC = () => {
             disabled={isGenerating}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
               activeTool === 'quiz'
-                ? 'bg-purple-950/70 text-purple-200 border border-purple-500/50 shadow-sm'
+                ? 'bg-indigo-950/80 text-indigo-200 border border-indigo-500/50 shadow-xs'
                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#12131d] border border-transparent'
             }`}
           >
@@ -270,7 +290,7 @@ export const KnowledgeView: React.FC = () => {
             disabled={isGenerating}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
               activeTool === 'flashcards'
-                ? 'bg-purple-950/70 text-purple-200 border border-purple-500/50 shadow-sm'
+                ? 'bg-indigo-950/80 text-indigo-200 border border-indigo-500/50 shadow-xs'
                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#12131d] border border-transparent'
             }`}
           >
@@ -283,12 +303,12 @@ export const KnowledgeView: React.FC = () => {
             disabled={isGenerating}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
               activeTool === 'summary'
-                ? 'bg-purple-950/70 text-purple-200 border border-purple-500/50 shadow-sm'
+                ? 'bg-indigo-950/80 text-indigo-200 border border-indigo-500/50 shadow-xs'
                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#12131d] border border-transparent'
             }`}
           >
             <SparkleIcon className="w-4 h-4" />
-            <span>Summary</span>
+            <span>Summary Brief</span>
           </button>
         </div>
 
@@ -301,38 +321,36 @@ export const KnowledgeView: React.FC = () => {
               return (
                 <div
                   key={doc.id}
-                  className={`bg-gradient-to-b from-[#11121a] to-[#0c0d14] border rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md ${
+                  className={`bg-[#0e1017] border rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-xs ${
                     isAttached
-                      ? 'border-purple-500/80 shadow-[0_0_20px_rgba(139,92,246,0.15)] ring-1 ring-purple-500/30'
-                      : 'border-[#1c1e2d] hover:border-zinc-700'
+                      ? 'border-indigo-500/80 ring-1 ring-indigo-500/30'
+                      : 'border-[#1c1f2e] hover:border-zinc-700'
                   }`}
                 >
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-300 flex items-center justify-center flex-shrink-0 shadow-sm">
-                          <FileTextIcon className="w-5 h-5" />
-                        </div>
+                        <FileTextIcon className="w-6 h-6 text-indigo-400 shrink-0" weight="duotone" />
                         <div className="min-w-0">
                           <h3 className="text-xs font-bold text-zinc-100 truncate">
                             {doc.filename || doc.fileName}
                           </h3>
-                          <span className="text-[10px] text-zinc-500 font-mono">
+                          <span className="text-xs text-zinc-400 font-mono">
                             {doc.category || 'General'}
                           </span>
                         </div>
                       </div>
 
                       {isAttached && (
-                        <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-mono font-medium">
+                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-mono font-medium">
                           Active in Chat
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="mt-5 pt-3 border-t border-[#1a1b28] flex items-center justify-between text-xs">
-                    <span className="text-[10px] font-mono text-zinc-500 flex items-center gap-1.5">
+                  <div className="mt-5 pt-3 border-t border-[#171926] flex items-center justify-between text-xs">
+                    <span className="text-xs font-mono text-zinc-400 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       <span>Vector Ready</span>
                     </span>
@@ -343,7 +361,7 @@ export const KnowledgeView: React.FC = () => {
                         className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                           isAttached
                             ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-                            : 'bg-purple-950/60 text-purple-300 border border-purple-500/40 hover:bg-purple-900/60'
+                            : 'bg-indigo-950/60 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-900/60'
                         }`}
                       >
                         {isAttached ? 'Detach' : 'Attach to Chat'}
@@ -354,7 +372,7 @@ export const KnowledgeView: React.FC = () => {
                           setActiveDocId(doc.id);
                           setActiveTab('playground');
                         }}
-                        className="px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm"
+                        className="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-400/30 transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-xs"
                       >
                         <span>Ask AI</span>
                         <ArrowRightIcon className="w-3 h-3" />
@@ -369,13 +387,13 @@ export const KnowledgeView: React.FC = () => {
 
         {/* Tab 2: Auto Quiz View */}
         {activeTool === 'quiz' && quizData && (
-          <div className="max-w-2xl mx-auto bg-gradient-to-b from-[#11121a] to-[#0c0d14] border border-[#1e202f] rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-[#1a1b28] pb-4">
+          <div className="max-w-2xl mx-auto bg-[#0e1017] border border-[#1c1f2e] rounded-2xl p-6 sm:p-8 shadow-xl space-y-6 animate-scale-in">
+            <div className="flex items-center justify-between border-b border-[#1c1f2e] pb-4">
               <div>
                 <h3 className="text-base font-bold text-white">{quizData.title}</h3>
                 <p className="text-xs text-zinc-400 mt-0.5">{quizData.description}</p>
               </div>
-              <span className="text-xs px-2.5 py-1 rounded-full bg-purple-950/80 text-purple-300 border border-purple-500/40 font-mono">
+              <span className="text-xs px-2.5 py-1 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-500/40 font-mono">
                 {quizData.totalQuestions} Questions
               </span>
             </div>
@@ -399,13 +417,13 @@ export const KnowledgeView: React.FC = () => {
                           }}
                           className={`w-full text-left p-3 rounded-xl text-xs transition-all border cursor-pointer ${
                             isSelected
-                              ? 'border-purple-500 bg-purple-500/15 text-purple-100 shadow-[0_0_12px_rgba(139,92,246,0.2)]'
-                              : 'border-[#1c1e2d] bg-[#141522] text-zinc-300 hover:border-zinc-700'
+                              ? 'border-indigo-500 bg-indigo-950/40 text-indigo-100 ring-1 ring-indigo-500/30'
+                              : 'border-[#1c1f2e] bg-[#121420] text-zinc-300 hover:border-zinc-700'
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
                             <div className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 ${
-                              isSelected ? 'border-purple-400 bg-purple-500' : 'border-zinc-600'
+                              isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-zinc-600'
                             }`}>
                               {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                             </div>
@@ -419,7 +437,7 @@ export const KnowledgeView: React.FC = () => {
               ))}
             </div>
 
-            <div className="pt-4 border-t border-[#1a1b28] flex items-center justify-between">
+            <div className="pt-4 border-t border-[#1c1f2e] flex items-center justify-between">
               <button
                 onClick={() => setQuizAnswers(new Array(quizData.questions.length).fill(-1))}
                 className="text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer"
@@ -438,19 +456,19 @@ export const KnowledgeView: React.FC = () => {
                     percentage: Math.round((correct / quizData.questions.length) * 100)
                   });
                 }}
-                className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-500 border border-indigo-400/30 transition-all cursor-pointer shadow-xs"
               >
                 Submit Quiz
               </button>
             </div>
 
             {quizResult && (
-              <div className="p-4 rounded-xl bg-purple-950/60 border border-purple-500/50 text-purple-200 text-xs shadow-md animate-fade-in flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-indigo-950/60 border border-indigo-500/50 text-indigo-200 text-xs shadow-xs animate-fade-in flex items-center justify-between">
                 <div>
                   <span className="font-bold text-sm block">Quiz Results</span>
                   <span className="text-zinc-300">You scored {quizResult.score} out of {quizResult.total} questions ({quizResult.percentage}%)</span>
                 </div>
-                <div className="text-lg font-bold font-mono text-purple-300">
+                <div className="text-lg font-bold font-mono text-indigo-300">
                   {quizResult.percentage}%
                 </div>
               </div>
@@ -463,18 +481,18 @@ export const KnowledgeView: React.FC = () => {
           <div className="max-w-xl mx-auto space-y-4 animate-scale-in">
             <div
               onClick={() => setIsFlipped(!isFlipped)}
-              className="h-64 rounded-2xl bg-gradient-to-b from-[#12131d] to-[#0c0d15] border border-[#1e202f] hover:border-purple-500/50 p-8 flex flex-col justify-between cursor-pointer transition-all duration-300 shadow-2xl select-none relative card-shine"
+              className="h-64 rounded-2xl bg-[#0e1017] border border-[#1c1f2e] hover:border-indigo-500/50 p-8 flex flex-col justify-between cursor-pointer transition-all duration-300 shadow-xl select-none relative"
             >
-              <div className="flex items-center justify-between text-xs text-zinc-500 font-mono">
+              <div className="flex items-center justify-between text-xs text-zinc-400 font-mono">
                 <span>Card {cardIdx + 1} of {flashcards.length}</span>
-                <span className="text-purple-400 font-medium">Click card to Flip</span>
+                <span className="text-indigo-300 font-medium">Click card to Flip</span>
               </div>
 
               <div className="text-center text-sm md:text-base font-semibold text-zinc-100 leading-relaxed px-4">
                 {isFlipped ? flashcards[cardIdx].back : flashcards[cardIdx].front}
               </div>
 
-              <div className="text-center text-xs text-purple-300 font-mono font-medium">
+              <div className="text-center text-xs text-indigo-300 font-mono font-medium">
                 {isFlipped ? '[ANSWER]' : '[QUESTION]'}
               </div>
             </div>
@@ -485,11 +503,11 @@ export const KnowledgeView: React.FC = () => {
                   setIsFlipped(false);
                   setCardIdx(prev => (prev > 0 ? prev - 1 : flashcards.length - 1));
                 }}
-                className="px-4 py-2 rounded-xl bg-[#141522] border border-zinc-800 text-xs text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#121420] border border-[#202334] text-xs text-zinc-300 hover:text-white hover:bg-[#1a1c2c] transition-colors cursor-pointer"
               >
                 Previous
               </button>
-              <span className="text-xs text-zinc-500 font-mono">
+              <span className="text-xs text-zinc-400 font-mono">
                 {cardIdx + 1} / {flashcards.length}
               </span>
               <button
@@ -497,7 +515,7 @@ export const KnowledgeView: React.FC = () => {
                   setIsFlipped(false);
                   setCardIdx(prev => (prev + 1) % flashcards.length);
                 }}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-xs font-bold text-white hover:from-purple-500 hover:to-indigo-500 transition-all cursor-pointer shadow-md"
+                className="px-4 py-2 rounded-xl bg-indigo-600 text-xs font-bold text-white hover:bg-indigo-500 border border-indigo-400/30 transition-all cursor-pointer shadow-xs"
               >
                 Next Card
               </button>
@@ -507,7 +525,7 @@ export const KnowledgeView: React.FC = () => {
 
         {/* Tab 4: Summary View */}
         {activeTool === 'summary' && summaryText && (
-          <div className="max-w-3xl mx-auto bg-gradient-to-b from-[#11121a] to-[#0c0d14] border border-[#1e202f] rounded-2xl p-6 sm:p-8 shadow-xl text-xs text-zinc-200 leading-relaxed whitespace-pre-wrap font-sans animate-fade-in">
+          <div className="max-w-3xl mx-auto bg-[#0e1017] border border-[#1c1f2e] rounded-2xl p-6 sm:p-8 shadow-xl text-xs text-zinc-200 leading-relaxed whitespace-pre-wrap font-sans animate-fade-in">
             {summaryText}
           </div>
         )}

@@ -50,7 +50,7 @@ export const FoxLayout: React.FC = () => {
   }, [createNewChat, setIsSidebarOpen]);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#08090d] text-zinc-100 font-sans selection:bg-purple-500/30 selection:text-white">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#08090d] text-zinc-100 font-sans selection:bg-indigo-500/30 selection:text-white">
       {/* 1. Desktop Left Sidebar */}
       <div className="hidden md:block h-full flex-shrink-0">
         <Sidebar

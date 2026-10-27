@@ -22,7 +22,9 @@ export interface PlaygroundContextType {
   isParametersOpen: boolean;
   userProfile: UserProfile;
   activeDocId: number | null;
+  viewMode: 'landing' | 'app';
   
+  setViewMode: (mode: 'landing' | 'app') => void;
   setActiveTab: (tab: 'playground' | 'templates' | 'knowledge' | 'settings') => void;
   setActiveModel: (modelId: string) => void;
   setPromptInput: (val: string) => void;
