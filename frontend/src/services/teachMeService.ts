@@ -151,7 +151,9 @@ export const TeachMeAPI = {
 
     getHistory: async (page = 0, size = 10): Promise<PaginatedResponse<DocumentHistoryDTO>> => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const res = await apiRequest<PaginatedResponse<any>>(`/history/documents?page=${page}&size=${size}`);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const backendDocs: DocumentHistoryDTO[] = (res.content || []).map((doc: any) => ({
           id: doc.id,
           filename: doc.fileName || doc.filename || 'Untitled.pdf',
@@ -245,14 +247,15 @@ export const TeachMeAPI = {
 
     getAnalytics: async (documentId: number): Promise<DocumentAnalyticsDTO> => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const res = await apiRequest<any>(`/documents/${documentId}/analytics`);
         const totalWords = res.totalWords || 0;
         const estReading = Math.round(res.estimatedReadingTimeMinutes ?? res.estimatedReadingMinutes ?? Math.max(1, totalWords / 200));
         const chunkCount = res.chunkCount ?? res.chunksCount ?? Math.max(1, Math.round(totalWords / 300));
         
         return {
-          documentId: res.documentId || documentId,
-          filename: res.documentName || res.filename || 'Uploaded_Document.pdf',
+          documentId: (res.documentId as number) || documentId,
+          filename: (res.documentName as string) || (res.filename as string) || 'Uploaded_Document.pdf',
           documentName: res.documentName || res.filename || 'Uploaded_Document.pdf',
           totalWords,
           estimatedReadingMinutes: estReading,
@@ -983,8 +986,9 @@ export const TeachMeAPI = {
           method: 'POST',
           body: JSON.stringify(config)
         });
-      } catch (err: any) {
-        return { success: false, provider: config.provider, message: err?.message || 'Connection failed' };
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Connection failed';
+        return { success: false, provider: config.provider, message: msg };
       }
     },
 

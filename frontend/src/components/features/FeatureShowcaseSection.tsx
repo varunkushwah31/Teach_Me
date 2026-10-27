@@ -444,7 +444,7 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                     {/* Front Face */}
                     <div className="absolute inset-0 bg-[#121317] border-2 border-[#2e3238] hover:border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden shadow-2xl transition-colors">
                       <div className="text-[11px] font-mono text-[#9c9af2] uppercase tracking-wider">
-                        ✦ Front • Question
+                         Front • Question
                       </div>
                       <div className="text-[16px] font-medium text-[#f3f4f6] leading-normal">
                         {SAMPLE_FLASHCARD.front}
@@ -457,7 +457,7 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                     {/* Back Face */}
                     <div className="absolute inset-0 bg-[#15171c] border-2 border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden rotate-y-180 shadow-2xl">
                       <div className="text-[11px] font-mono text-[#a8ff53] uppercase tracking-wider">
-                        ✓ Back • Verified Answer
+                         Back • Verified Answer
                       </div>
                       <div className="text-[14px] text-[#e5e7eb] leading-[1.6]">
                         {SAMPLE_FLASHCARD.back}

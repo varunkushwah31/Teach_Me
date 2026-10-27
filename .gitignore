@@ -36,3 +36,5 @@ postgres-data/
 AGENTS.md
 /.agents/
 /postgres-data/
+.neon
+node_modules/

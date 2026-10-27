@@ -1023,7 +1023,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                               <div className="flex items-center justify-between mb-1">
                                 <span className="font-medium text-[#f3f4f6]">{f.questionText}</span>
                                 <span className={`font-mono text-[12px] ${f.isCorrect ? 'text-[#a8ff53]' : 'text-[#f43f5e]'}`}>
-                                  {f.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                                  {f.isCorrect ? ' Correct' : ' Incorrect'}
                                 </span>
                               </div>
                               <p className="text-[12.5px] text-[#b5b8c0]">{f.explanation}</p>
@@ -1128,7 +1128,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         {/* Front Face */}
                         <div className="absolute inset-0 bg-[#15171c] border-2 border-[#2e3238] hover:border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden shadow-2xl transition-colors text-center">
                           <div className="text-[11px] font-mono text-[#9c9af2] uppercase tracking-wider">
-                            ✦ Front • Question / Prompt
+                             Front • Question / Prompt
                           </div>
                           <p className="text-[17px] font-medium text-[#f3f4f6] leading-[1.6]">
                             {flashcards[currentCardIdx]?.front}
@@ -1141,7 +1141,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         {/* Back Face */}
                         <div className="absolute inset-0 bg-[#1a1d22] border-2 border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden rotate-y-180 shadow-2xl text-center">
                           <div className="text-[11px] font-mono text-[#a8ff53] uppercase tracking-wider">
-                            ✓ Back • Verified Answer
+                             Back • Verified Answer
                           </div>
                           <p className="text-[15px] text-[#f3f4f6] leading-[1.6]">
                             {flashcards[currentCardIdx]?.back}
@@ -1480,7 +1480,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     <div className="p-4 bg-[#1c1e21] rounded border border-[#a8ff53]/30">
-                      <div className="text-[13px] font-semibold text-[#a8ff53] mb-2 font-mono">✓ Mastered Concepts:</div>
+                      <div className="text-[13px] font-semibold text-[#a8ff53] mb-2 font-mono"> Mastered Concepts:</div>
                       <ul className="list-disc list-inside text-[12.5px] text-[#f3f4f6] space-y-1">
                         {readinessData.masteredTopics.map((t) => (
                           <li key={`mastered-topic-${t}`}>{t}</li>
@@ -1489,7 +1489,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     </div>
 
                     <div className="p-4 bg-[#1c1e21] rounded border border-[#f43f5e]/30">
-                      <div className="text-[13px] font-semibold text-[#f43f5e] mb-2 font-mono">⚠ Review Gap Recommendations:</div>
+                      <div className="text-[13px] font-semibold text-[#f43f5e] mb-2 font-mono"> Review Gap Recommendations:</div>
                       <ul className="list-disc list-inside text-[12.5px] text-[#f3f4f6] space-y-1">
                         {readinessData.gapTopics.map((t) => (
                           <li key={`gap-topic-${t}`}>{t}</li>
