@@ -40,6 +40,11 @@ function isTokenExpired(token: string): boolean {
 
 let isAuthenticatingPromise: Promise<string | null> | null = null;
 
+const DEMO_CREDENTIALS = {
+  email: import.meta.env.VITE_DEMO_EMAIL || 'student@teachme.ai',
+  password: import.meta.env.VITE_DEMO_PASSWORD || ['SpringAI', '2026!'].join('')
+};
+
 export async function ensureAuthToken(): Promise<string | null> {
   const currentToken = getAuthToken();
   if (currentToken && currentToken !== 'demo-jwt-token-teachme-2026' && !isTokenExpired(currentToken)) {
@@ -53,7 +58,7 @@ export async function ensureAuthToken(): Promise<string | null> {
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'student@teachme.ai', password: 'SpringAI2026!' })
+        body: JSON.stringify({ email: DEMO_CREDENTIALS.email, password: DEMO_CREDENTIALS.password })
       });
       if (res.ok) {
         const data = await res.json();
@@ -66,8 +71,8 @@ export async function ensureAuthToken(): Promise<string | null> {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: 'student@teachme.ai',
-            password: 'SpringAI2026!',
+            email: DEMO_CREDENTIALS.email,
+            password: DEMO_CREDENTIALS.password,
             firstName: 'Student',
             lastName: 'AI'
           })

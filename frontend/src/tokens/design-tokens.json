@@ -1,128 +1,95 @@
 {
   "color": {
     "slate-canvas": {
-      "$value": "#1c1e21",
+      "$value": "#08090d",
       "$type": "color",
-      "$description": "Slate Canvas — Primary page background, hero canvas, card surface base — the workspace floor everything sits on"
+      "$description": "Deep obsidian base canvas"
     },
-    "ink-well": {
-      "$value": "#121317",
+    "surface-1": {
+      "$value": "#0e1017",
       "$type": "color",
-      "$description": "Ink Well — Deepest surface — code block backgrounds, terminal panes, inset containers that need to feel recessed below the canvas"
+      "$description": "Primary card and container background"
     },
-    "graphite-hairline": {
-      "$value": "#3b3e45",
+    "surface-2": {
+      "$value": "#141622",
       "$type": "color",
-      "$description": "Graphite Hairline — Subtle borders, divider lines, card edges — barely visible separators that let density carry the visual structure"
+      "$description": "Secondary elevated panels and interactive hover surfaces"
     },
-    "steel-border": {
-      "$value": "#272a2e",
+    "surface-elevated": {
+      "$value": "#191c2b",
       "$type": "color",
-      "$description": "Steel Border — Slightly darker hairline for nested containers and secondary borders where Graphite feels too bright"
+      "$description": "Elevated modal and drawer backgrounds"
     },
-    "ash-text": {
-      "$value": "#b5b8c0",
+    "border-subtle": {
+      "$value": "#1c1f2e",
       "$type": "color",
-      "$description": "Ash Text — Tertiary text, captions, muted helper copy — text that should be readable but not competing with headlines"
+      "$description": "Crisp hairline container borders"
     },
-    "fog-text": {
-      "$value": "#878c99",
+    "border-medium": {
+      "$value": "#282c40",
       "$type": "color",
-      "$description": "Fog Text — Secondary body text, metadata, icon strokes — the most-used neutral text color, reading as a soft graphite on slate"
+      "$description": "Higher contrast divider and border lines"
     },
-    "cloud-text": {
-      "$value": "#d7d9dd",
+    "text-primary": {
+      "$value": "#f4f5f9",
       "$type": "color",
-      "$description": "Cloud Text — Secondary headings, button text, emphasized body — one step below full white, used where pure white would feel harsh"
+      "$description": "Headings, titles, and high-contrast labels"
     },
-    "bone-text": {
-      "$value": "#e5e7eb",
+    "text-secondary": {
+      "$value": "#9da3b8",
       "$type": "color",
-      "$description": "Bone Text — Primary text, headlines, high-contrast labels — the dominant foreground color against the slate canvas"
+      "$description": "Body copy, captions, and secondary descriptions"
     },
-    "signal-lime": {
-      "$value": "#a8ff53",
+    "text-tertiary": {
+      "$value": "#61677d",
       "$type": "color",
-      "$description": "Signal Lime — Green supporting accent for decorative details, logo mark, and primary CTA fill"
+      "$description": "Muted timestamps and keyboard shortcut legends"
     },
-    "syntax-violet": {
-      "$value": "#9c9af2",
+    "accent-indigo": {
+      "$value": "#6366f1",
       "$type": "color",
-      "$description": "Syntax Violet — Code syntax highlighting (functions, keywords), media generation feature icon"
+      "$description": "Primary interactive accent and brand token"
     },
-    "syntax-pink": {
-      "$value": "#fa3abf",
+    "accent-indigo-hover": {
+      "$value": "#4f46e5",
       "$type": "color",
-      "$description": "Syntax Pink — Code syntax (strings, special tokens), media processing feature icon"
+      "$description": "Hover state for primary action buttons"
     },
-    "event-violet": {
-      "$value": "#7655fd",
+    "accent-emerald": {
+      "$value": "#10b981",
       "$type": "color",
-      "$description": "Event Violet — Headline highlight words, streaming feature icon, decorative gradient accent"
+      "$description": "Operational readiness, passing tests, and vector readiness"
     },
-    "loop-green": {
-      "$value": "#afec73",
+    "accent-amber": {
+      "$value": "#f59e0b",
       "$type": "color",
-      "$description": "Loop Green — Code syntax (types, booleans), inline emphasis text"
+      "$description": "Parameter drift and warning signals"
     },
-    "key-lime": {
-      "$value": "#d9f07c",
-      "$type": "color",
-      "$description": "Key Lime — Code syntax (variables, parameters)"
-    },
-    "tag-magenta": {
-      "$value": "#e888f8",
-      "$type": "color",
-      "$description": "Tag Magenta — Code syntax (property names, tags)"
-    },
-    "mute-red": {
+    "accent-rose": {
       "$value": "#f43f5e",
       "$type": "color",
-      "$description": "Mute Red — Red supporting accent for decorative details and low-frequency emphasis"
+      "$description": "Errors and critical failures"
     }
   },
   "font": {
-    "satoshi": {
-      "$value": "'Satoshi', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      "$type": "fontFamily",
-      "$description": "Display and heading — Satoshi carries every headline from 16px sub-labels up to the 60px hero"
-    },
     "geist": {
-      "$value": "'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      "$type": "fontFamily",
-      "$description": "Body, navigation, buttons, links, UI labels — Geist is the workhorse that keeps the interface legible"
+      "$value": "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "$type": "fontFamily"
     },
-    "geist-mono": {
-      "$value": "'Geist Mono', 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-      "$type": "fontFamily",
-      "$description": "Code blocks, inline code, terminal output, log lines — locked at 14px"
+    "inter": {
+      "$value": "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "$type": "fontFamily"
+    },
+    "mono": {
+      "$value": "'JetBrains Mono', 'Geist Mono', ui-monospace, monospace",
+      "$type": "fontFamily"
     }
   },
-  "spacing": {
-    "4": { "$value": "4px", "$type": "dimension" },
-    "8": { "$value": "8px", "$type": "dimension" },
-    "12": { "$value": "12px", "$type": "dimension" },
-    "16": { "$value": "16px", "$type": "dimension" },
-    "24": { "$value": "24px", "$type": "dimension" },
-    "28": { "$value": "28px", "$type": "dimension" },
-    "32": { "$value": "32px", "$type": "dimension" },
-    "40": { "$value": "40px", "$type": "dimension" },
-    "48": { "$value": "48px", "$type": "dimension" },
-    "64": { "$value": "64px", "$type": "dimension" },
-    "96": { "$value": "96px", "$type": "dimension" },
-    "160": { "$value": "160px", "$type": "dimension" },
-    "192": { "$value": "192px", "$type": "dimension" }
-  },
   "radius": {
-    "cards": { "$value": "4px", "$type": "dimension" },
-    "pills": { "$value": "9999px", "$type": "dimension" },
-    "inputs": { "$value": "4px", "$type": "dimension" },
-    "buttons": { "$value": "4px", "$type": "dimension" }
-  },
-  "surface": {
-    "canvas": { "$value": "#1c1e21", "$type": "color" },
-    "inset": { "$value": "#121317", "$type": "color" },
-    "card": { "$value": "#1c1e21", "$type": "color" },
-    "accent": { "$value": "#a8ff53", "$type": "color" }
+    "sm": { "$value": "6px", "$type": "dimension" },
+    "md": { "$value": "10px", "$type": "dimension" },
+    "lg": { "$value": "14px", "$type": "dimension" },
+    "xl": { "$value": "20px", "$type": "dimension" },
+    "full": { "$value": "9999px", "$type": "dimension" }
   }
 }

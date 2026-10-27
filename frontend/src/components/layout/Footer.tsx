@@ -7,16 +7,16 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
   return (
-    <footer className="border-t border-[#272a2e] bg-[#121317] text-[#878c99] text-[14px]">
+    <footer className="border-t border-[#1c1f2e] bg-[#08090d] text-zinc-400 text-xs font-sans">
       
       {/* Pre-Footer Call to Action Banner */}
-      <div className="max-w-300 mx-auto px-4 sm:px-6 py-16 border-b border-[#272a2e]">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#1c1e21] border border-[#272a2e] p-8 sm:p-10 rounded-sm">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-b border-[#1c1f2e]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#0e1017] border border-[#1c1f2e] p-8 sm:p-10 rounded-3xl shadow-xl">
           <div>
-            <h2 className="font-bold text-[26px] sm:text-[32px] text-[#e5e7eb] mb-2 tracking-tight">
-              Ready to Ace Your Next Exam?
+            <h2 className="font-extrabold text-2xl sm:text-3xl text-white mb-2 tracking-tight">
+              Ready to Master Your Course Material?
             </h2>
-            <p className="text-[15px] text-[#878c99] max-w-130 leading-relaxed">
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
               Upload your textbook chapters, lecture slides, or syllabus to generate instant quizzes, SM-2 flashcards, and audio podcasts.
             </p>
           </div>
@@ -24,9 +24,9 @@ export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => onOpenStudio?.('documents')}
-              className="group flex items-center gap-2 px-5 py-3 bg-[#a8ff53] hover:bg-[#b8ff70] text-[#121317] font-semibold text-[14.5px] rounded-sm shadow-[inset_0_0_0_1px_rgba(168,255,83,0.4)] transition-all cursor-pointer"
+              className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs border border-indigo-400/30 transition-all cursor-pointer active:scale-95 group"
             >
-              <span>Upload PDF & Study</span>
+              <span>Upload PDF &amp; Study</span>
               <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
@@ -34,55 +34,51 @@ export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
       </div>
 
       {/* Multi-Column Links Area */}
-      <div className="max-w-300 mx-auto px-4 sm:px-6 py-14">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           
           {/* Col 1: Brand & Bio */}
           <div className="col-span-2 md:col-span-1 space-y-3">
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-[#a8ff53]" aria-hidden="true">
-                  <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>
-              </div>
-              <span className="font-bold text-[18px] text-[#e5e7eb] tracking-tight">
-                TeachMe<span className="text-[#a8ff53] font-normal text-[14px]">.study</span>
+              <div className="w-3.5 h-3.5 rounded-full bg-indigo-500 ring-2 ring-indigo-500/30" />
+              <span className="font-extrabold text-base text-white tracking-tight">
+                TeachMe<span className="text-indigo-400 font-normal text-xs">.study</span>
               </span>
             </div>
 
-            <p className="text-[13px] text-[#878c99] max-w-70 leading-[1.6]">
+            <p className="text-xs text-zinc-400 leading-relaxed max-w-xs">
               Personalized AI study companion for students. Grounded in your uploaded course materials with zero hallucination.
             </p>
           </div>
 
           {/* Col 2: Study Modes */}
           <div className="space-y-3">
-            <div className="font-semibold text-[13.5px] text-[#e5e7eb] uppercase tracking-wider">
+            <div className="font-bold text-xs text-white uppercase tracking-wider font-mono">
               Study Tools
             </div>
-            <ul className="space-y-2 text-[13px]">
+            <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => onOpenStudio?.('chat')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
-                  AI Tutor Q&A
+                <button onClick={() => onOpenStudio?.('chat')} className="hover:text-indigo-300 transition-colors cursor-pointer">
+                  AI Tutor Q&amp;A
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenStudio?.('quiz')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
+                <button onClick={() => onOpenStudio?.('quiz')} className="hover:text-indigo-300 transition-colors cursor-pointer">
                   Diagnostic Practice Quizzes
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenStudio?.('flashcards')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
+                <button onClick={() => onOpenStudio?.('flashcards')} className="hover:text-indigo-300 transition-colors cursor-pointer">
                   SM-2 Spaced Flashcards
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenStudio?.('podcast')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
+                <button onClick={() => onOpenStudio?.('podcast')} className="hover:text-indigo-300 transition-colors cursor-pointer">
                   2-Speaker Audio Podcasts
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenStudio?.('outline')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
+                <button onClick={() => onOpenStudio?.('outline')} className="hover:text-indigo-300 transition-colors cursor-pointer">
                   Cornell Lecture Outlines
                 </button>
               </li>
@@ -91,41 +87,41 @@ export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
 
           {/* Col 3: Popular Subjects */}
           <div className="space-y-3">
-            <div className="font-semibold text-[13.5px] text-[#e5e7eb] uppercase tracking-wider">
+            <div className="font-bold text-xs text-white uppercase tracking-wider font-mono">
               Sample Subjects
             </div>
-            <ul className="space-y-2 text-[13px] text-[#878c99]">
-              <li>Cellular Biology & Genetics</li>
+            <ul className="space-y-2 text-xs text-zinc-400">
+              <li>Cellular Biology &amp; Genetics</li>
               <li>Organic Chemistry Mechanisms</li>
-              <li>Data Structures & Algorithms</li>
-              <li>Constitutional Law & Precedents</li>
-              <li>Physics & Calculus Proofs</li>
+              <li>Data Structures &amp; Algorithms</li>
+              <li>Constitutional Law &amp; Precedents</li>
+              <li>Physics &amp; Calculus Proofs</li>
             </ul>
           </div>
 
           {/* Col 4: AI Engines & Sync */}
           <div className="space-y-3">
-            <div className="font-semibold text-[13.5px] text-[#e5e7eb] uppercase tracking-wider">
-              AI Engines & Sync
+            <div className="font-bold text-xs text-white uppercase tracking-wider font-mono">
+              AI Engines &amp; Sync
             </div>
-            <ul className="space-y-2 text-[13px]">
+            <ul className="space-y-2 text-xs">
               <li>
-                <button onClick={() => onOpenStudio?.('settings')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
+                <button onClick={() => onOpenStudio?.('settings')} className="hover:text-indigo-300 transition-colors cursor-pointer">
                   100% Free Local Ollama
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenStudio?.('settings')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
+                <button onClick={() => onOpenStudio?.('settings')} className="hover:text-indigo-300 transition-colors cursor-pointer">
                   OpenAI / Claude API Keys
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenStudio?.('flashcards')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
+                <button onClick={() => onOpenStudio?.('flashcards')} className="hover:text-indigo-300 transition-colors cursor-pointer">
                   Export to Anki (.apkg / .txt)
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenStudio?.('outline')} className="hover:text-[#a8ff53] transition-colors cursor-pointer">
+                <button onClick={() => onOpenStudio?.('outline')} className="hover:text-indigo-300 transition-colors cursor-pointer">
                   Download Markdown (.md)
                 </button>
               </li>
@@ -135,14 +131,14 @@ export const Footer: React.FC<FooterProps> = ({ onOpenStudio }) => {
         </div>
 
         {/* Bottom Bar: Copyright & Operational Status */}
-        <div className="mt-14 pt-6 border-t border-[#272a2e] flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] font-mono">
+        <div className="mt-14 pt-6 border-t border-[#1c1f2e] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
           <div>
-            © {new Date().getFullYear()} TeachMe AI Study Platform. All rights reserved.
+            &copy; {new Date().getFullYear()} TeachMe AI Study Platform. All rights reserved.
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1 bg-[#1c1e21] border border-[#272a2e] rounded-full text-[#e5e7eb]">
-            <span className="w-2 h-2 rounded-full bg-[#a8ff53] animate-pulse" />
-            <span className="text-[#a8ff53]">Ollama & Vector Store Connected</span>
+          <div className="flex items-center gap-2 px-3 py-1 bg-[#0e1017] border border-[#1c1f2e] rounded-full text-zinc-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="text-emerald-300">Ollama &amp; PgVector Store Connected</span>
           </div>
         </div>
 

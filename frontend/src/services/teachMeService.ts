@@ -22,13 +22,30 @@ import type {
 } from '../types/backend';
 
 function generateSecureRandomId(max = 1000): number {
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+  if (typeof globalThis !== 'undefined' && globalThis.crypto?.getRandomValues) {
     const array = new Uint32Array(1);
-    crypto.getRandomValues(array);
+    globalThis.crypto.getRandomValues(array);
     return (array[0] % max) + 1;
   }
-  return Math.floor(Math.random() * max) + 1;
+  const timestamp = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  return (Math.floor(timestamp) % max) + 1;
 }
+
+const simulateWordStream = async (text: string, onChunk?: (chunk: string) => void): Promise<void> => {
+  const words = text.split(' ');
+  return new Promise(resolve => {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < words.length) {
+        onChunk?.(words[index] + ' ');
+        index++;
+      } else {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 35);
+  });
+};
 
 export const TeachMeAPI = {
   // Authentication (/api/auth)
@@ -404,10 +421,7 @@ export const TeachMeAPI = {
         } else {
           mockAnswer += `The lecture notes define this concept as a multi-stage systematic process [1]. Each phase builds sequentially on the previous state to guarantee structural correctness and optimal performance under standard course constraints [2].`;
         }
-        for (const word of mockAnswer.split(' ')) {
-          await new Promise(r => setTimeout(r, 35));
-          onChunk?.(word + ' ');
-        }
+        await simulateWordStream(mockAnswer, onChunk);
         return mockAnswer;
       }
     },
@@ -872,31 +886,35 @@ export const TeachMeAPI = {
   // Group Study Workspaces (/api/workspaces)
   workspaces: {
     getWorkspaces: async (): Promise<GroupWorkspaceDTO[]> => {
-      return [
-        {
-          id: 1,
-          name: 'Distributed Systems Study Group',
-          description: 'Collaborative vector index for Spring AI, Kafka, and PgVector',
-          ownerId: 1,
-          sharedDocumentIds: [101, 103],
-          activeMembers: [
-            { id: 1, name: 'Alex (You)', avatarColor: '#a8ff53', status: 'ACTIVE' },
-            { id: 2, name: 'Maya S.', avatarColor: '#9c9af2', status: 'ACTIVE' },
-            { id: 3, name: 'Dr. Lin', avatarColor: '#fa3abf', status: 'IDLE' }
-          ]
-        },
-        {
-          id: 2,
-          name: 'Neuroscience & SM-2 Research',
-          description: 'Spaced repetition models and memory consolidation notes',
-          ownerId: 1,
-          sharedDocumentIds: [102],
-          activeMembers: [
-            { id: 1, name: 'Alex (You)', avatarColor: '#a8ff53', status: 'ACTIVE' },
-            { id: 4, name: 'Sarah K.', avatarColor: '#afec73', status: 'ACTIVE' }
-          ]
-        }
-      ];
+      try {
+        return await apiRequest<GroupWorkspaceDTO[]>('/workspaces');
+      } catch {
+        return [
+          {
+            id: 1,
+            name: 'Distributed Systems Study Group',
+            description: 'Collaborative vector index for Spring AI, Kafka, and PgVector',
+            ownerId: 1,
+            sharedDocumentIds: [101, 103],
+            activeMembers: [
+              { id: 1, name: 'Alex (You)', avatarColor: '#6366f1', status: 'ACTIVE' },
+              { id: 2, name: 'Maya S.', avatarColor: '#818cf8', status: 'ACTIVE' },
+              { id: 3, name: 'Dr. Lin', avatarColor: '#10b981', status: 'IDLE' }
+            ]
+          },
+          {
+            id: 2,
+            name: 'Neuroscience & SM-2 Research',
+            description: 'Spaced repetition models and memory consolidation notes',
+            ownerId: 1,
+            sharedDocumentIds: [102],
+            activeMembers: [
+              { id: 1, name: 'Alex (You)', avatarColor: '#6366f1', status: 'ACTIVE' },
+              { id: 4, name: 'Sarah K.', avatarColor: '#34d399', status: 'ACTIVE' }
+            ]
+          }
+        ];
+      }
     },
 
     create: async (name: string, description = 'Study Group'): Promise<GroupWorkspaceDTO> => {
@@ -911,7 +929,7 @@ export const TeachMeAPI = {
           description,
           ownerId: 1,
           sharedDocumentIds: [101],
-          activeMembers: [{ id: 1, name: 'Alex (You)', avatarColor: '#a8ff53', status: 'ACTIVE' }]
+          activeMembers: [{ id: 1, name: 'Alex (You)', avatarColor: '#6366f1', status: 'ACTIVE' }]
         };
       }
     }

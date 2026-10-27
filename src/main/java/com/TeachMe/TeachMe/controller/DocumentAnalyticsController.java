@@ -126,7 +126,7 @@ public class DocumentAnalyticsController {
         return freq.entrySet().stream()
                 .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
                 .limit(6)
-                .map(Map.Entry::getKey)
+                .map(entry -> entry.getKey())
                 .toList();
     }
 }

@@ -1,0 +1,76 @@
+{
+  "groups": [
+    {
+      "name": "application",
+      "type": "java.lang.Object",
+      "description": "Custom application configuration properties."
+    },
+    {
+      "name": "application.ai",
+      "type": "java.lang.Object",
+      "description": "Custom AI configuration properties."
+    },
+    {
+      "name": "application.security",
+      "type": "java.lang.Object",
+      "description": "Custom security configuration properties."
+    },
+    {
+      "name": "cors",
+      "type": "java.lang.Object",
+      "description": "Custom CORS configuration properties."
+    }
+  ],
+  "properties": [
+    {
+      "name": "application.ai.default-provider",
+      "type": "java.lang.String",
+      "description": "Default AI provider."
+    },
+    {
+      "name": "application.ai.api-key",
+      "type": "java.lang.String",
+      "description": "AI provider API key."
+    },
+    {
+      "name": "application.ai.base-url",
+      "type": "java.lang.String",
+      "description": "AI provider base URL."
+    },
+    {
+      "name": "application.ai.model",
+      "type": "java.lang.String",
+      "description": "AI provider model name."
+    },
+    {
+      "name": "application.ai.temperature",
+      "type": "java.lang.Double",
+      "description": "AI provider temperature."
+    },
+    {
+      "name": "application.security.jwt.secret-key",
+      "type": "java.lang.String",
+      "description": "JWT Secret key."
+    },
+    {
+      "name": "application.security.jwt.expiration",
+      "type": "java.lang.Long",
+      "description": "JWT access token expiration time in milliseconds."
+    },
+    {
+      "name": "application.security.jwt.refresh-token-expiration",
+      "type": "java.lang.Long",
+      "description": "JWT refresh token expiration time in milliseconds."
+    },
+    {
+      "name": "application.security.cors.allowed-origins",
+      "type": "java.lang.String",
+      "description": "CORS allowed origins list."
+    },
+    {
+      "name": "cors.allowed-origins",
+      "type": "java.lang.String",
+      "description": "CORS allowed origins list."
+    }
+  ]
+}

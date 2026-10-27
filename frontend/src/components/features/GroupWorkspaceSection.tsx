@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UsersIcon, ArrowRightIcon, ArrowsClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
+import { ArrowRightIcon, ArrowsClockwiseIcon, CheckIcon } from '@phosphor-icons/react';
 import { TeachMeAPI } from '@/services/teachMeService.ts';
 import type { GroupWorkspaceDTO } from '@/types/backend.ts';
 
@@ -18,9 +18,9 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
       ownerId: 1,
       sharedDocumentIds: [101, 103],
       activeMembers: [
-        { id: 1, name: 'Alex (You)', avatarColor: '#a8ff53', status: 'ACTIVE' },
-        { id: 2, name: 'Maya S.', avatarColor: '#9c9af2', status: 'ACTIVE' },
-        { id: 3, name: 'Dr. Lin', avatarColor: '#fa3abf', status: 'IDLE' }
+        { id: 1, name: 'Alex (You)', avatarColor: '#6366f1', status: 'ACTIVE' },
+        { id: 2, name: 'Maya S.', avatarColor: '#818cf8', status: 'ACTIVE' },
+        { id: 3, name: 'Dr. Lin', avatarColor: '#10b981', status: 'IDLE' }
       ]
     },
     {
@@ -30,8 +30,8 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
       ownerId: 1,
       sharedDocumentIds: [102],
       activeMembers: [
-        { id: 1, name: 'Alex (You)', avatarColor: '#a8ff53', status: 'ACTIVE' },
-        { id: 4, name: 'Sarah K.', avatarColor: '#afec73', status: 'ACTIVE' }
+        { id: 1, name: 'Alex (You)', avatarColor: '#6366f1', status: 'ACTIVE' },
+        { id: 4, name: 'Sarah K.', avatarColor: '#34d399', status: 'ACTIVE' }
       ]
     }
   ]);
@@ -43,30 +43,26 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
   };
 
   return (
-    <section id="workspaces" className="py-24 border-t border-[#2e3238] bg-[#1c1e21] font-['Inter']">
-      <div className="max-w-310 mx-auto px-4 sm:px-6">
+    <section id="workspaces" className="py-24 border-t border-[#1c1f2e] bg-[#08090d] font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-[#e888f8] font-mono text-[13px] font-semibold mb-3">
-              <UsersIcon className="w-4 h-4" />
-              <span>Multiplayer Study Rooms</span>
-            </div>
-            <h2 className="font-bold text-[32px] sm:text-[40px] text-[#f3f4f6] mb-3 tracking-tight">
-              Collaborative Group Workspaces & Shared Vectors
+            <h2 className="font-extrabold text-3xl sm:text-4xl text-white mb-3 tracking-tight">
+              Collaborative Group Workspaces &amp; Shared Vectors
             </h2>
-            <p className="text-[16px] text-[#b5b8c0] max-w-160 leading-[1.6]">
+            <p className="text-sm sm:text-base text-zinc-400 max-w-[65ch] leading-relaxed">
               Share document vector indices with your study cohort. Real-time multiplayer annotations, shared quiz battles, and instant Anki deck synchronization.
             </p>
           </div>
 
           <button
             onClick={() => onOpenStudio?.('documents')}
-            className="group mt-4 md:mt-0 inline-flex items-center gap-2 text-[14px] text-[#a8ff53] font-semibold hover:underline cursor-pointer"
+            className="group mt-4 md:mt-0 inline-flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer"
           >
             <span>Create Workspace in Studio</span>
-            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" weight="bold" />
+            <ArrowRightIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" weight="bold" />
           </button>
         </div>
 
@@ -75,35 +71,35 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
           {workspaces.map((ws) => (
             <div
               key={ws.id}
-              className="bg-[#121317] border border-[#2e3238] hover:border-[#424750] rounded p-6 flex flex-col justify-between transition-all space-y-5 shadow-2xl card-hover-lift"
+              className="bg-[#0e1017] border border-[#1c1f2e] hover:border-[#282c40] rounded-3xl p-6 flex flex-col justify-between transition-all space-y-5 shadow-2xl"
             >
               <div>
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#2e3238]">
-                  <span className="text-[12px] font-mono text-[#a8ff53]">POST /api/workspaces/{ws.id}</span>
-                  <div className="flex items-center gap-1.5 text-[11px] text-[#a8ff53] font-mono">
-                    <span className="w-2 h-2 rounded-full bg-[#a8ff53] animate-pulse" />
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#1c1f2e]">
+                  <span className="text-xs font-mono text-indigo-300">POST /api/workspaces/{ws.id}</span>
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-300 font-mono">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
                     <span>Live Sync Active</span>
                   </div>
                 </div>
 
-                <h3 className="font-bold text-[20px] text-[#f3f4f6] mb-2">
+                <h3 className="font-bold text-lg text-white mb-2">
                   {ws.name}
                 </h3>
-                <p className="text-[14px] leading-[1.6] text-[#b5b8c0] mb-4">
+                <p className="text-xs sm:text-sm leading-relaxed text-zinc-400 mb-4">
                   {ws.description}
                 </p>
 
                 {/* Active Members Avatars */}
                 <div className="space-y-2">
-                  <div className="text-[12px] font-mono text-[#a0a4af]">Active Study Room Cohort:</div>
+                  <div className="text-xs font-mono text-zinc-400">Active Study Room Cohort:</div>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     {ws.activeMembers.map((m) => (
-                      <div key={m.id} className="flex items-center gap-2 text-[12px] bg-[#1c1e21] border border-[#2e3238] px-3 py-1.5 rounded">
+                      <div key={m.id} className="flex items-center gap-2 text-xs bg-[#141622] border border-[#1c1f2e] px-3 py-1.5 rounded-xl">
                         <div
                           className="w-2.5 h-2.5 rounded-full"
                           style={{ backgroundColor: m.avatarColor }}
                         />
-                        <span className="text-[#f3f4f6] font-medium">{m.name}</span>
+                        <span className="text-zinc-200 font-medium">{m.name}</span>
                       </div>
                     ))}
                   </div>
@@ -111,20 +107,20 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
               </div>
 
               {/* Workspace Actions */}
-              <div className="pt-4 border-t border-[#2e3238] flex items-center justify-between">
-                <span className="text-[12px] font-mono text-[#a0a4af]">Shared Docs: {ws.sharedDocumentIds.length} Vector Indices</span>
+              <div className="pt-4 border-t border-[#1c1f2e] flex items-center justify-between">
+                <span className="text-xs font-mono text-zinc-400">Shared Docs: {ws.sharedDocumentIds.length} Vector Indices</span>
                 <button
                   onClick={() => handleSyncAnki(ws.name)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#272a2e] hover:bg-[#343840] text-[#a8ff53] text-[12.5px] font-semibold rounded transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#141622] hover:bg-[#1a1d2e] border border-[#282c40] text-indigo-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
                 >
                   {syncedDeck === ws.name ? (
                     <>
-                      <CheckIcon className="w-3.5 h-3.5 text-[#a8ff53]" weight="bold" />
-                      <span>Anki Deck Synced!</span>
+                      <CheckIcon className="w-3.5 h-3.5 text-emerald-400" weight="bold" />
+                      <span className="text-emerald-300">Anki Deck Synced!</span>
                     </>
                   ) : (
                     <>
-                      <ArrowsClockwiseIcon className="w-3.5 h-3.5" weight="bold" />
+                      <ArrowsClockwiseIcon className="w-3.5 h-3.5 text-indigo-400" weight="bold" />
                       <span>Sync Anki Deck</span>
                     </>
                   )}
@@ -138,4 +134,3 @@ export const GroupWorkspaceSection: React.FC<GroupWorkspaceSectionProps> = ({ on
     </section>
   );
 };
-

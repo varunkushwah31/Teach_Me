@@ -31,7 +31,7 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
   const [validationResult, setValidationResult] = useState<{ success: boolean; message: string; latencyMs?: number } | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const currentProviderDefaults = DEFAULT_PROVIDER_MODELS[config.provider];
+  const currentProviderDefaults = DEFAULT_PROVIDER_MODELS[config.provider] || DEFAULT_PROVIDER_MODELS.openai;
 
   const handleProviderSelect = (provider: AIProvider) => {
     const defaults = DEFAULT_PROVIDER_MODELS[provider];
@@ -61,7 +61,7 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
     setTimeout(() => {
       setSaveSuccess(false);
       onClose();
-    }, 1200);
+    }, 900);
   };
 
   const handleClearKey = () => {
@@ -70,23 +70,23 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-[#13151b] border border-white/10 rounded-2xl shadow-2xl overflow-hidden font-sans text-[#e5e7eb]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in select-none">
+      <div className="relative w-full max-w-xl bg-[#0e1017] border border-[#1f2133] rounded-3xl shadow-2xl overflow-hidden font-sans text-zinc-100 animate-scale-in">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#15171c]">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-lime-400/10 text-lime-400 rounded-lg border border-lime-400/20">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#1c1f2e] bg-[#0c0d13]">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20">
               <KeyIcon className="w-5 h-5" weight="bold" />
             </div>
             <div>
-              <h2 className="text-[17px] font-sans font-bold text-white tracking-tight">AI Providers & Custom API Keys</h2>
-              <p className="text-[12px] text-zinc-400">Bring your own API key or use 100% Free Local Ollama</p>
+              <h2 className="text-base font-bold text-white tracking-tight">AI Providers &amp; Gateway Keys</h2>
+              <p className="text-xs text-zinc-400 mt-0.5">Bring your custom API credentials or run local Ollama inference</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-[#878c99] hover:text-[#e5e7eb] hover:bg-[#1c1e21] rounded transition-colors cursor-pointer"
+            className="p-1.5 text-zinc-400 hover:text-white hover:bg-[#161826] rounded-lg transition-colors cursor-pointer"
           >
             <XIcon className="w-5 h-5" />
           </button>
@@ -97,14 +97,14 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
           
           {/* Provider Selector Grid */}
           <div>
-            <span className="block text-[13px] font-medium text-[#878c99] mb-2">Select AI Provider</span>
+            <span className="block text-xs font-semibold text-zinc-300 mb-2.5">Select AI Provider</span>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
-                { id: 'ollama', label: 'Local Ollama', badge: 'Free / Offline' },
+                { id: 'ollama', label: 'Local Ollama', badge: 'Free / Local' },
                 { id: 'openai', label: 'OpenAI', badge: 'GPT-4o / o3' },
                 { id: 'anthropic', label: 'Anthropic', badge: 'Claude 3.5' },
                 { id: 'gemini', label: 'Google Gemini', badge: 'Flash / Pro' },
-                { id: 'groq', label: 'Groq Cloud', badge: 'Ultra-Fast' },
+                { id: 'groq', label: 'Groq Cloud', badge: 'LPU Speed' },
                 { id: 'deepseek', label: 'DeepSeek', badge: 'V3 / R1' },
                 { id: 'openrouter', label: 'OpenRouter', badge: 'Multi-LLM' }
               ].map((p) => {
@@ -114,14 +114,14 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
                     key={p.id}
                     type="button"
                     onClick={() => handleProviderSelect(p.id as AIProvider)}
-                    className={`p-2.5 rounded border text-left transition-all cursor-pointer ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[#1c1e21] border-[#a8ff53] text-[#a8ff53] shadow-sm shadow-[#a8ff53]/10'
-                        : 'bg-[#15171c] border-[#272a2e] text-[#878c99] hover:border-[#3b3e45] hover:text-[#e5e7eb]'
+                        ? 'bg-indigo-950/40 border-indigo-500/80 text-white shadow-xs'
+                        : 'bg-[#141622] border-[#1c1f2e] text-zinc-400 hover:border-[#282c40] hover:text-zinc-200'
                     }`}
                   >
-                    <div className="text-[13px] font-semibold text-[#e5e7eb]">{p.label}</div>
-                    <div className="text-[11px] text-[#878c99] font-['Geist_Mono']">{p.badge}</div>
+                    <div className="text-xs font-bold text-zinc-100">{p.label}</div>
+                    <div className="text-xs text-indigo-400 font-mono mt-0.5">{p.badge}</div>
                   </button>
                 );
               })}
@@ -130,10 +130,10 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
 
           {/* API Key Input (if not Ollama) */}
           {config.provider !== 'ollama' ? (
-            <div className="p-4 bg-[#15171c] border border-[#272a2e] rounded space-y-3">
+            <div className="p-4 bg-[#141622] border border-[#1c1f2e] rounded-2xl space-y-3 shadow-xs">
               <div className="flex items-center justify-between">
-                <label htmlFor="settings-api-key" className="text-[13px] font-medium text-[#e5e7eb] flex items-center gap-1.5 cursor-pointer">
-                  <KeyIcon className="w-4 h-4 text-[#a8ff53]" weight="bold" />
+                <label htmlFor="settings-api-key" className="text-xs font-semibold text-zinc-200 flex items-center gap-1.5 cursor-pointer">
+                  <KeyIcon className="w-4 h-4 text-indigo-400" weight="bold" />
                   <span>{config.provider.toUpperCase()} API Key</span>
                 </label>
                 <div className="flex items-center gap-2">
@@ -141,12 +141,12 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
                     <button
                       type="button"
                       onClick={handleClearKey}
-                      className="text-[11px] text-[#ff6b6b] hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs text-rose-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <TrashIcon className="w-3.5 h-3.5" /> Clear
                     </button>
                   )}
-                  <span className="text-[11px] text-[#878c99] font-['Geist_Mono']">Stored in Browser localStorage</span>
+                  <span className="text-xs text-zinc-400 font-mono">Local storage encrypted</span>
                 </div>
               </div>
 
@@ -160,28 +160,28 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
                     setValidationResult(null);
                   }}
                   placeholder={currentProviderDefaults.placeholderKey}
-                  className="w-full px-3 py-2 pr-20 bg-[#1c1e21] border border-[#272a2e] rounded text-[13px] text-[#e5e7eb] font-['Geist_Mono'] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 pr-20 bg-[#0e1017] border border-[#222436] rounded-xl text-xs text-zinc-100 font-mono focus:border-indigo-500/70 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowKey(!showKey)}
-                  className="absolute right-2 px-2.5 py-1 text-[11px] bg-[#121317] border border-[#272a2e] hover:border-[#3b3e45] text-[#878c99] hover:text-[#e5e7eb] rounded cursor-pointer"
+                  className="absolute right-2 px-2.5 py-1 text-xs bg-[#141622] border border-[#282c40] hover:border-indigo-500/50 text-zinc-400 hover:text-white rounded-lg cursor-pointer"
                 >
                   {showKey ? <EyeSlashIcon className="w-3.5 h-3.5" /> : <EyeIcon className="w-3.5 h-3.5" />}
                 </button>
               </div>
 
-              <p className="text-[11px] text-[#878c99] leading-relaxed">
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 Your key remains strictly private in your browser client and is never logged or exposed to third parties.
               </p>
             </div>
           ) : (
-            <div className="p-4 bg-[#15171c] border border-[#272a2e] rounded space-y-3">
+            <div className="p-4 bg-[#141622] border border-[#1c1f2e] rounded-2xl space-y-3 shadow-xs">
               <div className="flex items-center justify-between">
-                <label htmlFor="settings-ollama-url" className="text-[13px] font-semibold text-[#e5e7eb] cursor-pointer">
+                <label htmlFor="settings-ollama-url" className="text-xs font-semibold text-zinc-200 cursor-pointer">
                   Local Ollama Daemon URL
                 </label>
-                <span className="text-[11px] text-[#a8ff53] font-['Geist_Mono'] bg-[#a8ff53]/10 px-2 py-0.5 rounded border border-[#a8ff53]/30">
+                <span className="text-xs text-emerald-300 font-mono bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/30">
                   Zero Cloud Cost
                 </span>
               </div>
@@ -191,7 +191,7 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
                 value={config.baseUrl}
                 onChange={(e) => setConfig((prev) => ({ ...prev, baseUrl: e.target.value }))}
                 placeholder="http://localhost:11434"
-                className="w-full px-3 py-2 bg-[#1c1e21] border border-[#272a2e] rounded text-[13px] text-[#e5e7eb] font-['Geist_Mono'] focus:outline-none"
+                className="w-full px-3.5 py-2.5 bg-[#0e1017] border border-[#222436] rounded-xl text-xs text-zinc-100 font-mono focus:border-indigo-500/70 focus:outline-none"
               />
             </div>
           )}
@@ -199,14 +199,14 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
           {/* Model Selection & Custom Name */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="settings-preset-models" className="block text-[13px] font-medium text-[#878c99] mb-1.5 cursor-pointer">
+              <label htmlFor="settings-preset-models" className="block text-xs font-semibold text-zinc-300 mb-1.5 cursor-pointer">
                 Preset Models
               </label>
               <select
                 id="settings-preset-models"
                 value={config.model}
                 onChange={(e) => setConfig((prev) => ({ ...prev, model: e.target.value }))}
-                className="w-full px-3 py-2 bg-[#1c1e21] border border-[#272a2e] rounded text-[13px] text-[#e5e7eb] font-['Geist_Mono'] focus:outline-none cursor-pointer"
+                className="w-full px-3.5 py-2.5 bg-[#141622] border border-[#1c1f2e] rounded-xl text-xs text-zinc-100 font-mono focus:border-indigo-500/70 focus:outline-none cursor-pointer"
               >
                 {currentProviderDefaults.modelList.map((m) => (
                   <option key={m} value={m}>{m}</option>
@@ -215,7 +215,7 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
             </div>
 
             <div>
-              <label htmlFor="settings-custom-model" className="block text-[13px] font-medium text-[#878c99] mb-1.5 cursor-pointer">
+              <label htmlFor="settings-custom-model" className="block text-xs font-semibold text-zinc-300 mb-1.5 cursor-pointer">
                 Custom Model ID
               </label>
               <input
@@ -224,25 +224,25 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
                 value={config.model}
                 onChange={(e) => setConfig((prev) => ({ ...prev, model: e.target.value }))}
                 placeholder="e.g. gpt-4o, deepseek-r1:8b"
-                className="w-full px-3 py-2 bg-[#1c1e21] border border-[#272a2e] rounded text-[13px] text-[#e5e7eb] font-['Geist_Mono'] focus:outline-none"
+                className="w-full px-3.5 py-2.5 bg-[#141622] border border-[#1c1f2e] rounded-xl text-xs text-zinc-100 font-mono focus:border-indigo-500/70 focus:outline-none"
               />
             </div>
           </div>
 
           {/* Hyperparameters (Temperature & Top-K) */}
-          <div className="p-4 bg-[#15171c] border border-[#272a2e] rounded space-y-4">
-            <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#e5e7eb]">
-              <SlidersIcon className="w-4 h-4 text-[#a8ff53]" />
+          <div className="p-4 bg-[#141622] border border-[#1c1f2e] rounded-2xl space-y-4 shadow-xs">
+            <div className="flex items-center gap-2 text-xs font-bold text-zinc-200">
+              <SlidersIcon className="w-4 h-4 text-indigo-400" />
               <span>Generation Parameters</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[12px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div>
-                <div className="flex justify-between text-[#878c99] mb-1">
+                <div className="flex justify-between text-zinc-400 mb-1.5">
                   <label htmlFor="settings-temperature" className="cursor-pointer">
-                    Temperature: <strong className="text-[#e5e7eb]">{config.temperature}</strong>
+                    Temperature: <strong className="text-white font-mono">{config.temperature}</strong>
                   </label>
-                  <span className="font-['Geist_Mono']">0 = Precise, 1 = Creative</span>
+                  <span className="font-mono text-zinc-400">0.0 to 1.0</span>
                 </div>
                 <input
                   id="settings-temperature"
@@ -252,16 +252,16 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
                   step="0.05"
                   value={config.temperature}
                   onChange={(e) => setConfig((prev) => ({ ...prev, temperature: Number.parseFloat(e.target.value) }))}
-                  className="w-full accent-[#a8ff53]"
+                  className="w-full accent-indigo-500 cursor-pointer"
                 />
               </div>
 
               <div>
-                <div className="flex justify-between text-[#878c99] mb-1">
+                <div className="flex justify-between text-zinc-400 mb-1.5">
                   <label htmlFor="settings-top-k" className="cursor-pointer">
-                    Vector Top-K Chunks: <strong className="text-[#e5e7eb]">{config.topK}</strong>
+                    Vector Top-K Chunks: <strong className="text-white font-mono">{config.topK}</strong>
                   </label>
-                  <span className="font-['Geist_Mono']">Context Depth</span>
+                  <span className="font-mono text-zinc-400">Context Depth</span>
                 </div>
                 <input
                   id="settings-top-k"
@@ -271,7 +271,7 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
                   step="1"
                   value={config.topK}
                   onChange={(e) => setConfig((prev) => ({ ...prev, topK: Number.parseInt(e.target.value, 10) }))}
-                  className="w-full accent-[#a8ff53]"
+                  className="w-full accent-indigo-500 cursor-pointer"
                 />
               </div>
             </div>
@@ -280,18 +280,18 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
           {/* Connection Test Status Feedback */}
           {validationResult && (
             <div
-              className={`p-3 rounded border text-[13px] flex items-center justify-between ${
+              className={`p-3.5 rounded-xl border text-xs flex items-center justify-between ${
                 validationResult.success
-                  ? 'bg-[#a8ff53]/10 border-[#a8ff53]/30 text-[#a8ff53]'
-                  : 'bg-[#ff6b6b]/10 border-[#ff6b6b]/30 text-[#ff6b6b]'
+                  ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-200'
+                  : 'bg-rose-950/60 border-rose-500/40 text-rose-200'
               }`}
             >
               <div className="flex items-center gap-2">
-                {validationResult.success ? <CheckIcon className="w-4 h-4" /> : <WarningCircleIcon className="w-4 h-4" />}
+                {validationResult.success ? <CheckIcon className="w-4 h-4 text-emerald-400" /> : <WarningCircleIcon className="w-4 h-4 text-rose-400" />}
                 <span>{validationResult.message}</span>
               </div>
               {validationResult.latencyMs !== undefined && (
-                <span className="text-[11px] font-['Geist_Mono'] opacity-80">{validationResult.latencyMs}ms</span>
+                <span className="text-xs font-mono opacity-80">{validationResult.latencyMs}ms</span>
               )}
             </div>
           )}
@@ -299,14 +299,14 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-[#272a2e] bg-[#15171c] flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-[#1c1f2e] bg-[#0c0d13] flex items-center justify-between">
           <button
             type="button"
             onClick={handleTestConnection}
             disabled={isValidating}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1c1e21] hover:bg-[#272a2e] border border-[#272a2e] text-[#e5e7eb] text-[13px] font-medium rounded transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[#141622] hover:bg-[#1a1d2e] border border-[#222436] hover:border-indigo-500/40 text-zinc-200 text-xs font-semibold rounded-xl transition-all disabled:opacity-50 cursor-pointer active:scale-95"
           >
-            <ArrowsClockwiseIcon className={`w-4 h-4 ${isValidating ? 'animate-spin text-[#a8ff53]' : ''}`} />
+            <ArrowsClockwiseIcon className={`w-4 h-4 ${isValidating ? 'animate-spin text-indigo-400' : ''}`} />
             <span>{isValidating ? 'Testing...' : 'Test Connection'}</span>
           </button>
 
@@ -314,14 +314,14 @@ const ApiKeySettingsModalContent: React.FC<{ onClose: () => void }> = ({ onClose
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-1.5 text-[13px] text-[#878c99] hover:text-[#e5e7eb] transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold text-zinc-400 hover:text-white transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleSave}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-[#a8ff53] hover:bg-[#b8ff70] text-[#121317] font-semibold text-[13px] rounded transition-colors shadow-sm cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-xs border border-indigo-400/30 cursor-pointer active:scale-95"
             >
               {saveSuccess ? <CheckIcon className="w-4 h-4" weight="bold" /> : null}
               <span>{saveSuccess ? 'Saved!' : 'Save & Apply'}</span>

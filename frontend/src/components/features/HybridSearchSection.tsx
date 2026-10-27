@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MagnifyingGlassIcon, DatabaseIcon, ArrowRightIcon } from '@phosphor-icons/react';
+import { MagnifyingGlassIcon, ArrowRightIcon } from '@phosphor-icons/react';
 import type { SearchResultChunkDTO } from '@/types/backend.ts';
 
 interface HybridSearchSectionProps {
@@ -57,61 +57,57 @@ export const HybridSearchSection: React.FC<HybridSearchSectionProps> = ({ onOpen
   };
 
   return (
-    <section id="search" className="py-24 border-t border-[#2e3238] bg-[#1c1e21] font-['Inter']">
-      <div className="max-w-310 mx-auto px-4 sm:px-6">
+    <section id="search" className="py-24 border-t border-[#1c1f2e] bg-[#08090d] font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-[#a8ff53] font-mono text-[13px] font-semibold mb-3">
-              <DatabaseIcon className="w-4 h-4" />
-              <span>Sub-50ms PgVector Retrieval</span>
-            </div>
-            <h2 className="font-bold text-[32px] sm:text-[40px] text-[#f3f4f6] mb-3 tracking-tight">
+            <h2 className="font-extrabold text-3xl sm:text-4xl text-white mb-3 tracking-tight">
               Instant Concept Search Across All Course Materials
             </h2>
-            <p className="text-[16px] text-[#b5b8c0] max-w-160 leading-[1.6]">
+            <p className="text-sm sm:text-base text-zinc-400 max-w-[65ch] leading-relaxed">
               TeachMe combines PostgreSQL PgVector cosine similarity with full-text search, instantly locating exact formulas, chemical mechanisms, and legal precedents in milliseconds.
             </p>
           </div>
 
           <button
             onClick={() => onOpenStudio?.('search')}
-            className="group inline-flex items-center gap-2 text-[14px] text-[#a8ff53] font-semibold hover:underline cursor-pointer mt-4 md:mt-0"
+            className="group inline-flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer mt-4 md:mt-0"
           >
             <span>Search in Studio</span>
-            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" weight="bold" />
+            <ArrowRightIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" weight="bold" />
           </button>
         </div>
 
         {/* Search Interactive Window */}
-        <div className="bg-[#121317] border border-[#2e3238] rounded p-6 shadow-2xl space-y-6">
+        <div className="bg-[#0e1017] border border-[#1c1f2e] rounded-3xl p-6 shadow-2xl space-y-6">
           
           {/* Query Bar */}
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <div className="relative flex-1 w-full">
-              <MagnifyingGlassIcon className="w-4 h-4 text-[#a0a4af] absolute left-3.5 top-3.5" />
+              <MagnifyingGlassIcon className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search across all uploaded textbook chunks..."
-                className="w-full bg-[#1c1e21] border border-[#2e3238] rounded pl-10 pr-4 py-2.5 text-[14px] text-[#f3f4f6] focus:outline-none"
+                className="w-full bg-[#141622] border border-[#1c1f2e] rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-100 placeholder-zinc-400 focus:border-indigo-500/70 focus:outline-none transition-colors"
               />
             </div>
           </div>
 
           {/* Quick Subject Query Pills */}
-          <div className="flex items-center gap-2 flex-wrap text-[12.5px]">
-            <span className="text-[#a0a4af]">Sample study queries:</span>
+          <div className="flex items-center gap-2 flex-wrap text-xs">
+            <span className="text-zinc-400">Sample study queries:</span>
             {['SN2 nucleophilic substitution', 'ATP Synthase proton gradient'].map((q) => (
               <button
                 key={q}
                 onClick={() => handleSelectQuery(q)}
-                className={`px-3 py-1.5 rounded border font-mono transition-colors cursor-pointer text-[12px] card-hover-lift ${
+                className={`px-3 py-1.5 rounded-xl border font-mono transition-colors cursor-pointer text-xs ${
                   query === q
-                    ? 'bg-[#a8ff53] text-[#121317] font-semibold border-[#a8ff53] shadow-[0_0_12px_rgba(168,255,83,0.2)]'
-                    : 'bg-[#1c1e21] border-[#2e3238] text-[#d7d9dd] hover:border-[#424750]'
+                    ? 'bg-indigo-950/80 text-indigo-200 font-semibold border-indigo-500/50 shadow-xs'
+                    : 'bg-[#141622] border-[#1c1f2e] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
                 }`}
               >
                 {q}
@@ -124,25 +120,25 @@ export const HybridSearchSection: React.FC<HybridSearchSectionProps> = ({ onOpen
             {results.map((res) => (
               <div
                 key={res.chunkId}
-                className="p-4 bg-[#1c1e21] border border-[#2e3238] rounded space-y-2.5 hover:border-[#424750] transition-colors shadow-lg animate-slide-up"
+                className="p-5 bg-[#141622] border border-[#1c1f2e] rounded-2xl space-y-3 hover:border-indigo-500/40 transition-colors shadow-xs animate-slide-up"
               >
-                <div className="flex items-center justify-between text-[12px] font-mono">
+                <div className="flex items-center justify-between text-xs font-mono">
                   <div className="flex items-center gap-2">
-                    <span className="text-[#a8ff53] font-semibold">{res.documentName}</span>
-                    <span className="text-[#a0a4af]">Chunk {res.chunkId}</span>
+                    <span className="text-white font-bold">{res.documentName}</span>
+                    <span className="text-zinc-400">• Chunk {res.chunkId}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#9c9af2] bg-[#9c9af2]/10 px-2 py-0.5 rounded border border-[#9c9af2]/20">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-indigo-300 bg-indigo-950/70 px-2.5 py-0.5 rounded-full border border-indigo-500/30">
                       Cosine: {(res.cosineScore * 100).toFixed(1)}%
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-[#a8ff53]/10 text-[#a8ff53] border border-[#a8ff53]/20">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-500/30">
                       Re-Rank: {(res.reRankScore * 100).toFixed(1)}%
                     </span>
                   </div>
                 </div>
 
-                <p className="text-[14px] leading-[1.65] text-[#e5e7eb]">
-                  "{res.text}"
+                <p className="text-xs sm:text-sm leading-relaxed text-zinc-300 font-sans">
+                  &ldquo;{res.text}&rdquo;
                 </p>
               </div>
             ))}
@@ -154,4 +150,3 @@ export const HybridSearchSection: React.FC<HybridSearchSectionProps> = ({ onOpen
     </section>
   );
 };
-

@@ -57,6 +57,21 @@ In iaculis arcu eros, eget tempus orci facilisis id. Lorem ipsum dolor sit amet,
   }
 ];
 
+function updateMessageContent(
+  chats: ChatSession[],
+  targetChatId: string,
+  messageId: string,
+  updater: (prevContent: string) => string
+): ChatSession[] {
+  return chats.map(c => {
+    if (c.id !== targetChatId) return c;
+    return {
+      ...c,
+      messages: c.messages.map(m => (m.id === messageId ? { ...m, content: updater(m.content) } : m))
+    };
+  });
+}
+
 export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [chats, setChats] = useState<ChatSession[]>(() => {
     try {
@@ -309,13 +324,7 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         targetChatId,
         docIds,
         (token: string) => {
-          setChats(prev => prev.map(c => {
-            if (c.id !== targetChatId) return c;
-            return {
-              ...c,
-              messages: c.messages.map(m => (m.id === assistantMsgId ? { ...m, content: m.content + token } : m))
-            };
-          }));
+          setChats(prev => updateMessageContent(prev, targetChatId, assistantMsgId, content => content + token));
         }
       );
     } catch {
@@ -333,13 +342,7 @@ export const PlaygroundProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         `2. **Execution Context**: This response was generated in demonstration mode with ${selectedModelOption.name}.\n\n` +
         `Let me know if you would like to adjust parameters or explore subtopics in more detail.`;
 
-      setChats(prev => prev.map(c => {
-        if (c.id !== targetChatId) return c;
-        return {
-          ...c,
-          messages: c.messages.map(m => (m.id === assistantMsgId ? { ...m, content: fallbackResponse } : m))
-        };
-      }));
+      setChats(prev => updateMessageContent(prev, targetChatId, assistantMsgId, () => fallbackResponse));
     } finally {
       setIsStreaming(false);
     }

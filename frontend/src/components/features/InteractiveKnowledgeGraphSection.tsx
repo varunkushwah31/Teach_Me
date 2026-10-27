@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShareNetworkIcon, ArrowRightIcon, SparkleIcon, BookOpenIcon } from '@phosphor-icons/react';
+import { ArrowRightIcon, SparkleIcon, BookOpenIcon } from '@phosphor-icons/react';
 
 interface KnowledgeNode {
   id: string;
@@ -18,7 +18,7 @@ const NODES: KnowledgeNode[] = [
     x: 400,
     y: 200,
     group: 'core',
-    color: '#a8ff53',
+    color: '#6366f1',
     description: 'Central genetic blueprint composed of antiparallel nucleotide strands (A-T, G-C) stabilized by hydrogen bonding.'
   },
   {
@@ -27,7 +27,7 @@ const NODES: KnowledgeNode[] = [
     x: 180,
     y: 120,
     group: 'mechanism',
-    color: '#9c9af2',
+    color: '#818cf8',
     description: 'RNA Polymerase II binds to the promoter sequence to transcribe DNA into precursor mRNA, followed by 5\' capping and intron splicing.'
   },
   {
@@ -36,7 +36,7 @@ const NODES: KnowledgeNode[] = [
     x: 620,
     y: 120,
     group: 'synthesis',
-    color: '#fa3abf',
+    color: '#a5b4fc',
     description: 'Ribosomes (60S/40S subunits) read mRNA codons, where tRNA delivers matching amino acids to synthesize polypeptide chains.'
   },
   {
@@ -45,7 +45,7 @@ const NODES: KnowledgeNode[] = [
     x: 200,
     y: 300,
     group: 'synthesis',
-    color: '#afec73',
+    color: '#10b981',
     description: 'Chaperone proteins assist polypeptide folding into tertiary and quaternary structures, forming functional biological enzymes.'
   },
   {
@@ -54,7 +54,7 @@ const NODES: KnowledgeNode[] = [
     x: 600,
     y: 300,
     group: 'metabolism',
-    color: '#d9f07c',
+    color: '#34d399',
     description: 'Glycolysis, Krebs Cycle, and the Electron Transport Chain generate 32 ATP molecules driven by proton gradients and ATP Synthase.'
   },
   {
@@ -86,40 +86,36 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode>(NODES[0]);
 
   return (
-    <section id="knowledge-graph" className="py-24 border-t border-[#2e3238] bg-[#1c1e21] relative overflow-hidden font-['Inter']">
-      <div className="max-w-310 mx-auto px-4 sm:px-6">
+    <section id="knowledge-graph" className="py-24 border-t border-[#1c1f2e] bg-[#08090d] relative overflow-hidden font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-[#e888f8] font-mono text-[13px] font-semibold mb-3">
-              <ShareNetworkIcon className="w-4 h-4" />
-              <span>Vector Graph Reasoning</span>
-            </div>
-            <h2 className="font-bold text-[32px] sm:text-[40px] text-[#f3f4f6] mb-3 tracking-tight">
+            <h2 className="font-extrabold text-3xl sm:text-4xl text-white mb-3 tracking-tight">
               Visual Concept Maps Extracted from Course Textbooks
             </h2>
-            <p className="text-[16px] text-[#b5b8c0] max-w-160 leading-[1.6]">
+            <p className="text-sm sm:text-base text-zinc-400 max-w-[65ch] leading-relaxed">
               TeachMe parses semantic entities and directional causal links directly from uploaded documents. Click any node below to inspect its definition and generate targeted diagnostic quizzes.
             </p>
           </div>
 
           <button
             onClick={() => onOpenStudio?.('knowledge')}
-            className="group inline-flex items-center gap-2 text-[14px] text-[#a8ff53] font-semibold hover:underline cursor-pointer mt-4 md:mt-0"
+            className="group inline-flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer mt-4 md:mt-0"
           >
             <span>Explore full concept graph in Studio</span>
-            <ArrowRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" weight="bold" />
+            <ArrowRightIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" weight="bold" />
           </button>
         </div>
 
         {/* Interactive Graph Box */}
-        <div className="bg-[#121317] border border-[#2e3238] rounded p-6 shadow-2xl relative">
+        <div className="bg-[#0e1017] border border-[#1c1f2e] rounded-3xl p-6 shadow-2xl relative">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
             {/* SVG Visualizer */}
-            <div className="lg:col-span-8 bg-[#1c1e21] border border-[#2e3238] rounded p-4 flex items-center justify-center relative min-h-96 overflow-hidden">
+            <div className="lg:col-span-8 bg-[#08090d] border border-[#1c1f2e] rounded-2xl p-4 flex items-center justify-center relative min-h-96 overflow-hidden">
               <svg viewBox="0 0 800 420" className="w-full h-full max-h-96">
                 {/* Edges */}
                 {EDGES.map((edge) => {
@@ -134,7 +130,7 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
                         y1={src.y}
                         x2={dst.x}
                         y2={dst.y}
-                        stroke={isHighlighted ? '#a8ff53' : '#3b3e45'}
+                        stroke={isHighlighted ? '#6366f1' : '#282c40'}
                         strokeWidth={isHighlighted ? '2.5' : '1'}
                         strokeDasharray={isHighlighted ? 'none' : '4,4'}
                         className="transition-all duration-300"
@@ -152,27 +148,14 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
                       onClick={() => setSelectedNode(node)}
                       className="cursor-pointer group"
                     >
-                      {/* Outer pulse when selected */}
-                      {isSelected && (
-                        <circle
-                          cx={node.x}
-                          cy={node.y}
-                          r="30"
-                          fill="none"
-                          stroke={node.color}
-                          strokeWidth="2"
-                          className="animate-ping opacity-40"
-                        />
-                      )}
-                      
                       {/* Node circle */}
                       <circle
                         cx={node.x}
                         cy={node.y}
                         r={isSelected ? '22' : '17'}
-                        fill="#121317"
+                        fill="#0e1017"
                         stroke={node.color}
-                        strokeWidth={isSelected ? '3.5' : '1.5'}
+                        strokeWidth={isSelected ? '3' : '1.5'}
                         className="transition-all duration-200"
                       />
 
@@ -181,7 +164,7 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
                         x={node.x}
                         y={node.y + 35}
                         textAnchor="middle"
-                        fill={isSelected ? '#f3f4f6' : '#a0a4af'}
+                        fill={isSelected ? '#ffffff' : '#9da3b8'}
                         fontSize="12"
                         fontFamily="Inter, sans-serif"
                         fontWeight={isSelected ? '700' : '500'}
@@ -195,45 +178,46 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
             </div>
 
             {/* Selected Node Details Inspector */}
-            <div className="lg:col-span-4 bg-[#1c1e21] border border-[#2e3238] rounded p-6 space-y-4 shadow-xl">
-              <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+            <div className="lg:col-span-4 bg-[#141622] border border-[#1c1f2e] rounded-2xl p-6 space-y-4 shadow-xl">
+              <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                 <div className="flex items-center gap-2">
                   <div
-                    className="w-3 h-3 rounded-full animate-ping"
+                    className="w-2.5 h-2.5 rounded-full"
                     style={{ backgroundColor: selectedNode.color }}
                   />
-                  <span className="font-mono text-[12px] text-[#a0a4af] uppercase tracking-wider">
+                  <span className="font-mono text-xs text-zinc-300 uppercase tracking-wider font-semibold">
                     {selectedNode.group} Concept
                   </span>
                 </div>
-                <span className="text-[11px] px-2 py-0.5 rounded bg-[#121317] border border-[#2e3238] text-[#a8ff53] font-mono">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 font-mono">
                   Vector Grounded
                 </span>
               </div>
 
               <div>
-                <h4 className="font-bold text-[19px] text-[#f3f4f6] mb-2">
+                <h4 className="font-bold text-lg text-white mb-2">
                   {selectedNode.label}
                 </h4>
-                <p className="text-[14px] leading-[1.65] text-[#b5b8c0]">
+                <p className="text-xs sm:text-sm leading-relaxed text-zinc-400">
                   {selectedNode.description}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-[#2e3238] space-y-2">
+              <div className="pt-4 border-t border-[#1c1f2e] space-y-2">
                 <button
                   onClick={() => onOpenStudio?.('quiz')}
-                  className="w-full py-2.5 bg-[#272a2e] hover:bg-[#343840] text-[#a8ff53] text-[13px] font-semibold rounded transition-all cursor-pointer text-center flex items-center justify-center gap-2 hover:shadow-[0_0_15px_rgba(168,255,83,0.15)]"
+                  className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all cursor-pointer text-center flex items-center justify-center gap-2 shadow-xs active:scale-95"
                 >
                   <SparkleIcon className="w-4 h-4" />
-                  <span>Generate Quiz for this Concept →</span>
+                  <span>Generate Quiz for this Concept</span>
+                  <ArrowRightIcon className="w-3.5 h-3.5" />
                 </button>
 
                 <button
                   onClick={() => onOpenStudio?.('chat')}
-                  className="w-full py-2 bg-[#121317] hover:bg-[#191c22] text-[#d7d9dd] border border-[#2e3238] text-[12.5px] rounded transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
+                  className="w-full py-2 bg-[#0e1017] hover:bg-[#191c2b] text-zinc-200 border border-[#1c1f2e] text-xs font-semibold rounded-xl transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
                 >
-                  <BookOpenIcon className="w-3.5 h-3.5 text-[#9c9af2]" />
+                  <BookOpenIcon className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Ask AI Tutor About Concept</span>
                 </button>
               </div>
@@ -247,4 +231,3 @@ export const InteractiveKnowledgeGraphSection: React.FC<InteractiveKnowledgeGrap
     </section>
   );
 };
-

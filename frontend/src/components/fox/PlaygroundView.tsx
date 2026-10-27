@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   ArrowUpIcon,
   BookmarkSimpleIcon,
@@ -7,7 +7,9 @@ import {
   BookOpenIcon,
   CodeIcon,
   CpuIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  CopyIcon,
+  CheckIcon
 } from '@phosphor-icons/react';
 import { usePlayground } from '../../context/usePlayground';
 import { MarkdownMessage } from './MarkdownMessage';
@@ -31,6 +33,13 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({ onOpenSaveTempla
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
+
+  const handleCopyMessage = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedMsgId(id);
+    setTimeout(() => setCopiedMsgId(null), 1600);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -160,8 +169,34 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({ onOpenSaveTempla
                         {msg.content}
                       </div>
                     ) : (
-                      <div className="bg-[#0e1017] border border-[#1c1f2e] rounded-xl p-5 sm:p-6 text-zinc-200 w-full max-w-3xl shadow-sm leading-relaxed relative">
+                      <div className="bg-[#0e1017] border border-[#1c1f2e] rounded-xl p-5 sm:p-6 text-zinc-200 w-full max-w-3xl shadow-sm leading-relaxed relative group">
                         <MarkdownMessage content={msg.content} />
+                        
+                        {/* Assistant Message Telemetry & Action Bar */}
+                        <div className="mt-4 pt-3 border-t border-[#171926] flex items-center justify-between text-xs font-mono text-zinc-400">
+                          <span className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                            <span>Synthesized via SSE Stream</span>
+                          </span>
+
+                          <button
+                            onClick={() => handleCopyMessage(msg.id, msg.content)}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-zinc-400 hover:text-white bg-[#141622] hover:bg-[#1a1d2e] border border-[#222436] transition-colors cursor-pointer"
+                            title="Copy response"
+                          >
+                            {copiedMsgId === msg.id ? (
+                              <>
+                                <CheckIcon className="w-3.5 h-3.5 text-emerald-400" />
+                                <span className="text-emerald-300">Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <CopyIcon className="w-3.5 h-3.5" />
+                                <span>Copy</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>

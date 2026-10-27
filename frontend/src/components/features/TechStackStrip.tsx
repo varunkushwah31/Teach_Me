@@ -13,12 +13,12 @@ const SUBJECT_PILLS = [
 
 export const TechStackStrip: React.FC = () => {
   return (
-    <section className="py-10 border-t border-[#2e3238] bg-[#1c1e21] font-['Inter']">
-      <div className="max-w-310 mx-auto px-4 sm:px-6">
+    <section className="py-10 border-t border-[#1c1f2e] bg-[#08090d] font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8 justify-between">
-          <div className="text-[14px] text-[#f3f4f6] font-semibold whitespace-nowrap flex items-center gap-2">
-            <SparkleIcon className="w-4 h-4 text-[#a8ff53]" weight="fill" />
-            <span>Built for students across every discipline & model:</span>
+          <div className="text-xs sm:text-sm text-zinc-200 font-semibold whitespace-nowrap flex items-center gap-2">
+            <SparkleIcon className="w-4 h-4 text-indigo-400" weight="fill" />
+            <span>Built for students and engineers across every discipline:</span>
           </div>
 
           {/* Clean flex wrap pill badges */}
@@ -26,10 +26,10 @@ export const TechStackStrip: React.FC = () => {
             {SUBJECT_PILLS.map((sub) => (
               <div
                 key={sub.label}
-                className="flex items-center gap-2 px-3 py-1 bg-[#121317] border border-[#2e3238] hover:border-[#424750] rounded-full text-[12.5px] transition-all cursor-default card-hover-lift"
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#0e1017] border border-[#1c1f2e] hover:border-[#282c40] rounded-xl text-xs transition-all cursor-default"
               >
-                <span className="text-[#f3f4f6] font-medium">{sub.label}</span>
-                <span className="text-[11px] font-mono text-[#a8ff53] bg-[#1c1e21] px-2 py-0.5 rounded border border-[#2e3238]">
+                <span className="text-zinc-200 font-medium">{sub.label}</span>
+                <span className="text-xs font-mono text-indigo-300 bg-[#141622] px-2 py-0.5 rounded-md border border-indigo-500/20">
                   {sub.tag}
                 </span>
               </div>
@@ -40,4 +40,3 @@ export const TechStackStrip: React.FC = () => {
     </section>
   );
 };
-

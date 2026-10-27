@@ -166,14 +166,14 @@ public class HybridSearchServiceImpl implements HybridSearchService {
         for (int rank = 0; rank < vectorResults.size(); rank++) {
             Document doc = vectorResults.get(rank);
             String docId = doc.getId();
-            rrfScores.merge(docId, 1.0 / (k + rank + 1), Double::sum);
+            rrfScores.merge(docId, 1.0 / (k + rank + 1), (s1, s2) -> s1 + s2);
             documentMap.put(docId, doc);
         }
 
         for (int rank = 0; rank < fullTextResults.size(); rank++) {
             Document doc = fullTextResults.get(rank);
             String docId = doc.getId();
-            rrfScores.merge(docId, 1.0 / (k + rank + 1), Double::sum);
+            rrfScores.merge(docId, 1.0 / (k + rank + 1), (s1, s2) -> s1 + s2);
             documentMap.putIfAbsent(docId, doc);
         }
 

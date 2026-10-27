@@ -34,6 +34,8 @@ public class DocumentController {
     private final AuthService authService;
 
     private static final String ERROR_KEY = "error";
+    private static final String MESSAGE_KEY = "message";
+    private static final String USER_NOT_FOUND_MSG = "User not found in repository";
 
     @PostMapping("/upload")
     @Operation(summary = "Upload PDF document", description = "Accepts a PDF document upload, and launches an asynchronous background ingestion job to parse and embed it.")
@@ -46,7 +48,7 @@ public class DocumentController {
         try {
             Long userId = authService.getAuthenticatedUserId();
             User currentUser = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found in repository"));
+                    .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MSG));
 
             String jobId = UUID.randomUUID().toString();
 
@@ -63,7 +65,7 @@ public class DocumentController {
             );
 
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of(
-                    "message", "File upload accepted. Processing started in background.",
+                    MESSAGE_KEY, "File upload accepted. Processing started in background.",
                     "jobId", jobId
             ));
         } catch (Exception e) {
@@ -91,11 +93,11 @@ public class DocumentController {
         try {
             Long userId = authService.getAuthenticatedUserId();
             User currentUser = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found in repository"));
+                    .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MSG));
 
             QuizDTO quiz = quizGenerationService.generateQuiz(documentId, currentUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                    "message", "Quiz generated successfully",
+                    MESSAGE_KEY, "Quiz generated successfully",
                     "quiz", quiz
             ));
 
@@ -115,12 +117,12 @@ public class DocumentController {
         try {
             Long userId = authService.getAuthenticatedUserId();
             User currentUser = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found in repository"));
+                    .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MSG));
 
             ingestionService.deleteDocument(documentId, currentUser);
 
             return ResponseEntity.ok(Map.of(
-                    "message", "Document deleted successfully",
+                    MESSAGE_KEY, "Document deleted successfully",
                     "documentId", documentId
             ));
         } catch (ResourceNotFoundException e) {

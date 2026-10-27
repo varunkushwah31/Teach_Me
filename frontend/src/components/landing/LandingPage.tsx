@@ -10,7 +10,7 @@ import { LandingFooter } from './LandingFooter';
 
 export const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#07080c] text-zinc-100 selection:bg-purple-500/30 selection:text-white font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#07080c] text-zinc-100 selection:bg-indigo-500/30 selection:text-white font-sans antialiased overflow-x-hidden">
       {/* Top Fixed Blur Navigation */}
       <LandingNavbar />
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  RobotIcon,
   QuestionIcon,
   StackIcon,
   SpeakerHighIcon,
@@ -10,7 +9,8 @@ import {
   ArrowRightIcon,
   SparkleIcon,
   XCircleIcon,
-  BookOpenIcon
+  BookOpenIcon,
+  ChatCircleDotsIcon
 } from '@phosphor-icons/react';
 
 interface FeatureShowcaseSectionProps {
@@ -157,42 +157,37 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
   };
 
   return (
-    <section id="study-tools" className="py-24 border-t border-[#2e3238] bg-[#1c1e21] font-['Inter']">
-      <div className="max-w-310 mx-auto px-4 sm:px-6">
+    <section id="study-tools" className="py-24 border-t border-[#1c1f2e] bg-[#08090d] font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="max-w-190 mb-12">
-          <div className="inline-flex items-center gap-1.5 text-[#a8ff53] font-mono text-[13px] font-semibold mb-3">
-            <SparkleIcon className="w-4 h-4" />
-            <span>Interactive AI Study Laboratory</span>
-          </div>
-
-          <h2 className="font-bold text-[32px] sm:text-[42px] text-[#f3f4f6] mb-4 tracking-tight">
+        <div className="max-w-3xl mb-12">
+          <h2 className="font-extrabold text-3xl sm:text-4xl text-white mb-4 tracking-tight">
             Four Grounded Learning Engines for Complete Course Mastery
           </h2>
 
-          <p className="text-[16px] text-[#b5b8c0] leading-[1.6]">
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-[65ch]">
             Try each AI study engine live below. Every question, quiz, flashcard, and podcast is synthesized strictly from your uploaded textbook documents with verifiable chapter footnotes.
           </p>
         </div>
 
         {/* Feature Interactive Engine Selector Tabs */}
-        <div className="flex flex-wrap gap-2.5 mb-8 border-b border-[#2e3238] pb-4">
+        <div className="flex flex-wrap gap-2.5 mb-8 border-b border-[#1c1f2e] pb-4">
           {[
-            { id: 'tutor' as const, label: '1. AI Tutor Q&A & Citations', icon: <RobotIcon className="w-4 h-4 text-[#a8ff53]" />, activeBorder: 'border-[#a8ff53]', activeBg: 'bg-[#a8ff53]/10 text-[#a8ff53]' },
-            { id: 'quiz' as const, label: '2. Diagnostic Auto-Quizzes', icon: <QuestionIcon className="w-4 h-4 text-[#fa3abf]" />, activeBorder: 'border-[#fa3abf]', activeBg: 'bg-[#fa3abf]/10 text-[#fa3abf]' },
-            { id: 'flashcard' as const, label: '3. SM-2 Spaced Flashcards', icon: <StackIcon className="w-4 h-4 text-[#9c9af2]" />, activeBorder: 'border-[#9c9af2]', activeBg: 'bg-[#9c9af2]/10 text-[#9c9af2]' },
-            { id: 'podcast' as const, label: '4. 2-Speaker AI Podcast', icon: <SpeakerHighIcon className="w-4 h-4 text-[#d9f07c]" />, activeBorder: 'border-[#d9f07c]', activeBg: 'bg-[#d9f07c]/10 text-[#d9f07c]' }
+            { id: 'tutor' as const, label: '1. AI Tutor Q&A & Citations', icon: <ChatCircleDotsIcon className="w-4 h-4 text-indigo-400" /> },
+            { id: 'quiz' as const, label: '2. Diagnostic Auto-Quizzes', icon: <QuestionIcon className="w-4 h-4 text-indigo-400" /> },
+            { id: 'flashcard' as const, label: '3. SM-2 Spaced Flashcards', icon: <StackIcon className="w-4 h-4 text-indigo-400" /> },
+            { id: 'podcast' as const, label: '4. 2-Speaker AI Podcast', icon: <SpeakerHighIcon className="w-4 h-4 text-indigo-400" /> }
           ].map(tab => {
             const isActive = activeEngine === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveEngine(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded text-[14px] font-medium transition-all cursor-pointer card-hover-lift ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   isActive
-                    ? `bg-[#121317] border-2 ${tab.activeBorder} text-[#f3f4f6] shadow-[0_0_20px_rgba(0,0,0,0.4)]`
-                    : 'text-[#a0a4af] hover:text-[#f3f4f6] bg-[#121317]/50 hover:bg-[#121317] border border-[#2e3238]'
+                    ? 'bg-indigo-950/80 border border-indigo-500/50 text-indigo-200 shadow-xs'
+                    : 'text-zinc-400 hover:text-white bg-[#0e1017] hover:bg-[#141622] border border-[#1c1f2e]'
                 }`}
               >
                 {tab.icon}
@@ -203,32 +198,32 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
         </div>
 
         {/* Interactive Showcase Laboratory Window */}
-        <div className="bg-[#121317] border border-[#2e3238] rounded p-6 sm:p-8 shadow-2xl animate-fade-in">
+        <div className="bg-[#0e1017] border border-[#1c1f2e] rounded-3xl p-6 sm:p-8 shadow-2xl animate-fade-in">
           
           {/* ENGINE 1: AI Tutor Q&A Streaming & Citations */}
           {activeEngine === 'tutor' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-5 space-y-4">
-                <div className="text-[12px] font-mono text-[#a8ff53] bg-[#a8ff53]/10 px-2.5 py-1 rounded inline-block border border-[#a8ff53]/20">
+                <div className="text-xs font-mono text-indigo-300 bg-indigo-950/70 px-2.5 py-1 rounded-md inline-block border border-indigo-500/30">
                   POST /api/chat/ask/stream • SSE Vector RAG
                 </div>
-                <h3 className="font-bold text-[24px] sm:text-[28px] text-[#f3f4f6] tracking-tight">
+                <h3 className="font-bold text-2xl text-white tracking-tight">
                   Realtime AI Tutor with Verifiable Citations
                 </h3>
-                <p className="text-[15px] text-[#b5b8c0] leading-[1.65]">
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
                   Stream explanations directly from course textbooks. Click any verified citation to jump straight to the source page and chunk in your document library.
                 </p>
-                <div className="space-y-2 pt-2 text-[13.5px] text-[#d7d9dd]">
+                <div className="space-y-2 pt-2 text-xs text-zinc-300">
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#a8ff53]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Sub-50ms token latency with Server-Sent Events (SSE)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#a8ff53]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>PgVector cosine distance chunk matching (&lt; 0.35 threshold)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#a8ff53]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Zero hallucination: answers restricted strictly to document context</span>
                   </div>
                 </div>
@@ -236,37 +231,37 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                 <div className="pt-4">
                   <button
                     onClick={() => onOpenStudio?.('chat')}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#a8ff53] text-[#121317] font-semibold text-[14px] rounded hover:bg-[#baff6b] transition-all cursor-pointer shadow-[0_0_15px_rgba(168,255,83,0.2)]"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs border border-indigo-400/30 active:scale-95"
                   >
                     <span>Launch AI Tutor in Studio</span>
-                    <ArrowRightIcon className="w-4 h-4" weight="bold" />
+                    <ArrowRightIcon className="w-3.5 h-3.5" weight="bold" />
                   </button>
                 </div>
               </div>
 
               {/* Interactive Live Q&A Stream Simulator */}
-              <div className="lg:col-span-7 bg-[#1c1e21] border border-[#2e3238] rounded p-5 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
-                  <div className="flex items-center gap-2 font-mono text-[12px] text-[#a0a4af]">
-                    <span className="w-2 h-2 rounded-full bg-[#a8ff53] animate-ping" />
+              <div className="lg:col-span-7 bg-[#141622] border border-[#1c1f2e] rounded-2xl p-5 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
+                  <div className="flex items-center gap-2 font-mono text-xs text-zinc-400">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
                     <span>Stream: tutor-qa.sse</span>
                   </div>
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#121317] text-[#a8ff53] border border-[#2e3238]">
+                  <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-[#0e1017] text-indigo-300 border border-indigo-500/30">
                     HNSW Cosine: 0.96
                   </span>
                 </div>
 
                 {/* Prompt selector pills */}
-                <div className="flex items-center gap-2 flex-wrap text-[12px]">
-                  <span className="text-[#a0a4af]">Test live prompt:</span>
+                <div className="flex items-center gap-2 flex-wrap text-xs">
+                  <span className="text-zinc-400">Test live prompt:</span>
                   {Object.keys(SAMPLE_TUTOR_PROMPTS).map((p) => (
                     <button
                       key={p}
                       onClick={() => setActiveTutorPrompt(p)}
-                      className={`px-2.5 py-1 rounded border transition-colors cursor-pointer text-[12px] ${
+                      className={`px-2.5 py-1 rounded-lg border transition-colors cursor-pointer text-xs ${
                         activeTutorPrompt === p
-                          ? 'bg-[#a8ff53] text-[#121317] font-semibold border-[#a8ff53]'
-                          : 'bg-[#121317] border-[#2e3238] text-[#d7d9dd] hover:border-[#424750]'
+                          ? 'bg-indigo-950/80 text-indigo-200 font-semibold border-indigo-500/50 shadow-xs'
+                          : 'bg-[#0e1017] border-[#1c1f2e] text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
                       }`}
                     >
                       {p.split(' ')[0]} {p.split(' ')[1]}...
@@ -275,19 +270,19 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                 </div>
 
                 {/* Stream Box */}
-                <div className="p-4 bg-[#121317] border border-[#2e3238] rounded min-h-48 space-y-3">
-                  <div className="text-[13px] font-semibold text-[#a8ff53] flex items-center gap-1.5 font-mono">
-                    <RobotIcon className="w-4 h-4" />
+                <div className="p-4 bg-[#0e1017] border border-[#1c1f2e] rounded-xl min-h-48 space-y-3">
+                  <div className="text-xs font-bold text-indigo-300 flex items-center gap-1.5 font-mono">
+                    <SparkleIcon className="w-4 h-4 text-indigo-400" />
                     <span>TeachMe AI Tutor Answer:</span>
                   </div>
-                  <p className="text-[14px] leading-[1.65] text-[#f3f4f6] whitespace-pre-wrap">
+                  <p className="text-xs sm:text-sm leading-relaxed text-zinc-200 whitespace-pre-wrap font-sans">
                     {typedOutput}
-                    {isTyping && <span className="inline-block w-2 h-4 bg-[#a8ff53] ml-1 animate-pulse" />}
+                    {isTyping && <span className="inline-block w-2 h-3.5 bg-indigo-400 ml-1" />}
                   </p>
 
                   {!isTyping && (
-                    <div className="mt-3 pt-3 border-t border-[#2e3238] flex items-start gap-2 text-[12px] text-[#a0a4af]">
-                      <BookOpenIcon className="w-4 h-4 text-[#a8ff53] shrink-0 mt-0.5" />
+                    <div className="mt-3 pt-3 border-t border-[#171926] flex items-start gap-2 text-xs text-zinc-400 font-mono">
+                      <BookOpenIcon className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
                       <span>{SAMPLE_TUTOR_PROMPTS[activeTutorPrompt].citation}</span>
                     </div>
                   )}
@@ -300,26 +295,26 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
           {activeEngine === 'quiz' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-5 space-y-4">
-                <div className="text-[12px] font-mono text-[#fa3abf] bg-[#fa3abf]/10 px-2.5 py-1 rounded inline-block border border-[#fa3abf]/20">
-                  POST /api/quiz/generate/&#123;id&#125; • Bloom's Taxonomy
+                <div className="text-xs font-mono text-indigo-300 bg-indigo-950/70 px-2.5 py-1 rounded-md inline-block border border-indigo-500/30">
+                  POST /api/quiz/generate/101 • Blooms Taxonomy
                 </div>
-                <h3 className="font-bold text-[24px] sm:text-[28px] text-[#f3f4f6] tracking-tight">
+                <h3 className="font-bold text-2xl text-white tracking-tight">
                   Automated 5-Question Diagnostic Quizzes
                 </h3>
-                <p className="text-[15px] text-[#b5b8c0] leading-[1.65]">
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
                   Select an answer on the right to see instant Bloom cognitive grading with complete pedagogical rationale explanations.
                 </p>
-                <div className="space-y-2 pt-2 text-[13.5px] text-[#d7d9dd]">
+                <div className="space-y-2 pt-2 text-xs text-zinc-300">
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#fa3abf]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Calculates percentage score with 80% passing standard</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#fa3abf]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Detailed feedback explaining why distractors are wrong</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#fa3abf]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Feeds directly into Exam Readiness score calculations</span>
                   </div>
                 </div>
@@ -327,35 +322,35 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                 <div className="pt-4">
                   <button
                     onClick={() => onOpenStudio?.('quiz')}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#a8ff53] text-[#121317] font-semibold text-[14px] rounded hover:bg-[#baff6b] transition-all cursor-pointer shadow-[0_0_15px_rgba(168,255,83,0.2)]"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs border border-indigo-400/30 active:scale-95"
                   >
                     <span>Generate Full Quiz in Studio</span>
-                    <ArrowRightIcon className="w-4 h-4" weight="bold" />
+                    <ArrowRightIcon className="w-3.5 h-3.5" weight="bold" />
                   </button>
                 </div>
               </div>
 
               {/* Interactive Quiz Question Card */}
-              <div className="lg:col-span-7 bg-[#1c1e21] border border-[#2e3238] rounded p-6 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
-                  <span className="text-[12px] font-mono text-[#a0a4af]">Diagnostic Question 1 of 5</span>
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#fa3abf]/10 text-[#fa3abf] border border-[#fa3abf]/20">
+              <div className="lg:col-span-7 bg-[#141622] border border-[#1c1f2e] rounded-2xl p-6 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
+                  <span className="text-xs font-mono text-zinc-400">Diagnostic Question 1 of 5</span>
+                  <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-500/30">
                     Pass Target: 80%
                   </span>
                 </div>
 
-                <div className="text-[16px] font-semibold text-[#f3f4f6]">
+                <div className="text-sm font-bold text-white">
                   {SAMPLE_QUIZ.question}
                 </div>
 
                 <div className="space-y-2.5">
                   {SAMPLE_QUIZ.options.map((opt, idx) => {
                     const isSelected = selectedOption === idx;
-                    let optionStyle = 'bg-[#121317] border-[#2e3238] text-[#d7d9dd] hover:border-[#424750]';
+                    let optionStyle = 'bg-[#0e1017] border-[#1c1f2e] text-zinc-300 hover:border-zinc-700';
                     if (quizSubmitted && opt.correct) {
-                      optionStyle = 'bg-[#a8ff53]/10 border-[#a8ff53] text-[#a8ff53] font-medium';
+                      optionStyle = 'bg-emerald-950/60 border-emerald-500/80 text-emerald-200 font-medium';
                     } else if (quizSubmitted && isSelected && !opt.correct) {
-                      optionStyle = 'bg-[#f43f5e]/10 border-[#f43f5e] text-[#f43f5e] font-medium';
+                      optionStyle = 'bg-rose-950/60 border-rose-500/80 text-rose-200 font-medium';
                     }
 
                     return (
@@ -363,19 +358,19 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                         key={opt.text}
                         type="button"
                         onClick={() => handleSelectQuizOption(idx)}
-                        className={`w-full text-left p-3.5 rounded border transition-all flex items-center justify-between text-[13.5px] cursor-pointer ${optionStyle}`}
+                        className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between text-xs cursor-pointer ${optionStyle}`}
                       >
                         <span>{opt.text}</span>
-                        {quizSubmitted && opt.correct && <CheckCircleIcon className="w-4 h-4 text-[#a8ff53] shrink-0" weight="fill" />}
-                        {quizSubmitted && isSelected && !opt.correct && <XCircleIcon className="w-4 h-4 text-[#f43f5e] shrink-0" weight="fill" />}
+                        {quizSubmitted && opt.correct && <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />}
+                        {quizSubmitted && isSelected && !opt.correct && <XCircleIcon className="w-4 h-4 text-rose-400 shrink-0" weight="fill" />}
                       </button>
                     );
                   })}
                 </div>
 
                 {quizSubmitted && (
-                  <div className="p-3.5 bg-[#121317] border border-[#a8ff53]/30 rounded-xl text-[13px] text-[#b5b8c0] animate-slide-up space-y-1">
-                    <span className="text-[#a8ff53] font-semibold font-mono">Pedagogical Explanation:</span>
+                  <div className="p-3.5 bg-[#0e1017] border border-[#1c1f2e] rounded-xl text-xs text-zinc-300 animate-slide-up space-y-1">
+                    <span className="text-indigo-400 font-semibold font-mono">Pedagogical Explanation:</span>
                     <p>{SAMPLE_QUIZ.explanation}</p>
                   </div>
                 )}
@@ -387,26 +382,26 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
           {activeEngine === 'flashcard' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-5 space-y-4">
-                <div className="text-[12px] font-mono text-[#9c9af2] bg-[#9c9af2]/10 px-2.5 py-1 rounded inline-block border border-[#9c9af2]/20">
-                  POST /api/flashcards/&#123;id&#125;/review • SM-2 Algorithm
+                <div className="text-xs font-mono text-indigo-300 bg-indigo-950/70 px-2.5 py-1 rounded-md inline-block border border-indigo-500/30">
+                  POST /api/flashcards/101/review • SM-2 Algorithm
                 </div>
-                <h3 className="font-bold text-[24px] sm:text-[28px] text-[#f3f4f6] tracking-tight">
+                <h3 className="font-bold text-2xl text-white tracking-tight">
                   SuperMemo-2 (SM-2) Spaced Repetition
                 </h3>
-                <p className="text-[15px] text-[#b5b8c0] leading-[1.65]">
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
                   Click the 3D flashcard on the right to flip between Front and Back. Rate your recall from 0 to 5 to see the mathematical Ease Factor dynamically recalculate.
                 </p>
-                <div className="space-y-2 pt-2 text-[13.5px] text-[#d7d9dd]">
+                <div className="space-y-2 pt-2 text-xs text-zinc-300">
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#9c9af2]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Clamps minimum Ease Factor to 1.3 to avoid recall burnout</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#9c9af2]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Exponential review interval expansion for grades &gt;= 3</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#9c9af2]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>One-click export to Anki (.apkg / .txt) for mobile study</span>
                   </div>
                 </div>
@@ -414,19 +409,19 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                 <div className="pt-4">
                   <button
                     onClick={() => onOpenStudio?.('flashcards')}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#a8ff53] text-[#121317] font-semibold text-[14px] rounded hover:bg-[#baff6b] transition-all cursor-pointer shadow-[0_0_15px_rgba(168,255,83,0.2)]"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs border border-indigo-400/30 active:scale-95"
                   >
                     <span>Practice Flashcards in Studio</span>
-                    <ArrowRightIcon className="w-4 h-4" weight="bold" />
+                    <ArrowRightIcon className="w-3.5 h-3.5" weight="bold" />
                   </button>
                 </div>
               </div>
 
               {/* Interactive 3D Flip Flashcard */}
-              <div className="lg:col-span-7 bg-[#1c1e21] border border-[#2e3238] rounded p-6 text-center space-y-4 shadow-xl">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
-                  <span className="text-[12px] font-mono text-[#9c9af2]">Deck: {SAMPLE_FLASHCARD.deck}</span>
-                  <span className="text-[11px] font-mono text-[#a0a4af] bg-[#121317] px-2 py-0.5 rounded border border-[#2e3238]">
+              <div className="lg:col-span-7 bg-[#141622] border border-[#1c1f2e] rounded-2xl p-6 text-center space-y-4 shadow-xl">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
+                  <span className="text-xs font-mono text-indigo-300">Deck: {SAMPLE_FLASHCARD.deck}</span>
+                  <span className="text-xs font-mono text-zinc-400 bg-[#0e1017] px-2.5 py-0.5 rounded-full border border-[#1c1f2e]">
                     Click card to flip
                   </span>
                 </div>
@@ -442,27 +437,27 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                     }`}
                   >
                     {/* Front Face */}
-                    <div className="absolute inset-0 bg-[#121317] border-2 border-[#2e3238] hover:border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden shadow-2xl transition-colors">
-                      <div className="text-[11px] font-mono text-[#9c9af2] uppercase tracking-wider">
-                         Front • Question
+                    <div className="absolute inset-0 bg-[#0e1017] border border-[#1c1f2e] hover:border-indigo-500/50 rounded-2xl p-6 flex flex-col justify-between backface-hidden shadow-xl transition-colors">
+                      <div className="text-xs font-mono text-indigo-400 uppercase tracking-wider font-semibold">
+                        Front • Question
                       </div>
-                      <div className="text-[16px] font-medium text-[#f3f4f6] leading-normal">
+                      <div className="text-sm sm:text-base font-bold text-white leading-relaxed">
                         {SAMPLE_FLASHCARD.front}
                       </div>
-                      <div className="text-[11px] text-[#a0a4af] font-mono">
+                      <div className="text-xs text-zinc-400 font-mono">
                         (Click to reveal answer)
                       </div>
                     </div>
 
                     {/* Back Face */}
-                    <div className="absolute inset-0 bg-[#15171c] border-2 border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden rotate-y-180 shadow-2xl">
-                      <div className="text-[11px] font-mono text-[#a8ff53] uppercase tracking-wider">
-                         Back • Verified Answer
+                    <div className="absolute inset-0 bg-[#0c0d14] border border-indigo-500/60 rounded-2xl p-6 flex flex-col justify-between backface-hidden rotate-y-180 shadow-xl">
+                      <div className="text-xs font-mono text-emerald-400 uppercase tracking-wider font-semibold">
+                        Back • Verified Answer
                       </div>
-                      <div className="text-[14px] text-[#e5e7eb] leading-[1.6]">
+                      <div className="text-xs sm:text-sm text-zinc-200 leading-relaxed">
                         {SAMPLE_FLASHCARD.back}
                       </div>
-                      <div className="text-[11px] text-[#a0a4af] font-mono">
+                      <div className="text-xs text-zinc-400 font-mono">
                         (Click to flip back)
                       </div>
                     </div>
@@ -472,15 +467,15 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                 {/* Recall Quality Buttons */}
                 <div className="pt-2 space-y-2">
                   <div className="flex items-center justify-center gap-2 flex-wrap">
-                    <span className="text-[12px] text-[#a0a4af] mr-1">Rate recall quality:</span>
+                    <span className="text-xs text-zinc-400 mr-1">Rate recall quality:</span>
                     {[0, 1, 2, 3, 4, 5].map((q) => (
                       <button
                         key={q}
                         onClick={() => handleRateFlashcard(q)}
-                        className={`w-9 h-9 rounded bg-[#121317] hover:bg-[#272a2e] border text-[13px] font-mono transition-all cursor-pointer ${
+                        className={`w-9 h-9 rounded-xl bg-[#0e1017] hover:bg-[#1a1d2e] border text-xs font-mono transition-all cursor-pointer ${
                           cardRating === q
-                            ? 'border-[#9c9af2] text-[#9c9af2] font-bold bg-[#9c9af2]/10 shadow-[0_0_10px_rgba(156,154,242,0.3)]'
-                            : 'border-[#2e3238] text-[#d7d9dd]'
+                            ? 'border-indigo-500 text-indigo-300 font-bold bg-indigo-950/40 shadow-xs'
+                            : 'border-[#1c1f2e] text-zinc-300'
                         }`}
                       >
                         {q}
@@ -489,7 +484,7 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                   </div>
 
                   {cardRating !== null && (
-                    <div className="text-[12px] font-mono text-[#a8ff53] animate-slide-up">
+                    <div className="text-xs font-mono text-emerald-400 animate-slide-up">
                       SM-2 Recalculated: Ease Factor = <span className="font-bold">{calculatedEF.toFixed(2)}</span> • Next review scheduled
                     </div>
                   )}
@@ -502,26 +497,26 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
           {activeEngine === 'podcast' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-5 space-y-4">
-                <div className="text-[12px] font-mono text-[#d9f07c] bg-[#d9f07c]/10 px-2.5 py-1 rounded inline-block border border-[#d9f07c]/20">
-                  POST /api/audio/generate-podcast/&#123;id&#125; • 2-Host TTS
+                <div className="text-xs font-mono text-indigo-300 bg-indigo-950/70 px-2.5 py-1 rounded-md inline-block border border-indigo-500/30">
+                  POST /api/audio/generate-podcast/101 • 2-Host TTS
                 </div>
-                <h3 className="font-bold text-[24px] sm:text-[28px] text-[#f3f4f6] tracking-tight">
+                <h3 className="font-bold text-2xl text-white tracking-tight">
                   NotebookLM-Style 2-Speaker Audio Podcast
                 </h3>
-                <p className="text-[15px] text-[#b5b8c0] leading-[1.65]">
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
                   Turn textbook chapters into natural conversational dialogue between Alex and Maya. Listen hands-free on commutes or while reviewing formulas.
                 </p>
-                <div className="space-y-2 pt-2 text-[13.5px] text-[#d7d9dd]">
+                <div className="space-y-2 pt-2 text-xs text-zinc-300">
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#d9f07c]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Distinct vocal synthesis pitches for Host Alex and Host Maya</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#d9f07c]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Conversational banter and analogies to clarify dry concepts</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="w-4 h-4 text-[#d9f07c]" weight="fill" />
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-400 shrink-0" weight="fill" />
                     <span>Realtime speech synthesis synchronized with script highlights</span>
                   </div>
                 </div>
@@ -529,49 +524,50 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                 <div className="pt-4">
                   <button
                     onClick={() => onOpenStudio?.('podcast')}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#a8ff53] text-[#121317] font-semibold text-[14px] rounded hover:bg-[#baff6b] transition-all cursor-pointer shadow-[0_0_15px_rgba(168,255,83,0.2)]"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-xs border border-indigo-400/30 active:scale-95"
                   >
                     <span>Generate Audio in Studio</span>
-                    <ArrowRightIcon className="w-4 h-4" weight="bold" />
+                    <ArrowRightIcon className="w-3.5 h-3.5" weight="bold" />
                   </button>
                 </div>
               </div>
 
               {/* Interactive Audio Player & Soundwave Equalizer */}
-              <div className="lg:col-span-7 bg-[#1c1e21] border border-[#2e3238] rounded p-6 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+              <div className="lg:col-span-7 bg-[#141622] border border-[#1c1f2e] rounded-2xl p-6 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
-                    <div className="text-[15px] font-semibold text-[#f3f4f6]">
-                      Episode 1: Spring AI Vector Workflows & Learning Memory
+                    <div className="text-sm font-semibold text-white">
+                      Episode 1: Spring AI Vector Workflows &amp; Learning Memory
                     </div>
-                    <div className="text-[12px] text-[#a0a4af] font-mono">
-                      Co-hosts: Alex & Maya • Duration: ~8 mins
+                    <div className="text-xs text-zinc-400 font-mono mt-0.5">
+                      Co-hosts: Alex &amp; Maya • Duration: ~8 mins
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={handleTogglePodcast}
-                    className="p-3.5 rounded-full bg-[#a8ff53] text-[#121317] hover:scale-105 active:scale-95 transition-transform cursor-pointer shadow-[0_0_20px_rgba(168,255,83,0.3)]"
+                    className="w-11 h-11 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
                   >
                     {isPlayingPodcast ? (
-                      <PauseIcon className="w-5 h-5 fill-current" weight="fill" />
+                      <PauseIcon className="w-4 h-4" weight="fill" />
                     ) : (
-                      <PlayIcon className="w-5 h-5 fill-current" weight="fill" />
+                      <PlayIcon className="w-4 h-4" weight="fill" />
                     )}
                   </button>
                 </div>
 
                 {/* Animated Soundwave Visualizer Bars */}
-                <div className="flex items-center gap-1.5 h-14 bg-[#121317] p-3 rounded border border-[#2e3238]">
-                  {[1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4].map((animIdx, i) => (
+                <div className="flex items-center gap-1.5 h-12 bg-[#0e1017] p-3 rounded-xl border border-[#1c1f2e]">
+                  {[12, 22, 30, 16, 28, 14, 26, 18, 32, 20, 12, 24, 28, 16, 20, 14, 30, 18].map((_, i) => (
                     <div
                       key={i}
                       className={`flex-1 rounded-full transition-all duration-200 ${
                         isPlayingPodcast
-                          ? `bg-[#a8ff53] animate-equalizer-${animIdx}`
-                          : 'bg-[#2e3238] h-3'
+                          ? 'bg-indigo-500 animate-pulse'
+                          : 'bg-[#282c40] h-2.5'
                       }`}
+                      style={{ height: isPlayingPodcast ? `${(i % 3 + 1) * 8}px` : '10px' }}
                     />
                   ))}
                 </div>
@@ -583,14 +579,14 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
                     return (
                       <div
                         key={idx}
-                        className={`p-2.5 rounded border text-[13px] leading-normal transition-all ${
+                        className={`p-2.5 rounded-xl border text-xs leading-normal transition-all ${
                           isCurrentSpeaker
-                            ? 'bg-[#121317] border-[#a8ff53] text-[#f3f4f6] shadow-[0_0_12px_rgba(168,255,83,0.15)]'
-                            : 'bg-[#121317]/50 border-transparent text-[#a0a4af]'
+                            ? 'bg-[#0e1017] border-indigo-500/80 text-white shadow-xs'
+                            : 'bg-[#0e1017]/60 border-transparent text-zinc-400'
                         }`}
                       >
-                        <span className={`font-mono font-semibold mr-2 ${
-                          line.speaker === 'Alex' ? 'text-[#a8ff53]' : 'text-[#9c9af2]'
+                        <span className={`font-mono font-bold mr-2 ${
+                          line.speaker === 'Alex' ? 'text-indigo-400' : 'text-emerald-400'
                         }`}>
                           [{line.speaker}]:
                         </span>
@@ -609,4 +605,3 @@ export const FeatureShowcaseSection: React.FC<FeatureShowcaseSectionProps> = ({ 
     </section>
   );
 };
-

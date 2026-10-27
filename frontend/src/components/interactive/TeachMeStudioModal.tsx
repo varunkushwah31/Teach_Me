@@ -497,13 +497,13 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md">
-      <div className="bg-[#121317] border border-[#3b3e45] rounded-2xl w-full max-w-287.5 h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans">
+      <div className="bg-[#0e1017] border border-[#282c40] rounded-2xl w-full max-w-287.5 h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans">
         
         {/* Top Header Bar */}
-        <div className="px-5 py-3 bg-[#15171c] border-b border-[#272a2e] flex items-center justify-between">
+        <div className="px-5 py-3 bg-[#0e1017] border-b border-[#1c1f2e] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-5 h-5 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-[#a8ff53]">
+              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-indigo-500">
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
             </div>
@@ -519,7 +519,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
               <select
                 value={selectedDocId}
                 onChange={(e) => setSelectedDocId(Number(e.target.value))}
-                className="px-2.5 py-1 bg-[#1c1e21] border border-[#272a2e] rounded text-[12px] text-[#e5e7eb] max-w-60 focus:outline-none"
+                className="px-2.5 py-1 bg-[#141622] border border-[#1c1f2e] rounded text-[12px] text-[#e5e7eb] max-w-60 focus:outline-none"
               >
                 {documents.length === 0 && (
                   <option value={0}>No documents uploaded</option>
@@ -530,14 +530,14 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
               </select>
             </div>
 
-            <span className="px-2 py-0.5 rounded bg-[#272a2e] text-[#a8ff53] text-[11px] font-mono flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#a8ff53] animate-pulse" />
+            <span className="px-2 py-0.5 rounded bg-[#1c1f2e] text-indigo-400 text-[11px] font-mono flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span>AI Engine Ready</span>
             </span>
 
             <button
               onClick={onClose}
-              className="p-1.5 text-[#878c99] hover:text-[#e5e7eb] rounded-sm hover:bg-[#272a2e] transition-colors cursor-pointer"
+              className="p-1.5 text-[#878c99] hover:text-[#e5e7eb] rounded-sm hover:bg-[#1c1f2e] transition-colors cursor-pointer"
             >
               <XIcon className="w-4 h-4" />
             </button>
@@ -548,7 +548,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           
           {/* Left Sidebar Navigation */}
-          <aside className="w-full md:w-64 shrink-0 bg-[#15171c] border-b md:border-b-0 md:border-r border-[#2e3238] flex flex-col justify-between overflow-y-auto p-3.5 space-y-4">
+          <aside className="w-full md:w-64 shrink-0 bg-[#0e1017] border-b md:border-b-0 md:border-r border-[#1c1f2e] flex flex-col justify-between overflow-y-auto p-3.5 space-y-4">
             
             <div className="space-y-4">
               
@@ -558,8 +558,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   College Notes & RAG
                 </div>
                 {[
-                  { id: 'documents', label: 'Course Notes & PDFs', icon: <FileTextIcon className="w-4 h-4 text-[#a8ff53]" /> },
-                  { id: 'chat', label: 'Notes RAG Chatbot', icon: <RobotIcon className="w-4 h-4 text-[#a8ff53]" /> },
+                  { id: 'documents', label: 'Course Notes & PDFs', icon: <FileTextIcon className="w-4 h-4 text-indigo-400" /> },
+                  { id: 'chat', label: 'Notes RAG Chatbot', icon: <RobotIcon className="w-4 h-4 text-indigo-400" /> },
                   { id: 'search', label: 'PgVector Hybrid Search', icon: <MagnifyingGlassIcon className="w-4 h-4 text-[#9c9af2]" /> },
                   { id: 'knowledge', label: 'Concept Knowledge Graph', icon: <ShareNetworkIcon className="w-4 h-4 text-[#fa3abf]" /> }
                 ].map(tab => {
@@ -570,8 +570,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-[13px] font-medium transition-all text-left cursor-pointer ${
                         isActive
-                          ? 'bg-[#1c1e21] text-[#a8ff53] font-semibold border-l-3 border-[#a8ff53] shadow-[0_0_12px_rgba(168,255,83,0.12)]'
-                          : 'text-[#a0a4af] hover:text-[#f3f4f6] hover:bg-[#1c1e21]/60'
+                          ? 'bg-[#141622] text-indigo-400 font-semibold border border-indigo-500/50 bg-indigo-950/40 text-indigo-200 shadow-xs'
+                          : 'text-[#a0a4af] hover:text-[#f3f4f6] hover:bg-[#141622]/60'
                       }`}
                     >
                       {tab.icon}
@@ -589,7 +589,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 {[
                   { id: 'quiz', label: 'Exam Diagnostic Quiz', icon: <QuestionIcon className="w-4 h-4 text-[#fa3abf]" /> },
                   { id: 'flashcards', label: 'SM-2 Course Flashcards', icon: <StackIcon className="w-4 h-4 text-[#9c9af2]" /> },
-                  { id: 'readiness', label: 'AI Exam Readiness', icon: <TrophyIcon className="w-4 h-4 text-[#d9f07c]" /> }
+                  { id: 'readiness', label: 'AI Exam Readiness', icon: <TrophyIcon className="w-4 h-4 text-indigo-400" /> }
                 ].map(tab => {
                   const isActive = activeTab === tab.id;
                   return (
@@ -598,8 +598,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-[13px] font-medium transition-all text-left cursor-pointer ${
                         isActive
-                          ? 'bg-[#1c1e21] text-[#a8ff53] font-semibold border-l-3 border-[#a8ff53] shadow-[0_0_12px_rgba(168,255,83,0.12)]'
-                          : 'text-[#a0a4af] hover:text-[#f3f4f6] hover:bg-[#1c1e21]/60'
+                          ? 'bg-[#141622] text-indigo-400 font-semibold border border-indigo-500/50 bg-indigo-950/40 text-indigo-200 shadow-xs'
+                          : 'text-[#a0a4af] hover:text-[#f3f4f6] hover:bg-[#141622]/60'
                       }`}
                     >
                       {tab.icon}
@@ -615,9 +615,9 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   Synthesize & Plan
                 </div>
                 {[
-                  { id: 'summarizer', label: 'Map-Reduce Chapter Brief', icon: <SparkleIcon className="w-4 h-4 text-[#d9f07c]" /> },
+                  { id: 'summarizer', label: 'Map-Reduce Chapter Brief', icon: <SparkleIcon className="w-4 h-4 text-indigo-400" /> },
                   { id: 'podcast', label: '2-Speaker Review Podcast', icon: <SpeakerHighIcon className="w-4 h-4 text-[#afec73]" /> },
-                  { id: 'study-plan', label: '5-Day Study Roadmap', icon: <CalendarIcon className="w-4 h-4 text-[#a8ff53]" /> },
+                  { id: 'study-plan', label: '5-Day Study Roadmap', icon: <CalendarIcon className="w-4 h-4 text-indigo-400" /> },
                   { id: 'outline', label: 'Cornell Notes & Formulas', icon: <BookOpenIcon className="w-4 h-4 text-[#9c9af2]" /> },
                   { id: 'workspaces', label: 'Study Workspaces', icon: <UsersIcon className="w-4 h-4 text-[#fa3abf]" /> }
                 ].map(tab => {
@@ -628,8 +628,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-[13px] font-medium transition-all text-left cursor-pointer ${
                         isActive
-                          ? 'bg-[#1c1e21] text-[#a8ff53] font-semibold border-l-3 border-[#a8ff53] shadow-[0_0_12px_rgba(168,255,83,0.12)]'
-                          : 'text-[#a0a4af] hover:text-[#f3f4f6] hover:bg-[#1c1e21]/60'
+                          ? 'bg-[#141622] text-indigo-400 font-semibold border border-indigo-500/50 bg-indigo-950/40 text-indigo-200 shadow-xs'
+                          : 'text-[#a0a4af] hover:text-[#f3f4f6] hover:bg-[#141622]/60'
                       }`}
                     >
                       {tab.icon}
@@ -642,16 +642,16 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             </div>
 
             {/* Bottom Category: Settings & Sync */}
-            <div className="pt-3 border-t border-[#2e3238]">
+            <div className="pt-3 border-t border-[#1c1f2e]">
               <button
                 onClick={() => setActiveTab('settings')}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-[13px] font-medium transition-all text-left cursor-pointer ${
                   activeTab === 'settings'
-                    ? 'bg-[#1c1e21] text-[#a8ff53] font-semibold border-l-3 border-[#a8ff53] shadow-[0_0_12px_rgba(168,255,83,0.12)]'
-                    : 'text-[#a0a4af] hover:text-[#f3f4f6] hover:bg-[#1c1e21]/60'
+                    ? 'bg-[#141622] text-indigo-400 font-semibold border border-indigo-500/50 bg-indigo-950/40 text-indigo-200 shadow-xs'
+                    : 'text-[#a0a4af] hover:text-[#f3f4f6] hover:bg-[#141622]/60'
                 }`}
               >
-                <SlidersIcon className="w-4 h-4 text-[#a8ff53]" />
+                <SlidersIcon className="w-4 h-4 text-indigo-400" />
                 <span className="truncate">AI Engine & API Keys</span>
               </button>
             </div>
@@ -659,14 +659,14 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
           </aside>
 
           {/* Right Main Workbench Viewport */}
-          <main className="flex-1 p-5 md:p-6 overflow-y-auto bg-[#121317]">
+          <main className="flex-1 p-5 md:p-6 overflow-y-auto bg-[#0e1017]">
             
             {/* TAB 1: Documents & RAG Ingestion */}
             {activeTab === 'documents' && (
               <div className="space-y-6 max-w-240 mx-auto animate-fade-in">
                 
                 {/* Upload Header Area */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#2e3238] gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#1c1f2e] gap-3">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">
                       Textbook & Document Library
@@ -676,7 +676,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     </span>
                   </div>
 
-                  <label className="flex items-center gap-2 px-4 py-2 bg-[#a8ff53] text-[#121317] font-semibold text-[13px] rounded hover:bg-[#baff6b] transition-all cursor-pointer shadow-[0_0_15px_rgba(168,255,83,0.2)]">
+                  <label className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13px] rounded hover:bg-indigo-500 transition-all cursor-pointer shadow-md">
                     <UploadSimpleIcon className="w-4 h-4" weight="bold" />
                     <span>Upload New PDF</span>
                     <input
@@ -690,20 +690,20 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 </div>
 
                 {uploadStatus && (
-                  <div className="p-3.5 bg-[#1c1e21] border border-[#a8ff53] rounded text-[13px] text-[#f3f4f6] flex items-center gap-2 animate-slide-up">
-                    <span className="w-2 h-2 rounded-full bg-[#a8ff53] animate-pulse" />
+                  <div className="p-3.5 bg-[#141622] border border-indigo-500 rounded text-[13px] text-[#f3f4f6] flex items-center gap-2 animate-slide-up">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
                     <span>{uploadStatus}</span>
                   </div>
                 )}
 
                 {/* Documents Table */}
-                <div className="bg-[#15171c] border border-[#2e3238] rounded overflow-hidden shadow-xl">
-                  <div className="px-4 py-3 bg-[#1c1e21] border-b border-[#2e3238] flex items-center justify-between font-mono text-[12px] text-[#a0a4af]">
+                <div className="bg-[#0e1017] border border-[#1c1f2e] rounded overflow-hidden shadow-xl">
+                  <div className="px-4 py-3 bg-[#141622] border-b border-[#1c1f2e] flex items-center justify-between font-mono text-[12px] text-[#a0a4af]">
                     <span>Uploaded Course Materials</span>
                     <span>Status / Chunks</span>
                   </div>
 
-                  <div className="divide-y divide-[#2e3238]">
+                  <div className="divide-y divide-[#1c1f2e]">
                     {documents.length === 0 ? (
                       <div className="p-8 text-center text-[#878c99] font-mono text-[13px]">
                         No course materials uploaded yet. Upload a PDF above to begin studying!
@@ -721,11 +721,11 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                             key={doc.id}
                             onClick={() => setSelectedDocId(doc.id)}
                             className={`p-4 flex items-center justify-between cursor-pointer transition-colors ${
-                              isSelected ? 'bg-[#1c1e21] border-l-4 border-[#a8ff53]' : 'hover:bg-[#1c1e21]/50'
+                              isSelected ? 'bg-[#141622] border border-indigo-500/60 ring-1 ring-indigo-500/30' : 'hover:bg-[#141622]/50'
                             }`}
                           >
                             <div className="flex items-center gap-3">
-                              <FileTextIcon className="w-5 h-5 text-[#a8ff53] shrink-0" />
+                              <FileTextIcon className="w-5 h-5 text-indigo-400 shrink-0" />
                               <div>
                                 <div className="font-semibold text-[14.5px] text-[#f3f4f6]">
                                   {displayName}
@@ -744,12 +744,12 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                             <div className="flex items-center gap-2">
                               <span className={`px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold border ${
                                 isCompleted
-                                  ? 'bg-[#a8ff53]/10 text-[#a8ff53] border-[#a8ff53]/30'
+                                  ? 'bg-indigo-950/60 text-indigo-400 border-indigo-500/40'
                                   : isProcessing
-                                  ? 'bg-[#d9f07c]/10 text-[#d9f07c] border-[#d9f07c]/30 animate-pulse'
+                                  ? 'bg-indigo-950/60 text-indigo-400 border-indigo-500/30 animate-pulse'
                                   : isFailed
                                   ? 'bg-[#f43f5e]/10 text-[#f43f5e] border-[#f43f5e]/30'
-                                  : 'bg-[#121317] text-[#a0a4af] border-[#2e3238]'
+                                  : 'bg-[#0e1017] text-[#a0a4af] border-[#1c1f2e]'
                               }`}>
                                 {doc.status}
                               </span>
@@ -776,10 +776,10 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                 {/* Document Analytics & Readability */}
                 {analytics && (
-                  <div className="bg-[#15171c] border border-[#2e3238] rounded p-5 space-y-4 shadow-xl">
+                  <div className="bg-[#0e1017] border border-[#1c1f2e] rounded p-5 space-y-4 shadow-xl">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-[16px] text-[#f3f4f6]">
-                        Document Vector Analytics: <span className="text-[#a8ff53] font-mono text-[14px]">{analytics.documentName || analytics.filename}</span>
+                        Document Vector Analytics: <span className="text-indigo-400 font-mono text-[14px]">{analytics.documentName || analytics.filename}</span>
                       </span>
                       <span className="text-[11px] font-mono text-[#9c9af2] bg-[#9c9af2]/10 px-2 py-0.5 rounded border border-[#9c9af2]/20">
                         GET /api/documents/{selectedDocId}/analytics
@@ -787,19 +787,19 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      <div className="p-3.5 bg-[#1c1e21] rounded border border-[#2e3238]">
+                      <div className="p-3.5 bg-[#141622] rounded border border-[#1c1f2e]">
                         <div className="text-[11px] font-mono text-[#a0a4af]">Total Words</div>
                         <div className="text-[17px] font-bold text-[#f3f4f6]">{(analytics.totalWords || 0).toLocaleString()}</div>
                       </div>
-                      <div className="p-3.5 bg-[#1c1e21] rounded border border-[#2e3238]">
+                      <div className="p-3.5 bg-[#141622] rounded border border-[#1c1f2e]">
                         <div className="text-[11px] font-mono text-[#a0a4af]">Est. Reading Time</div>
-                        <div className="text-[17px] font-bold text-[#a8ff53]">{analytics.estimatedReadingMinutes ?? analytics.estimatedReadingTimeMinutes ?? 1} mins</div>
+                        <div className="text-[17px] font-bold text-indigo-400">{analytics.estimatedReadingMinutes ?? analytics.estimatedReadingTimeMinutes ?? 1} mins</div>
                       </div>
-                      <div className="p-3.5 bg-[#1c1e21] rounded border border-[#2e3238]">
+                      <div className="p-3.5 bg-[#141622] rounded border border-[#1c1f2e]">
                         <div className="text-[11px] font-mono text-[#a0a4af]">Readability Grade</div>
                         <div className="text-[14.5px] font-medium text-[#fa3abf] truncate">{analytics.readabilityGrade || analytics.readabilityGradeLevel || 'Undergraduate'}</div>
                       </div>
-                      <div className="p-3.5 bg-[#1c1e21] rounded border border-[#2e3238]">
+                      <div className="p-3.5 bg-[#141622] rounded border border-[#1c1f2e]">
                         <div className="text-[11px] font-mono text-[#a0a4af]">Vector Chunks</div>
                         <div className="text-[17px] font-bold text-[#9c9af2]">{analytics.chunksCount ?? analytics.chunkCount ?? 1}</div>
                       </div>
@@ -813,13 +813,13 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {activeTab === 'chat' && (
               <div className="h-full flex flex-col justify-between max-w-240 mx-auto animate-fade-in">
                 {/* Active Document RAG Context Indicator */}
-                <div className="mb-3 px-3.5 py-2 bg-[#15171c] border border-[#2e3238] rounded flex items-center justify-between text-[12px] font-mono">
-                  <div className="flex items-center gap-2 text-[#a8ff53]">
+                <div className="mb-3 px-3.5 py-2 bg-[#0e1017] border border-[#1c1f2e] rounded flex items-center justify-between text-[12px] font-mono">
+                  <div className="flex items-center gap-2 text-indigo-400">
                     <BookOpenIcon className="w-3.5 h-3.5" />
                     <span>RAG Document: <strong>{documents.find(d => d.id === selectedDocId)?.filename || 'Course Document'}</strong></span>
                   </div>
                   <div className="flex items-center gap-2 text-[#878c99]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#a8ff53] animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                     <span>PgVector Retrieval Active</span>
                   </div>
                 </div>
@@ -833,17 +833,17 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       <div
                         className={`max-w-[85%] rounded p-4 text-[14px] leading-[1.65] shadow-lg ${
                           msg.role === 'user'
-                            ? 'bg-[#272a2e] text-[#f3f4f6] border border-[#424750]'
-                            : 'bg-[#15171c] text-[#e5e7eb] border border-[#2e3238]'
+                            ? 'bg-[#1c1f2e] text-[#f3f4f6] border border-[#424750]'
+                            : 'bg-[#0e1017] text-[#e5e7eb] border border-[#1c1f2e]'
                         }`}
                       >
                         <div className="flex items-center justify-between text-[11px] text-[#a0a4af] mb-1.5 font-mono">
-                          <span className="font-semibold text-[#a8ff53]">{msg.role === 'user' ? 'Student' : 'TeachMe College AI Tutor'}</span>
+                          <span className="font-semibold text-indigo-400">{msg.role === 'user' ? 'Student' : 'TeachMe College AI Tutor'}</span>
                           {msg.role === 'assistant' && <span className="text-[#a0a4af]">POST /api/chat/ask/stream</span>}
                         </div>
                         <p className="whitespace-pre-wrap">{msg.text}</p>
                         {msg.citations && (
-                          <div className="mt-2.5 pt-2 border-t border-[#2e3238] text-[12px] text-[#a8ff53] font-mono flex items-center gap-1.5">
+                          <div className="mt-2.5 pt-2 border-t border-[#1c1f2e] text-[12px] text-indigo-400 font-mono flex items-center gap-1.5">
                             <BookOpenIcon className="w-3.5 h-3.5" />
                             <span>Citations: {msg.citations.join(', ')}</span>
                           </div>
@@ -853,8 +853,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   ))}
                   {isStreaming && (
                     <div className="flex justify-start">
-                      <div className="bg-[#15171c] border border-[#2e3238] p-3 rounded text-[13px] text-[#a0a4af] flex items-center gap-2 font-mono">
-                        <span className="w-2 h-2 rounded-full bg-[#a8ff53] animate-ping" />
+                      <div className="bg-[#0e1017] border border-[#1c1f2e] p-3 rounded text-[13px] text-[#a0a4af] flex items-center gap-2 font-mono">
+                        <span className="w-2 h-2 rounded-full bg-indigo-600 hover:bg-indigo-500 animate-ping" />
                         <span>Streaming vector RAG tokens...</span>
                       </div>
                     </div>
@@ -873,7 +873,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       key={preset}
                       type="button"
                       onClick={() => setChatInput(preset)}
-                      className="text-[11.5px] px-2.5 py-1 rounded-full bg-[#1c1e21] border border-[#2e3238] hover:border-[#a8ff53]/50 text-[#b5b8c0] hover:text-[#a8ff53] transition-colors cursor-pointer"
+                      className="text-[11.5px] px-2.5 py-1 rounded-full bg-[#141622] border border-[#1c1f2e] hover:border-indigo-500/60 text-[#b5b8c0] hover:text-indigo-400 transition-colors cursor-pointer"
                     >
                       {preset}
                     </button>
@@ -881,19 +881,19 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 </div>
 
                 {/* Chat Input Bar */}
-                <div className="pt-3 border-t border-[#2e3238] flex items-center gap-2">
+                <div className="pt-3 border-t border-[#1c1f2e] flex items-center gap-2">
                   <input
                     type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Ask a question about your uploaded college notes, slides, or textbook..."
-                    className="flex-1 px-4 py-2.5 bg-[#15171c] border border-[#2e3238] rounded text-[14px] text-[#f3f4f6] focus:outline-none"
+                    className="flex-1 px-4 py-2.5 bg-[#0e1017] border border-[#1c1f2e] rounded text-[14px] text-[#f3f4f6] focus:outline-none"
                   />
                   <button
                     onClick={handleSendMessage}
                     disabled={isStreaming}
-                    className="px-5 py-2.5 bg-[#a8ff53] text-[#121317] font-semibold text-[14px] rounded hover:bg-[#baff6b] transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50 shadow-[0_0_12px_rgba(168,255,83,0.2)]"
+                    className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[14px] rounded hover:bg-indigo-500 transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50 shadow-xs"
                   >
                     <span>Send</span>
                     <PaperPlaneTiltIcon className="w-4 h-4" weight="bold" />
@@ -906,7 +906,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {activeTab === 'quiz' && (
               <div className="max-w-220 mx-auto py-2 space-y-4 animate-fade-in">
                 {!currentQuiz ? (
-                  <div className="text-center py-12 bg-[#15171c] border border-[#2e3238] rounded p-8 space-y-4 shadow-2xl">
+                  <div className="text-center py-12 bg-[#0e1017] border border-[#1c1f2e] rounded p-8 space-y-4 shadow-2xl">
                     <QuestionIcon className="w-12 h-12 text-[#fa3abf] mx-auto" />
                     <h3 className="font-bold text-[24px] text-[#f3f4f6]">
                       Diagnostic Auto-Quiz Engine
@@ -917,7 +917,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     <button
                       onClick={handleGenerateQuiz}
                       disabled={isGeneratingQuiz}
-                      className="px-6 py-3 bg-[#a8ff53] text-[#121317] font-semibold text-[14px] rounded hover:bg-[#baff6b] transition-all cursor-pointer inline-flex items-center gap-2 shadow-[0_0_15px_rgba(168,255,83,0.2)]"
+                      className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[14px] rounded hover:bg-indigo-500 transition-all cursor-pointer inline-flex items-center gap-2 shadow-md"
                     >
                       {isGeneratingQuiz ? <ArrowsClockwiseIcon className="w-4 h-4 animate-spin" /> : <PlayIcon className="w-4 h-4 fill-current" />}
                       <span>{isGeneratingQuiz ? 'Generating Questions...' : 'Generate 5-Question Quiz'}</span>
@@ -926,7 +926,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 ) : (
                   <div className="space-y-4">
                     {/* Quiz Progress & Question */}
-                    <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                    <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                       <div>
                         <span className="text-[13px] font-mono text-[#fa3abf] font-semibold">
                           Question {currentQuestionIdx + 1} of {currentQuiz.questions.length}
@@ -942,7 +942,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       </button>
                     </div>
 
-                    <div className="bg-[#15171c] border border-[#2e3238] rounded p-6 space-y-5 shadow-xl">
+                    <div className="bg-[#0e1017] border border-[#1c1f2e] rounded p-6 space-y-5 shadow-xl">
                       <h4 className="font-bold text-[19px] text-[#f3f4f6] leading-[1.35]">
                         {currentQuiz.questions[currentQuestionIdx].questionText}
                       </h4>
@@ -951,10 +951,10 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       <div className="space-y-2.5">
                         {currentQuiz.questions[currentQuestionIdx].options.map((opt, optIdx) => {
                           const isChosen = selectedOptions[currentQuestionIdx] === optIdx;
-                          let btnStyle = 'bg-[#1c1e21] border-[#2e3238] text-[#d7d9dd] hover:border-[#424750]';
+                          let btnStyle = 'bg-[#141622] border-[#1c1f2e] text-[#d7d9dd] hover:border-[#424750]';
 
                           if (isChosen) {
-                            btnStyle = 'bg-[#a8ff53]/15 border-[#a8ff53] text-[#a8ff53] font-semibold';
+                            btnStyle = 'bg-indigo-600 hover:bg-indigo-500/15 border-indigo-500 text-indigo-400 font-semibold';
                           }
 
                           return (
@@ -964,7 +964,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                               className={`w-full text-left p-3.5 rounded border text-[14px] transition-all cursor-pointer ${btnStyle}`}
                             >
                               <div className="flex items-center gap-3">
-                                <span className="w-6 h-6 rounded flex items-center justify-center bg-[#121317] border border-[#2e3238] text-[12px] font-mono font-bold">
+                                <span className="w-6 h-6 rounded flex items-center justify-center bg-[#0e1017] border border-[#1c1f2e] text-[12px] font-mono font-bold">
                                   {String.fromCodePoint(65 + optIdx)}
                                 </span>
                                 <span>{opt}</span>
@@ -975,7 +975,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       </div>
 
                       {/* Navigation Buttons */}
-                      <div className="pt-3 border-t border-[#2e3238] flex items-center justify-between">
+                      <div className="pt-3 border-t border-[#1c1f2e] flex items-center justify-between">
                         <button
                           onClick={() => setCurrentQuestionIdx(prev => Math.max(0, prev - 1))}
                           disabled={currentQuestionIdx === 0}
@@ -987,14 +987,14 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         {currentQuestionIdx < currentQuiz.questions.length - 1 ? (
                           <button
                             onClick={() => setCurrentQuestionIdx(prev => prev + 1)}
-                            className="px-4 py-2 bg-[#272a2e] hover:bg-[#343840] text-[#f3f4f6] font-medium rounded text-[13px] cursor-pointer"
+                            className="px-4 py-2 bg-[#1c1f2e] hover:bg-[#343840] text-[#f3f4f6] font-medium rounded text-[13px] cursor-pointer"
                           >
                             Next Question →
                           </button>
                         ) : (
                           <button
                             onClick={handleSubmitQuiz}
-                            className="px-5 py-2 bg-[#a8ff53] text-[#121317] font-semibold text-[13px] rounded hover:bg-[#baff6b] cursor-pointer shadow-[0_0_12px_rgba(168,255,83,0.2)]"
+                            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13px] rounded hover:bg-indigo-500 cursor-pointer shadow-xs"
                           >
                             Submit & Grade Quiz
                           </button>
@@ -1004,13 +1004,13 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                     {/* Quiz Results Breakdown */}
                     {quizResult && (
-                      <div className="bg-[#15171c] border border-[#a8ff53]/50 rounded p-6 space-y-4 shadow-2xl animate-slide-up">
-                        <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                      <div className="bg-[#0e1017] border border-indigo-500/60 rounded p-6 space-y-4 shadow-2xl animate-slide-up">
+                        <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                           <div>
                             <h4 className="font-bold text-[20px] text-[#f3f4f6]">
                               Assessment Results: {quizResult.score}%
                             </h4>
-                            <span className={`text-[12px] font-mono font-semibold ${quizResult.passed ? 'text-[#a8ff53]' : 'text-[#f43f5e]'}`}>
+                            <span className={`text-[12px] font-mono font-semibold ${quizResult.passed ? 'text-indigo-400' : 'text-[#f43f5e]'}`}>
                               {quizResult.passed ? 'PASSED (≥ 80%)' : 'NEEDS REVIEW (< 80%)'}
                             </span>
                           </div>
@@ -1019,10 +1019,10 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                         <div className="space-y-3">
                           {quizResult.feedback.map((f, i) => (
-                            <div key={`feedback-${f.questionText}-${i}`} className="p-3.5 bg-[#1c1e21] rounded border border-[#2e3238] text-[13.5px]">
+                            <div key={`feedback-${f.questionText}-${i}`} className="p-3.5 bg-[#141622] rounded border border-[#1c1f2e] text-[13.5px]">
                               <div className="flex items-center justify-between mb-1">
                                 <span className="font-medium text-[#f3f4f6]">{f.questionText}</span>
-                                <span className={`font-mono text-[12px] ${f.isCorrect ? 'text-[#a8ff53]' : 'text-[#f43f5e]'}`}>
+                                <span className={`font-mono text-[12px] ${f.isCorrect ? 'text-indigo-400' : 'text-[#f43f5e]'}`}>
                                   {f.isCorrect ? ' Correct' : ' Incorrect'}
                                 </span>
                               </div>
@@ -1040,7 +1040,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 4: Flashcards SM-2 with 3D Flip */}
             {activeTab === 'flashcards' && (
               <div className="max-w-200 mx-auto py-2 space-y-4 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">
                       SM-2 Spaced Repetition Flashcards
@@ -1051,7 +1051,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => TeachMeAPI.export.downloadAnki()}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#15171c] hover:bg-[#1c1e21] text-[#a8ff53] border border-[#2e3238] text-[12px] rounded font-medium cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0e1017] hover:bg-[#141622] text-indigo-400 border border-[#1c1f2e] text-[12px] rounded font-medium cursor-pointer"
                     >
                       <DownloadSimpleIcon className="w-3.5 h-3.5" />
                       <span>Anki Export</span>
@@ -1059,7 +1059,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                     <button
                       onClick={() => setShowCreateCard(!showCreateCard)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#272a2e] hover:bg-[#343840] text-[#f3f4f6] text-[13px] rounded font-medium cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1c1f2e] hover:bg-[#343840] text-[#f3f4f6] text-[13px] rounded font-medium cursor-pointer"
                     >
                       <PlusIcon className="w-3.5 h-3.5" />
                       <span>New Card</span>
@@ -1068,39 +1068,39 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 </div>
 
                 {showCreateCard && (
-                  <form onSubmit={handleCreateFlashcard} className="bg-[#15171c] border border-[#2e3238] p-5 rounded space-y-3 shadow-xl animate-slide-up">
+                  <form onSubmit={handleCreateFlashcard} className="bg-[#0e1017] border border-[#1c1f2e] p-5 rounded space-y-3 shadow-xl animate-slide-up">
                     <div className="text-[14px] font-semibold text-[#f3f4f6]">Create Custom Flashcard</div>
                     <input
                       type="text"
                       value={newDeck}
                       onChange={(e) => setNewDeck(e.target.value)}
                       placeholder="Deck Name (e.g. Distributed Systems)..."
-                      className="w-full p-2.5 bg-[#1c1e21] border border-[#2e3238] rounded text-[#f3f4f6] text-[13px] focus:outline-none"
+                      className="w-full p-2.5 bg-[#141622] border border-[#1c1f2e] rounded text-[#f3f4f6] text-[13px] focus:outline-none"
                     />
                     <input
                       type="text"
                       value={newFront}
                       onChange={(e) => setNewFront(e.target.value)}
                       placeholder="Front Question / Concept..."
-                      className="w-full p-2.5 bg-[#1c1e21] border border-[#2e3238] rounded text-[#f3f4f6] text-[13px] focus:outline-none"
+                      className="w-full p-2.5 bg-[#141622] border border-[#1c1f2e] rounded text-[#f3f4f6] text-[13px] focus:outline-none"
                     />
                     <textarea
                       value={newBack}
                       onChange={(e) => setNewBack(e.target.value)}
                       placeholder="Back Answer / Explanation..."
-                      className="w-full p-2.5 bg-[#1c1e21] border border-[#2e3238] rounded text-[#f3f4f6] text-[13px] h-20 focus:outline-none"
+                      className="w-full p-2.5 bg-[#141622] border border-[#1c1f2e] rounded text-[#f3f4f6] text-[13px] h-20 focus:outline-none"
                     />
                     <div className="flex justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => setShowCreateCard(false)}
-                        className="px-3.5 py-1.5 bg-[#1c1e21] hover:bg-[#272a2e] text-[#a0a4af] text-[13px] rounded cursor-pointer"
+                        className="px-3.5 py-1.5 bg-[#141622] hover:bg-[#1c1f2e] text-[#a0a4af] text-[13px] rounded cursor-pointer"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="px-4 py-1.5 bg-[#a8ff53] hover:bg-[#baff6b] text-[#121317] font-semibold text-[13px] rounded cursor-pointer shadow-[0_0_10px_rgba(168,255,83,0.2)]"
+                        className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13px] rounded cursor-pointer shadow-xs"
                       >
                         Save Flashcard
                       </button>
@@ -1126,7 +1126,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         }`}
                       >
                         {/* Front Face */}
-                        <div className="absolute inset-0 bg-[#15171c] border-2 border-[#2e3238] hover:border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden shadow-2xl transition-colors text-center">
+                        <div className="absolute inset-0 bg-[#0e1017] border-2 border-[#1c1f2e] hover:border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden shadow-2xl transition-colors text-center">
                           <div className="text-[11px] font-mono text-[#9c9af2] uppercase tracking-wider">
                              Front • Question / Prompt
                           </div>
@@ -1140,7 +1140,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                         {/* Back Face */}
                         <div className="absolute inset-0 bg-[#1a1d22] border-2 border-[#9c9af2] rounded p-6 flex flex-col justify-between backface-hidden rotate-y-180 shadow-2xl text-center">
-                          <div className="text-[11px] font-mono text-[#a8ff53] uppercase tracking-wider">
+                          <div className="text-[11px] font-mono text-indigo-400 uppercase tracking-wider">
                              Back • Verified Answer
                           </div>
                           <p className="text-[15px] text-[#f3f4f6] leading-[1.6]">
@@ -1155,7 +1155,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                     {/* SM-2 Quality Rating */}
                     {isFlipped && !reviewFeedback && (
-                      <div className="bg-[#15171c] border border-[#2e3238] p-4 rounded text-center space-y-3 shadow-xl animate-slide-up">
+                      <div className="bg-[#0e1017] border border-[#1c1f2e] p-4 rounded text-center space-y-3 shadow-xl animate-slide-up">
                         <div className="text-[13px] text-[#a0a4af]">Rate your recall difficulty (SM-2 Quality 0-5):</div>
                         <div className="flex flex-wrap items-center justify-center gap-2">
                           {[
@@ -1171,8 +1171,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                               onClick={() => handleRateFlashcard(q)}
                               className={`px-3 py-1.5 rounded text-[12px] font-mono border transition-all cursor-pointer ${
                                 q >= 3
-                                  ? 'bg-[#1c1e21] border-[#a8ff53]/40 text-[#a8ff53] hover:bg-[#a8ff53] hover:text-[#121317]'
-                                  : 'bg-[#1c1e21] border-[#f43f5e]/40 text-[#f43f5e] hover:bg-[#f43f5e] hover:text-[#121317]'
+                                  ? 'bg-[#141622] border-indigo-500/40 text-indigo-400 hover:bg-indigo-600 hover:bg-indigo-500 hover:text-white'
+                                  : 'bg-[#141622] border-[#f43f5e]/40 text-[#f43f5e] hover:bg-[#f43f5e] hover:text-white'
                               }`}
                             >
                               {label}
@@ -1183,7 +1183,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     )}
 
                     {reviewFeedback && (
-                      <div className="p-3.5 bg-[#a8ff53]/15 border border-[#a8ff53] rounded text-[13px] text-[#a8ff53] text-center font-mono animate-slide-up">
+                      <div className="p-3.5 bg-indigo-600 hover:bg-indigo-500/15 border border-indigo-500 rounded text-[13px] text-indigo-400 text-center font-mono animate-slide-up">
                         {reviewFeedback}
                       </div>
                     )}
@@ -1197,7 +1197,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 5: Map-Reduce Summarizer */}
             {activeTab === 'summarizer' && (
               <div className="max-w-220 mx-auto py-2 space-y-5 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">
                       Map-Reduce Document Summarizer
@@ -1208,7 +1208,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   <button
                     onClick={handleGenerateSummary}
                     disabled={isSummarizing}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-[#a8ff53] text-[#121317] font-semibold text-[13px] rounded hover:bg-[#baff6b] cursor-pointer disabled:opacity-50 shadow-[0_0_12px_rgba(168,255,83,0.2)]"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13px] rounded hover:bg-indigo-500 cursor-pointer disabled:opacity-50 shadow-xs"
                   >
                     {isSummarizing ? <ArrowsClockwiseIcon className="w-4 h-4 animate-spin" /> : <SparkleIcon className="w-4 h-4" />}
                     <span>{isSummarizing ? 'Synthesizing...' : 'Run Map-Reduce'}</span>
@@ -1216,10 +1216,10 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 </div>
 
                 {summaryData && (
-                  <div className="bg-[#15171c] border border-[#2e3238] p-6 rounded space-y-4 shadow-xl">
-                    <div className="flex items-center justify-between text-[12px] text-[#a0a4af] border-b border-[#2e3238] pb-3">
+                  <div className="bg-[#0e1017] border border-[#1c1f2e] p-6 rounded space-y-4 shadow-xl">
+                    <div className="flex items-center justify-between text-[12px] text-[#a0a4af] border-b border-[#1c1f2e] pb-3">
                       <span>Document: <strong className="text-[#f3f4f6]">{summaryData.documentName}</strong></span>
-                      <span className="text-[#a8ff53] font-mono">{summaryData.wordCount} words • Status: {summaryData.status}</span>
+                      <span className="text-indigo-400 font-mono">{summaryData.wordCount} words • Status: {summaryData.status}</span>
                     </div>
 
                     <div className="text-[14.5px] leading-[1.7] text-[#f3f4f6] whitespace-pre-wrap">
@@ -1233,7 +1233,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 6: Audio Podcast with Soundwave */}
             {activeTab === 'podcast' && (
               <div className="max-w-220 mx-auto py-2 space-y-5 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">
                       2-Speaker AI Study Podcast
@@ -1246,8 +1246,8 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       onClick={handleTogglePlayPodcast}
                       className={`flex items-center gap-1.5 px-3.5 py-1.5 font-semibold text-[13px] rounded transition-colors cursor-pointer ${
                         isPlayingPodcast
-                          ? 'bg-[#a8ff53] text-[#121317]'
-                          : 'bg-[#272a2e] text-[#a8ff53] hover:bg-[#343840]'
+                          ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                          : 'bg-[#1c1f2e] text-indigo-400 hover:bg-[#343840]'
                       }`}
                     >
                       <PlayIcon className="w-3.5 h-3.5 fill-current" />
@@ -1265,7 +1265,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         }
                       }}
                       disabled={isGeneratingPodcast}
-                      className="flex items-center gap-1.5 px-4 py-1.5 bg-[#a8ff53] text-[#121317] font-semibold text-[13px] rounded hover:bg-[#baff6b] cursor-pointer disabled:opacity-50 shadow-[0_0_12px_rgba(168,255,83,0.2)]"
+                      className="flex items-center gap-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13px] rounded hover:bg-indigo-500 cursor-pointer disabled:opacity-50 shadow-xs"
                     >
                       {isGeneratingPodcast ? <ArrowsClockwiseIcon className="w-4 h-4 animate-spin" /> : <SpeakerHighIcon className="w-4 h-4" />}
                       <span>Generate Episode</span>
@@ -1275,18 +1275,18 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                 {/* Animated Soundwave Equalizer */}
                 {isPlayingPodcast && (
-                  <div className="flex items-center justify-center gap-1.5 h-12 bg-[#15171c] border border-[#2e3238] rounded p-2">
+                  <div className="flex items-center justify-center gap-1.5 h-12 bg-[#0e1017] border border-[#1c1f2e] rounded p-2">
                     {[1, 2, 3, 4, 5, 2, 4, 1, 3, 5, 2, 4, 1].map((animIdx, idx) => (
-                      <div key={idx} className={`w-1.5 bg-[#a8ff53] rounded-full animate-equalizer-${animIdx}`} />
+                      <div key={idx} className={`w-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-full animate-equalizer-${animIdx}`} />
                     ))}
                   </div>
                 )}
 
                 {podcastData && (
-                  <div className="bg-[#15171c] border border-[#2e3238] p-6 rounded space-y-4 shadow-xl">
+                  <div className="bg-[#0e1017] border border-[#1c1f2e] p-6 rounded space-y-4 shadow-xl">
                     <div className="flex items-center justify-between">
                       <h4 className="font-bold text-[18px] text-[#f3f4f6]">{podcastData.title}</h4>
-                      <span className="text-[12.5px] text-[#a8ff53] font-mono">Duration: {podcastData.durationMinutes} mins</span>
+                      <span className="text-[12.5px] text-indigo-400 font-mono">Duration: {podcastData.durationMinutes} mins</span>
                     </div>
 
                     <div className="space-y-3 pt-2">
@@ -1295,11 +1295,11 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                           key={`podcast-turn-${turn.speaker}-${turn.text.slice(0, 15)}`}
                           className={`p-3.5 rounded border text-[13.5px] leading-relaxed transition-all ${
                             activeSpeakerIdx === i
-                              ? 'bg-[#1c1e21] border-[#a8ff53] shadow-[0_0_15px_rgba(168,255,83,0.15)] scale-[1.01]'
-                              : 'bg-[#1c1e21] border-[#2e3238]'
+                              ? 'bg-[#141622] border-indigo-500 shadow-md scale-[1.01]'
+                              : 'bg-[#141622] border-[#1c1f2e]'
                           }`}
                         >
-                          <span className={`font-semibold font-mono mr-2 ${turn.speaker === 'Alex' ? 'text-[#a8ff53]' : 'text-[#9c9af2]'}`}>
+                          <span className={`font-semibold font-mono mr-2 ${turn.speaker === 'Alex' ? 'text-indigo-400' : 'text-[#9c9af2]'}`}>
                             [{turn.speaker}]:
                           </span>
                           <span className="text-[#f3f4f6]">{turn.text}</span>
@@ -1314,7 +1314,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 7: Knowledge Graph */}
             {activeTab === 'knowledge' && (
               <div className="max-w-220 mx-auto py-2 space-y-4 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">
                       Concept Knowledge Graph
@@ -1324,24 +1324,24 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 </div>
 
                 {knowledgeGraph && (
-                  <div className="bg-[#15171c] border border-[#2e3238] p-6 rounded space-y-4 shadow-xl">
-                    <div className="text-[13px] font-mono text-[#a8ff53] font-semibold">Extracted Academic Entity Nodes:</div>
+                  <div className="bg-[#0e1017] border border-[#1c1f2e] p-6 rounded space-y-4 shadow-xl">
+                    <div className="text-[13px] font-mono text-indigo-400 font-semibold">Extracted Academic Entity Nodes:</div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {knowledgeGraph.nodes.map(n => (
-                        <div key={n.id} className="p-3.5 bg-[#1c1e21] border border-[#2e3238] rounded text-[13px]">
+                        <div key={n.id} className="p-3.5 bg-[#141622] border border-[#1c1f2e] rounded text-[13px]">
                           <div className="font-semibold text-[#f3f4f6] mb-1">{n.label}</div>
                           <div className="text-[11px] text-[#a0a4af] font-mono">Group: {n.group}</div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="pt-3 border-t border-[#2e3238]">
+                    <div className="pt-3 border-t border-[#1c1f2e]">
                       <div className="text-[13px] font-mono text-[#9c9af2] font-semibold mb-2">Directional Causal Relationships:</div>
                       <div className="space-y-1.5 text-[12px] text-[#a0a4af]">
                         {knowledgeGraph.edges.map((e, idx) => (
                           <div key={`kg-edge-${e.source}-${e.target}-${idx}`} className="flex items-center gap-2 font-mono">
                             <span className="text-[#f3f4f6] font-medium">{e.source}</span>
-                            <span className="text-[#a8ff53]">──({e.relationship})──►</span>
+                            <span className="text-indigo-400">──({e.relationship})──►</span>
                             <span className="text-[#f3f4f6] font-medium">{e.target}</span>
                           </div>
                         ))}
@@ -1355,7 +1355,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 8: Cornell Note Outline */}
             {activeTab === 'outline' && outlineData && (
               <div className="max-w-220 mx-auto py-2 space-y-4 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">{outlineData.title}</h3>
                     <span className="text-[12.5px] text-[#a0a4af] font-mono">GET /api/notes/{selectedDocId}/outline</span>
@@ -1363,7 +1363,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   <button
                     type="button"
                     onClick={() => TeachMeAPI.export.downloadMarkdownOutline(outlineData)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#a8ff53] text-[#121317] font-semibold text-[13px] rounded cursor-pointer shadow-[0_0_12px_rgba(168,255,83,0.2)]"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13px] rounded cursor-pointer shadow-xs"
                   >
                     <DownloadSimpleIcon className="w-3.5 h-3.5" weight="bold" />
                     <span>Download .MD</span>
@@ -1372,13 +1372,13 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                 <div className="space-y-4">
                   {outlineData.sections.map((sec) => (
-                    <div key={`outline-sec-${sec.heading}`} className="p-4 bg-[#15171c] border border-[#2e3238] rounded space-y-2.5 shadow-lg">
+                    <div key={`outline-sec-${sec.heading}`} className="p-4 bg-[#0e1017] border border-[#1c1f2e] rounded space-y-2.5 shadow-lg">
                       <h4 className="font-bold text-[16px] text-[#f3f4f6]">{sec.heading}</h4>
                       <ul className="list-disc list-inside text-[13.5px] text-[#b5b8c0] space-y-1.5 leading-[1.6]">
                         {sec.keyPoints.map((pt) => <li key={`outline-pt-${sec.heading}-${pt}`}>{pt}</li>)}
                       </ul>
                       {sec.formulas && (
-                        <div className="p-3 bg-[#1c1e21] border border-[#2e3238] rounded font-mono text-[12.5px] text-[#a8ff53]">
+                        <div className="p-3 bg-[#141622] border border-[#1c1f2e] rounded font-mono text-[12.5px] text-indigo-400">
                           {sec.formulas.map((f) => <div key={`outline-formula-${sec.heading}-${f}`}>Reaction / Formula: {f}</div>)}
                         </div>
                       )}
@@ -1391,7 +1391,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 9: Study Plan */}
             {activeTab === 'study-plan' && studyPlanData && (
               <div className="max-w-240 mx-auto py-2 space-y-4 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">{studyPlanData.planTitle}</h3>
                     <span className="text-[12.5px] text-[#a0a4af] font-mono">POST /api/study-plan/generate • {studyPlanData.totalDays} Days</span>
@@ -1400,9 +1400,9 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {studyPlanData.schedule.map((day) => (
-                    <div key={day.day} className="p-4 bg-[#15171c] border border-[#2e3238] rounded space-y-3 shadow-lg">
+                    <div key={day.day} className="p-4 bg-[#0e1017] border border-[#1c1f2e] rounded space-y-3 shadow-lg">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-mono text-[#a8ff53] bg-[#1c1e21] px-2 py-0.5 rounded border border-[#2e3238]">Day {day.day}</span>
+                        <span className="text-[11px] font-mono text-indigo-400 bg-[#141622] px-2 py-0.5 rounded border border-[#1c1f2e]">Day {day.day}</span>
                         <span className="text-[11.5px] text-[#a0a4af] flex items-center gap-1 font-mono"><ClockIcon className="w-3.5 h-3.5" /> {day.estimatedHours}h</span>
                       </div>
                       <div className="font-semibold text-[14px] text-[#f3f4f6]">{day.focusTopic}</div>
@@ -1418,7 +1418,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 10: Hybrid Search */}
             {activeTab === 'search' && (
               <div className="max-w-220 mx-auto py-2 space-y-4 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">Hybrid Vector & Re-Rank Search</h3>
                     <span className="text-[12.5px] text-[#a0a4af] font-mono">POST /api/search/batch</span>
@@ -1430,19 +1430,19 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-1 px-4 py-2.5 bg-[#15171c] border border-[#2e3238] rounded text-[14px] text-[#f3f4f6] focus:outline-none"
+                    className="flex-1 px-4 py-2.5 bg-[#0e1017] border border-[#1c1f2e] rounded text-[14px] text-[#f3f4f6] focus:outline-none"
                   />
-                  <button type="submit" className="px-5 py-2.5 bg-[#a8ff53] text-[#121317] font-semibold text-[13.5px] rounded hover:bg-[#baff6b] cursor-pointer shadow-[0_0_12px_rgba(168,255,83,0.2)]">
+                  <button type="submit" className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13.5px] rounded hover:bg-indigo-500 cursor-pointer shadow-xs">
                     {isSearching ? 'Searching...' : 'Search'}
                   </button>
                 </form>
 
                 <div className="space-y-3 pt-2">
                   {searchResults.map((res) => (
-                    <div key={`search-chunk-${res.documentId}-${res.documentName}-${res.text.slice(0, 15)}`} className="p-4 bg-[#15171c] border border-[#2e3238] rounded space-y-2 shadow-lg">
+                    <div key={`search-chunk-${res.documentId}-${res.documentName}-${res.text.slice(0, 15)}`} className="p-4 bg-[#0e1017] border border-[#1c1f2e] rounded space-y-2 shadow-lg">
                       <div className="flex items-center justify-between text-[12px] font-mono">
                         <span className="font-semibold text-[#f3f4f6]">{res.documentName}</span>
-                        <span className="text-[#a8ff53] bg-[#a8ff53]/10 px-2 py-0.5 rounded border border-[#a8ff53]/20">ReRank: {(res.reRankScore * 100).toFixed(1)}%</span>
+                        <span className="text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-500/30">ReRank: {(res.reRankScore * 100).toFixed(1)}%</span>
                       </div>
                       <p className="text-[13.5px] leading-[1.6] text-[#b5b8c0]">"{res.text}"</p>
                     </div>
@@ -1454,7 +1454,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 11: Exam Readiness */}
             {activeTab === 'readiness' && readinessData && (
               <div className="max-w-200 mx-auto py-2 space-y-4 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">
                       AI Exam Readiness Score
@@ -1463,24 +1463,24 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                   </div>
                 </div>
 
-                <div className="bg-[#15171c] border border-[#2e3238] p-6 rounded space-y-5 shadow-2xl">
+                <div className="bg-[#0e1017] border border-[#1c1f2e] p-6 rounded space-y-5 shadow-2xl">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-[38px] font-bold text-[#a8ff53]">
+                      <div className="text-[38px] font-bold text-indigo-400">
                         {readinessData.readinessScore}%
                       </div>
                       <span className="text-[12.5px] text-[#a0a4af] font-mono">Preparedness Status: {readinessData.status}</span>
                     </div>
 
-                    <div className="p-3.5 bg-[#1c1e21] rounded border border-[#2e3238] text-right">
+                    <div className="p-3.5 bg-[#141622] rounded border border-[#1c1f2e] text-right">
                       <div className="text-[11px] text-[#a0a4af] font-mono">Diagnostic Engine</div>
                       <div className="text-[14px] font-bold text-[#f3f4f6]">Verified Vector RAG</div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                    <div className="p-4 bg-[#1c1e21] rounded border border-[#a8ff53]/30">
-                      <div className="text-[13px] font-semibold text-[#a8ff53] mb-2 font-mono"> Mastered Concepts:</div>
+                    <div className="p-4 bg-[#141622] rounded border border-indigo-500/40">
+                      <div className="text-[13px] font-semibold text-indigo-400 mb-2 font-mono"> Mastered Concepts:</div>
                       <ul className="list-disc list-inside text-[12.5px] text-[#f3f4f6] space-y-1">
                         {readinessData.masteredTopics.map((t) => (
                           <li key={`mastered-topic-${t}`}>{t}</li>
@@ -1488,7 +1488,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       </ul>
                     </div>
 
-                    <div className="p-4 bg-[#1c1e21] rounded border border-[#f43f5e]/30">
+                    <div className="p-4 bg-[#141622] rounded border border-[#f43f5e]/30">
                       <div className="text-[13px] font-semibold text-[#f43f5e] mb-2 font-mono"> Review Gap Recommendations:</div>
                       <ul className="list-disc list-inside text-[12.5px] text-[#f3f4f6] space-y-1">
                         {readinessData.gapTopics.map((t) => (
@@ -1504,7 +1504,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 12: Group Study Workspaces */}
             {activeTab === 'workspaces' && (
               <div className="max-w-220 mx-auto py-2 space-y-4 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">Group Study Workspaces</h3>
                     <span className="text-[12.5px] text-[#a0a4af] font-mono">POST /api/workspaces/create</span>
@@ -1517,19 +1517,19 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     value={newWorkspaceName}
                     onChange={(e) => setNewWorkspaceName(e.target.value)}
                     placeholder="New room name (e.g. Distributed AI Study Lab)..."
-                    className="flex-1 px-4 py-2.5 bg-[#15171c] border border-[#2e3238] rounded text-[13.5px] text-[#f3f4f6] focus:outline-none"
+                    className="flex-1 px-4 py-2.5 bg-[#0e1017] border border-[#1c1f2e] rounded text-[13.5px] text-[#f3f4f6] focus:outline-none"
                   />
-                  <button type="submit" className="px-5 py-2.5 bg-[#a8ff53] text-[#121317] font-semibold text-[13px] rounded hover:bg-[#baff6b] cursor-pointer shadow-[0_0_12px_rgba(168,255,83,0.2)]">
+                  <button type="submit" className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13px] rounded hover:bg-indigo-500 cursor-pointer shadow-xs">
                     Create Room
                   </button>
                 </form>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   {workspacesList.map((ws) => (
-                    <div key={ws.id} className="p-4 bg-[#15171c] border border-[#2e3238] rounded space-y-3 shadow-lg">
+                    <div key={ws.id} className="p-4 bg-[#0e1017] border border-[#1c1f2e] rounded space-y-3 shadow-lg">
                       <div className="font-bold text-[16px] text-[#f3f4f6]">{ws.name}</div>
                       <p className="text-[13px] text-[#b5b8c0]">{ws.description}</p>
-                      <div className="pt-2.5 border-t border-[#2e3238] flex items-center justify-between text-[11.5px] text-[#a8ff53] font-mono">
+                      <div className="pt-2.5 border-t border-[#1c1f2e] flex items-center justify-between text-[11.5px] text-indigo-400 font-mono">
                         <span>{ws.activeMembers.length} Active Members</span>
                         <button
                           type="button"
@@ -1548,7 +1548,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
             {/* TAB 13: Student AI Model Settings (Ollama / Custom API Keys) */}
             {activeTab === 'settings' && (
               <div className="max-w-190 mx-auto py-2 space-y-5 animate-fade-in">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2e3238]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#1c1f2e]">
                   <div>
                     <h3 className="font-bold text-[22px] text-[#f3f4f6]">
                       AI Engine & Provider Settings
@@ -1573,7 +1573,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         setApiKeySaveFeedback('Settings applied & saved to browser storage!');
                         setTimeout(() => setApiKeySaveFeedback(null), 3000);
                       }}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-[#a8ff53] text-[#121317] font-semibold text-[13px] rounded hover:bg-[#baff6b] cursor-pointer shadow-[0_0_12px_rgba(168,255,83,0.2)]"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[13px] rounded hover:bg-indigo-500 cursor-pointer shadow-xs"
                     >
                       <span>Save Settings</span>
                     </button>
@@ -1581,13 +1581,13 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 </div>
 
                 {apiKeySaveFeedback && (
-                  <div className="p-3 bg-[#a8ff53]/15 border border-[#a8ff53] rounded text-[13px] text-[#a8ff53] font-mono animate-slide-up">
+                  <div className="p-3 bg-indigo-600 hover:bg-indigo-500/15 border border-indigo-500 rounded text-[13px] text-indigo-400 font-mono animate-slide-up">
                     {apiKeySaveFeedback}
                   </div>
                 )}
 
                 {/* AI Provider Switcher */}
-                <div className="bg-[#15171c] border border-[#2e3238] rounded p-5 space-y-4 shadow-xl">
+                <div className="bg-[#0e1017] border border-[#1c1f2e] rounded p-5 space-y-4 shadow-xl">
                   <div className="font-bold text-[16px] text-[#f3f4f6]">Select AI Model Provider</div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {[
@@ -1608,12 +1608,12 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         }}
                         className={`p-3 rounded border text-left transition-all cursor-pointer ${
                           aiProvider === prov.id
-                            ? 'bg-[#1c1e21] border-[#a8ff53] shadow-[0_0_12px_rgba(168,255,83,0.15)]'
-                            : 'bg-[#121317] border-[#2e3238] hover:border-[#424750]'
+                            ? 'bg-[#141622] border-indigo-500 shadow-xs'
+                            : 'bg-[#0e1017] border-[#1c1f2e] hover:border-[#424750]'
                         }`}
                       >
                         <div className="text-[13px] font-semibold text-[#f3f4f6]">{prov.label}</div>
-                        <div className="text-[11px] font-mono text-[#a8ff53]">{prov.badge}</div>
+                        <div className="text-[11px] font-mono text-indigo-400">{prov.badge}</div>
                       </button>
                     ))}
                   </div>
@@ -1621,18 +1621,18 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
 
                 {/* Provider-specific details */}
                 {aiProvider === 'ollama' ? (
-                  <div className="bg-[#15171c] border border-[#2e3238] rounded p-5 space-y-4 shadow-xl">
+                  <div className="bg-[#0e1017] border border-[#1c1f2e] rounded p-5 space-y-4 shadow-xl">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-[16px] text-[#f3f4f6]">Local Ollama Daemon URL</span>
-                        <span className="px-2 py-0.5 rounded bg-[#1c1e21] border border-[#2e3238] text-[11px] font-mono text-[#a8ff53]">
+                        <span className="px-2 py-0.5 rounded bg-[#141622] border border-[#1c1f2e] text-[11px] font-mono text-indigo-400">
                           Status: {ollamaStatus}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={handleTestOllama}
-                        className="text-[12px] text-[#a8ff53] font-mono hover:underline cursor-pointer"
+                        className="text-[12px] text-indigo-400 font-mono hover:underline cursor-pointer"
                       >
                         Test Connection ({ollamaLatency}ms)
                       </button>
@@ -1641,14 +1641,14 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                       type="text"
                       value={ollamaUrl}
                       onChange={(e) => setOllamaUrl(e.target.value)}
-                      className="w-full p-2.5 bg-[#1c1e21] border border-[#2e3238] rounded text-[#f3f4f6] text-[13px] font-mono focus:outline-none"
+                      className="w-full p-2.5 bg-[#141622] border border-[#1c1f2e] rounded text-[#f3f4f6] text-[13px] font-mono focus:outline-none"
                     />
                     <div>
                       <label className="block text-[#a0a4af] text-[12px] font-mono mb-1">Select Local Model</label>
                       <select
                         value={selectedModel}
                         onChange={(e) => setSelectedModel(e.target.value)}
-                        className="w-full p-2.5 bg-[#1c1e21] border border-[#2e3238] rounded text-[#f3f4f6] text-[13px] font-mono focus:outline-none"
+                        className="w-full p-2.5 bg-[#141622] border border-[#1c1f2e] rounded text-[#f3f4f6] text-[13px] font-mono focus:outline-none"
                       >
                         {modelsList.length > 0 ? (
                           modelsList.map((m) => (
@@ -1665,7 +1665,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-[#15171c] border border-[#2e3238] rounded p-5 space-y-4 shadow-xl">
+                  <div className="bg-[#0e1017] border border-[#1c1f2e] rounded p-5 space-y-4 shadow-xl">
                     <span className="font-bold text-[16px] text-[#f3f4f6]">{getProviderConfigHeader(aiProvider)}</span>
                     <div className="space-y-3">
                       <div>
@@ -1684,7 +1684,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                           value={customApiKey}
                           onChange={(e) => setCustomApiKey(e.target.value)}
                           placeholder="sk-..."
-                          className="w-full p-2.5 bg-[#1c1e21] border border-[#2e3238] rounded text-[#f3f4f6] text-[13px] font-mono focus:outline-none"
+                          className="w-full p-2.5 bg-[#141622] border border-[#1c1f2e] rounded text-[#f3f4f6] text-[13px] font-mono focus:outline-none"
                         />
                       </div>
                       <div>
@@ -1694,7 +1694,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                           value={customModelName}
                           onChange={(e) => setCustomModelName(e.target.value)}
                           placeholder={getTargetModelPlaceholder(aiProvider)}
-                          className="w-full p-2.5 bg-[#1c1e21] border border-[#2e3238] rounded text-[#f3f4f6] text-[13px] font-mono focus:outline-none"
+                          className="w-full p-2.5 bg-[#141622] border border-[#1c1f2e] rounded text-[#f3f4f6] text-[13px] font-mono focus:outline-none"
                         />
                       </div>
                     </div>
@@ -1702,7 +1702,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                 )}
 
                 {/* Temperature & Top-K Controls */}
-                <div className="bg-[#15171c] border border-[#2e3238] rounded p-5 space-y-4 shadow-xl">
+                <div className="bg-[#0e1017] border border-[#1c1f2e] rounded p-5 space-y-4 shadow-xl">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <div className="flex items-center justify-between mb-1">
@@ -1717,7 +1717,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         step="0.1"
                         value={temperature}
                         onChange={(e) => setTemperature(e.target.value)}
-                        className="w-full accent-[#a8ff53]"
+                        className="w-full accent-indigo-500"
                       />
                     </div>
 
@@ -1734,7 +1734,7 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
                         step="1"
                         value={topK}
                         onChange={(e) => setTopK(e.target.value)}
-                        className="w-full accent-[#a8ff53]"
+                        className="w-full accent-indigo-500"
                       />
                     </div>
                   </div>
@@ -1748,14 +1748,14 @@ export const TeachMeStudioModal: React.FC<TeachMeStudioModalProps> = ({ isOpen, 
         </div>
 
         {/* Modal Bottom Footer */}
-        <div className="p-3 bg-[#15171c] border-t border-[#2e3238] flex items-center justify-between text-[12px] text-[#a0a4af] font-mono">
+        <div className="p-3 bg-[#0e1017] border-t border-[#1c1f2e] flex items-center justify-between text-[12px] text-[#a0a4af] font-mono">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#a8ff53] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span>TeachMe AI Study Platform • PgVector & Ollama Integrated</span>
           </div>
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 bg-[#272a2e] hover:bg-[#343840] text-[#f3f4f6] font-medium rounded cursor-pointer"
+            className="px-3.5 py-1.5 bg-[#1c1f2e] hover:bg-[#343840] text-[#f3f4f6] font-medium rounded cursor-pointer"
           >
             Close Studio
           </button>

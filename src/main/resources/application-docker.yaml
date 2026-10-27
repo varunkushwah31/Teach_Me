@@ -27,12 +27,12 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        format_sql: false
+        "[format_sql]": false
         jdbc:
-          fetch_size: 50
-          batch_size: 10
-        order_inserts: true
-        order_updates: true
+          "[fetch_size]": 50
+          "[batch_size]": 10
+        "[order_inserts]": true
+        "[order_updates]": true
     show-sql: false
     open-in-view: false
 
@@ -61,7 +61,6 @@ server:
     connection-timeout: 10000ms
     keep-alive-timeout: 60000ms
     max-http-form-post-size: 50MB
-    max-http-request-header-size: 64KB
 
 management:
   endpoints:
@@ -98,5 +97,3 @@ application:
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
-
-

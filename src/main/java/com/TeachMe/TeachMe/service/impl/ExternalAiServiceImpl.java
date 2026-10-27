@@ -169,7 +169,7 @@ public class ExternalAiServiceImpl implements ExternalAiService {
                 .bodyToFlux(String.class)
                 .timeout(Duration.ofSeconds(60))
                 .flatMap(chunk -> Flux.fromArray(chunk.split("\n")))
-                .map(String::trim)
+                .map(s -> s.trim())
                 .filter(line -> line.startsWith("data:"))
                 .map(line -> line.substring(5).trim())
                 .filter(payload -> !payload.isEmpty() && !"[DONE]".equals(payload))
@@ -218,7 +218,7 @@ public class ExternalAiServiceImpl implements ExternalAiService {
                 .bodyToFlux(String.class)
                 .timeout(Duration.ofSeconds(60))
                 .flatMap(chunk -> Flux.fromArray(chunk.split("\n")))
-                .map(String::trim)
+                .map(s -> s.trim())
                 .filter(line -> line.startsWith("data:"))
                 .map(line -> line.substring(5).trim())
                 .filter(payload -> !payload.isEmpty())
@@ -349,13 +349,13 @@ public class ExternalAiServiceImpl implements ExternalAiService {
                 String testUrl = "https://generativelanguage.googleapis.com/v1beta/models?key=" + apiKey;
                 webClient.get().uri(testUrl).retrieve().toBodilessEntity().block(Duration.ofSeconds(8));
                 long latency = System.currentTimeMillis() - start;
-                List<String> models = getAvailableModels(provider, baseUrl, apiKey).stream().map(AiModelInfoDTO::id).toList();
+                List<String> models = getAvailableModels(provider, baseUrl, apiKey).stream().map(m -> m.id()).toList();
                 return AiConnectionTestResultDTO.success(provider, "Connected successfully to Google Gemini API", latency, models);
             }
 
             if ("anthropic".equalsIgnoreCase(provider)) {
                 if (apiKey.startsWith("sk-ant-")) {
-                    List<String> models = getAvailableModels(provider, baseUrl, apiKey).stream().map(AiModelInfoDTO::id).toList();
+                    List<String> models = getAvailableModels(provider, baseUrl, apiKey).stream().map(m -> m.id()).toList();
                     return AiConnectionTestResultDTO.success(provider, "Anthropic API key format verified and ready", 15L, models);
                 }
                 return AiConnectionTestResultDTO.failure(provider, "Invalid Anthropic API key format (must start with sk-ant-)");
@@ -376,7 +376,7 @@ public class ExternalAiServiceImpl implements ExternalAiService {
 
             List<String> liveModels = parseModelIds(response);
             if (liveModels.isEmpty()) {
-                liveModels = getAvailableModels(provider, baseUrl, apiKey).stream().map(AiModelInfoDTO::id).toList();
+                liveModels = getAvailableModels(provider, baseUrl, apiKey).stream().map(m -> m.id()).toList();
             }
 
             return AiConnectionTestResultDTO.success(provider, "Connected successfully to " + provider.toUpperCase() + " API", latency, liveModels);
@@ -397,7 +397,7 @@ public class ExternalAiServiceImpl implements ExternalAiService {
                     .block(Duration.ofSeconds(5));
 
             long latency = System.currentTimeMillis() - start;
-            List<String> models = getAvailableModels("ollama", cleanUrl, "").stream().map(AiModelInfoDTO::id).toList();
+            List<String> models = getAvailableModels("ollama", cleanUrl, "").stream().map(m -> m.id()).toList();
             return AiConnectionTestResultDTO.success("ollama", "Connected to local Ollama daemon", latency, models);
         } catch (Exception e) {
             return AiConnectionTestResultDTO.failure("ollama", "Ollama daemon unreachable at " + cleanUrl + ": " + e.getMessage());

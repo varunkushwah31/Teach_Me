@@ -11,23 +11,40 @@ import java.util.Map;
 @Service
 public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
 
+    private static final String NODE_1 = "node-1";
+    private static final String NODE_2 = "node-2";
+    private static final String KEY_LABEL = "label";
+    private static final String KEY_CATEGORY = "category";
+    private static final String KEY_IMPORTANCE = "importance";
+    private static final String KEY_SOURCE = "source";
+    private static final String KEY_TARGET = "target";
+    private static final String KEY_RELATION = "relation";
+
+    private Map<String, Object> node(String id, String label, String category, String importance) {
+        return Map.of("id", id, KEY_LABEL, label, KEY_CATEGORY, category, KEY_IMPORTANCE, importance);
+    }
+
+    private Map<String, Object> edge(String source, String target, String relation) {
+        return Map.of(KEY_SOURCE, source, KEY_TARGET, target, KEY_RELATION, relation);
+    }
+
     @Override
     public Map<String, Object> extractKnowledgeGraph(Long documentId) {
         log.info("Extracting concept knowledge graph for document ID {}", documentId);
 
         List<Map<String, Object>> nodes = List.of(
-                Map.of("id", "node-1", "label", "Schrödinger Equation", "category", "Core Concept", "importance", "HIGH"),
-                Map.of("id", "node-2", "label", "Wavefunction |Ψ(x,t)|", "category", "Mathematical Entity", "importance", "HIGH"),
-                Map.of("id", "node-3", "label", "Born Probability Rule", "category", "Interpretation", "importance", "MEDIUM"),
-                Map.of("id", "node-4", "label", "Heisenberg Uncertainty", "category", "Principle", "importance", "HIGH"),
-                Map.of("id", "node-5", "label", "Hamiltonian Operator H", "category", "Operator", "importance", "MEDIUM")
+                node(NODE_1, "Schrödinger Equation", "Core Concept", "HIGH"),
+                node(NODE_2, "Wavefunction |Ψ(x,t)|", "Mathematical Entity", "HIGH"),
+                node("node-3", "Born Probability Rule", "Interpretation", "MEDIUM"),
+                node("node-4", "Heisenberg Uncertainty", "Principle", "HIGH"),
+                node("node-5", "Hamiltonian Operator H", "Operator", "MEDIUM")
         );
 
         List<Map<String, Object>> edges = List.of(
-                Map.of("source", "node-1", "target", "node-2", "relation", "governs evolution of"),
-                Map.of("source", "node-2", "target", "node-3", "relation", "squared yields"),
-                Map.of("source", "node-1", "target", "node-5", "relation", "uses total energy operator"),
-                Map.of("source", "node-4", "target", "node-2", "relation", "constrains conjugate variables of")
+                edge(NODE_1, NODE_2, "governs evolution of"),
+                edge(NODE_2, "node-3", "squared yields"),
+                edge(NODE_1, "node-5", "uses total energy operator"),
+                edge("node-4", NODE_2, "constrains conjugate variables of")
         );
 
         return Map.of(

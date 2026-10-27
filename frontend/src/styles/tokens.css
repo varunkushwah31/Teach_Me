@@ -1,92 +1,85 @@
 :root {
-  /* Colors */
-  --color-slate-canvas: #1c1e21;
-  --color-ink-well: #121317;
-  --color-graphite-hairline: #3b3e45;
-  --color-steel-border: #272a2e;
-  --color-ash-text: #b5b8c0;
-  --color-fog-text: #878c99;
+  /* Colors - Electric Indigo & Slate Obsidian System */
+  --color-slate-canvas: #08090d;
+  --color-ink-well: #050608;
+  --color-graphite-hairline: #1c1f2e;
+  --color-steel-border: #282c40;
+  --color-ash-text: #9da3b8;
+  --color-fog-text: #61677d;
   --color-cloud-text: #d7d9dd;
-  --color-bone-text: #e5e7eb;
-  --color-signal-lime: #a8ff53;
-  --color-syntax-violet: #9c9af2;
-  --color-syntax-pink: #fa3abf;
-  --color-event-violet: #7655fd;
-  --color-loop-green: #afec73;
-  --color-key-lime: #d9f07c;
+  --color-bone-text: #f4f5f9;
+  --color-signal-indigo: #6366f1;
+  --color-signal-emerald: #10b981;
+  --color-syntax-violet: #818cf8;
+  --color-syntax-pink: #c084fc;
+  --color-event-violet: #6366f1;
+  --color-loop-green: #34d399;
+  --color-key-indigo: #a5b4fc;
   --color-tag-magenta: #e888f8;
   --color-mute-red: #f43f5e;
 
   /* Typography — Font Families */
-  --font-satoshi: 'Satoshi', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-geist: 'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-geist-mono: 'Geist Mono', 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-geist: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Geist Mono', ui-monospace, monospace;
 
   /* Typography — Scale */
-  --text-caption: 14px;
-  --leading-caption: 1.43;
-  --text-body: 16px;
-  --leading-body: 1.56;
-  --text-body-lg: 18px;
+  --text-caption: 12px;
+  --leading-caption: 1.4;
+  --text-body: 14px;
+  --leading-body: 1.6;
+  --text-body-lg: 16px;
   --leading-body-lg: 1.5;
-  --text-subheading: 20px;
+  --text-subheading: 18px;
   --leading-subheading: 1.4;
-  --tracking-subheading: 0.4px;
-  --text-heading-sm: 24px;
-  --leading-heading-sm: 1.38;
-  --text-heading: 30px;
-  --leading-heading: 1.33;
+  --tracking-subheading: -0.01em;
+  --text-heading-sm: 22px;
+  --leading-heading-sm: 1.3;
+  --text-heading: 28px;
+  --leading-heading: 1.25;
   --text-heading-lg: 36px;
-  --leading-heading-lg: 1.2;
-  --tracking-heading-lg: 1.8px;
+  --leading-heading-lg: 1.15;
+  --tracking-heading-lg: -0.02em;
   --text-display: 48px;
-  --leading-display: 1.11;
-  --tracking-display: 2.4px;
-  --text-hero: 60px;
-  --leading-hero: 1;
-  --tracking-hero: 3px;
+  --leading-display: 1.1;
+  --tracking-display: -0.03em;
+  --text-hero: 56px;
+  --leading-hero: 1.05;
+  --tracking-hero: -0.03em;
 
   /* Typography — Weights */
-  --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 800;
 
   /* Spacing */
-  --spacing-unit: 4px;
   --spacing-4: 4px;
   --spacing-8: 8px;
   --spacing-12: 12px;
   --spacing-16: 16px;
   --spacing-24: 24px;
-  --spacing-28: 28px;
   --spacing-32: 32px;
-  --spacing-40: 40px;
   --spacing-48: 48px;
   --spacing-64: 64px;
-  --spacing-96: 96px;
-  --spacing-160: 160px;
-  --spacing-192: 192px;
 
   /* Layout */
-  --page-max-width: 1200px;
+  --page-max-width: 1280px;
   --section-gap: 80px;
   --card-padding: 24px;
-  --element-gap: 8px;
 
   /* Border Radius */
-  --radius-md: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
 
-  /* Named Radii */
-  --radius-cards: 4px;
-  --radius-pills: 9999px;
-  --radius-inputs: 4px;
-  --radius-buttons: 4px;
-
   /* Surfaces */
-  --surface-canvas: #1c1e21;
-  --surface-inset: #121317;
-  --surface-card: #1c1e21;
-  --surface-accent: #a8ff53;
+  --surface-canvas: #08090d;
+  --surface-inset: #0e1017;
+  --surface-card: #141622;
+  --surface-elevated: #191c2b;
+  --surface-accent: #6366f1;
 }
